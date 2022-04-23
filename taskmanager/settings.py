@@ -80,7 +80,7 @@ WSGI_APPLICATION = "taskmanager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "http_only_auth",
+        "NAME": "taskmanager",
         "PASSWORD": "1234",
         "USER": "postgres",
         "HOST": "localhost",
