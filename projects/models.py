@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-from users.models import User
 
 
 class Project(models.Model):
@@ -19,15 +18,21 @@ class Project(models.Model):
     company_name = models.CharField(max_length=100)
     company_location = models.CharField(max_length=100)
     created_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="created_by"
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="project_created_by",
     )
     updated_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="updated_by"
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="project_updated_by",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
-    user = models.ManyToManyField(User)
+    user = models.ManyToManyField("users.User", related_name="project_user")
 
     def __str__(self):
         return self.name
