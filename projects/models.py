@@ -1,5 +1,18 @@
-from django.db import models
 import uuid
+from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
+
+
+class Attachement(models.Model):
+    name = models.CharField(max_length=64)
+    path = models.CharField(max_length=255)
+
+    # Below the mandatory fields for generic relation
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
 
 
 class Project(models.Model):
@@ -29,6 +42,7 @@ class Project(models.Model):
         null=True,
         related_name="project_updated_by",
     )
+    attachements = GenericRelation(Attachement)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
@@ -36,3 +50,22 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Income(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
+    title = models.CharField(max_length=128)
+    description = models.TextField()
+    amount = models.FloatField()
+
+    class Types(models.TextChoices):
+        initial_cost = "initial_cost"
+        maintanance = "maintanance"
+        upgrades = "upgrades"
+
+    type = models.CharField(
+        max_length=24, choices=Types.choices, default="initial_cost"
+    )
+
+
+# class Payments

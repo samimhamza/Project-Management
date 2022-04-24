@@ -1,8 +1,9 @@
 import uuid
 from django.db import models
-from projects.models import Project
+from projects.models import Project, Attachement
+from django.contrib.contenttypes.fields import GenericRelation
 
-
+# Start of Task Table
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     projects = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
@@ -53,6 +54,7 @@ class Task(models.Model):
         null=True,
         related_name="task_updated_by",
     )
+    attachements = GenericRelation(Attachement)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
@@ -61,6 +63,9 @@ class Task(models.Model):
         return self.name
 
 
+# End of Task Table
+
+# start of UserTask Table
 class UserTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(blank=True, null=True)
@@ -93,3 +98,26 @@ class UserTask(models.Model):
 
     def __str__(self):
         return self.description
+
+
+# End of UserTask Table
+
+# Start of Comments Table
+class Comments(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    body = models.TextField()
+    task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True)
+    commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    attachements = GenericRelation(Attachement)
+
+    def __str__(self):
+        return self.body
+
+
+# end of Comments Table
+
+# class Attachement(models.Model):
+#     attachmentable_id = models.CharField(max_length=64)
+#     attachmentable_type = models.CharField(max_length=32)
+#     name = models.CharField(max_length=64)
+#     path = models.CharField(max_length=255)
