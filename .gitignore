@@ -1,3 +1,4 @@
 /.vscode
 /venv/
 /taskmanager/__pycache__/
+.env
