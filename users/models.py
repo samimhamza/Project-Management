@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from projects.models import Project
 
 
 class Team(models.Model):
@@ -20,6 +21,7 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    project = models.ManyToManyField(Project)
 
     def __str__(self):
         return self.first_name + " " + self.last_name
