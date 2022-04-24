@@ -1,8 +1,8 @@
 from django.db import models
-
+import uuid
 # Create your models here.
 class Project(models.Model):
-    id                  = models.UUIDField(max_length=30)
+    id                  = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name                = models.CharField(max_length=30)
     description         = models.TextField()
     p_start_date        = models.DateTimeField()
@@ -18,3 +18,5 @@ class Project(models.Model):
     company_location    = models.CharField(max_length=100)
     created_at          = models.DateTimeField()
     updated_at          = models.DateTimeField()
+    def __str__(self):
+        return self.name
