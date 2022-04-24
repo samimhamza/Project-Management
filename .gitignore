@@ -4,3 +4,7 @@
 /taskmanager/.env
 taskmanager/.env
 taskmanager/__pycache__ 
+tasks/__pycache__ 
+projects/__pycache__ 
+expences/__pycache__ 
+incomes/__pycache__ 
