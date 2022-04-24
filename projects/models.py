@@ -53,6 +53,7 @@ class Project(models.Model):
 
 
 class Income(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
     description = models.TextField()
@@ -68,4 +69,17 @@ class Income(models.Model):
     )
 
 
-# class Payments
+class Payment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
+    source = models.CharField(max_length=255)
+    amount = models.FloatField()
+
+    class PaymentMethods(models.TextChoices):
+        cash = "cash"
+        credit_card = "credit_card"
+        bank_transaction = "bank_transaction"
+
+    payment_method = models.CharField(
+        max_length=24, choices=PaymentMethods.choices, default="cash"
+    )

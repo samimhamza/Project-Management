@@ -9,3 +9,11 @@ expences/__pycache__
 expenses/__pycache__ 
 incomes/__pycache__ 
 users/__pycache__ 
+users/migrations/__pycache__ 
+tasks/migrations/__pycache__ 
+taskmanager/migrations/__pycache__ 
+projects/migrations/__pycache__ 
+incomes/migrations/__pycache__ 
+expenses/migrations/__pycache__ 
+
+
