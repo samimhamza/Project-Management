@@ -29,7 +29,7 @@
     <execution />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../project_management_froentend" />
   </component>
   <component name="ProjectId" id="28Be3CgJ9DFP6LBckYEgTQmTsY9" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -42,9 +42,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../project_management_froentend" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../project_management_froentend/pages" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\pages" />
+    </key>
   </component>
   <component name="SvnConfiguration">
     <configuration />
