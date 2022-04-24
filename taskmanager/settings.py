@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "projects",
-    "incomes",
     "expenses",
     "tasks",
     "users",
