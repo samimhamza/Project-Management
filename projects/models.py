@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
+from softdelete.models import SoftDeleteObject
 
 
 class Attachement(models.Model):
@@ -32,7 +33,7 @@ class Location(models.Model):
     longtitude = models.CharField(max_length=128)
 
 
-class Project(models.Model):
+class Project(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=30)
     description = models.TextField()
@@ -62,14 +63,13 @@ class Project(models.Model):
     attachements = GenericRelation(Attachement)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
     user = models.ManyToManyField("users.User", related_name="project_user")
 
     def __str__(self):
         return self.name
 
 
-class Income(models.Model):
+class Income(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
@@ -86,7 +86,7 @@ class Income(models.Model):
     )
 
 
-class Payment(models.Model):
+class Payment(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
     source = models.CharField(max_length=255)
@@ -102,7 +102,7 @@ class Payment(models.Model):
     )
 
 
-class FocalPoint(models.Model):
+class FocalPoint(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     contact_name = models.CharField(max_length=64)

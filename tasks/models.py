@@ -2,9 +2,10 @@ import uuid
 from django.db import models
 from projects.models import Project, Attachement
 from django.contrib.contenttypes.fields import GenericRelation
+from softdelete.models import SoftDeleteObject
 
 # Start of Task Table
-class Task(models.Model):
+class Task(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     projects = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=64)
@@ -57,7 +58,6 @@ class Task(models.Model):
     attachements = GenericRelation(Attachement)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -66,7 +66,7 @@ class Task(models.Model):
 # End of Task Table
 
 # start of UserTask Table
-class UserTask(models.Model):
+class UserTask(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True)
@@ -94,7 +94,6 @@ class UserTask(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.description

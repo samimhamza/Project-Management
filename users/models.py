@@ -1,13 +1,13 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from softdelete.models import SoftDeleteObject
 
 
-class User(AbstractUser):
+class User(SoftDeleteObject, AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -25,7 +25,7 @@ class User(AbstractUser):
         return self.first_name + " " + self.last_name
 
 
-class Team(models.Model):
+class Team(SoftDeleteObject, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True)
@@ -43,7 +43,6 @@ class Team(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
     teamusers = models.ManyToManyField(
         User,
         through="TeamUser",
@@ -63,19 +62,18 @@ class TeamUser(models.Model):
         return self.type
 
 
-class UserNote(models.Model):
+class UserNote(SoftDeleteObject, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
     color = models.CharField(max_length=64)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + " " + self.color
 
 
-class Reminder(models.Model):
+class Reminder(SoftDeleteObject, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.TextField()
     remind_at = models.DateTimeField()
