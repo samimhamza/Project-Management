@@ -105,7 +105,3 @@ class Notification(models.Model):
         warning = "warning"
 
     type = models.CharField(max_length=24, choices=Types.choices, default="notify")
-
-
-class Reason(models.Model):
-    name = models.CharField(max_length=128)

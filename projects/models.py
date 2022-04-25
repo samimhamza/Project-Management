@@ -16,6 +16,15 @@ class Attachement(models.Model):
     content_object = GenericForeignKey()
 
 
+class Reason(models.Model):
+    description = models.TextField()
+
+    # Below the mandatory fields for generic relation
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
+
+
 class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
@@ -60,6 +69,7 @@ class Project(models.Model):
         related_name="project_updated_by",
     )
     attachements = GenericRelation(Attachement)
+    reasons = GenericRelation(Reason)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
