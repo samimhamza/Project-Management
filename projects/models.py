@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
-from softdelete.models import SoftDeleteObject
 
 
 class Attachement(models.Model):
@@ -33,7 +32,7 @@ class Location(models.Model):
     longtitude = models.CharField(max_length=128)
 
 
-class Project(SoftDeleteObject, models.Model):
+class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=30)
     description = models.TextField()
@@ -63,13 +62,14 @@ class Project(SoftDeleteObject, models.Model):
     attachements = GenericRelation(Attachement)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
     user = models.ManyToManyField("users.User", related_name="project_user")
 
     def __str__(self):
         return self.name
 
 
-class Income(SoftDeleteObject, models.Model):
+class Income(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
@@ -84,13 +84,15 @@ class Income(SoftDeleteObject, models.Model):
     type = models.CharField(
         max_length=24, choices=Types.choices, default="initial_cost"
     )
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
 
-class Payment(SoftDeleteObject, models.Model):
+class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
     source = models.CharField(max_length=255)
     amount = models.FloatField()
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class PaymentMethods(models.TextChoices):
         cash = "cash"
@@ -102,7 +104,7 @@ class Payment(SoftDeleteObject, models.Model):
     )
 
 
-class FocalPoint(SoftDeleteObject, models.Model):
+class FocalPoint(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     contact_name = models.CharField(max_length=64)
@@ -115,6 +117,7 @@ class FocalPoint(SoftDeleteObject, models.Model):
     phone = models.CharField(validators=[phone_regex], max_length=17)
     whatsapp = models.CharField(validators=[phone_regex], max_length=17)
     position = models.CharField(max_length=64)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class PeferMethods(models.TextChoices):
         email = "email"
