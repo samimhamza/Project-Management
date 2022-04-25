@@ -15,6 +15,9 @@ class Attachment(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
+    def __str__(self):
+        return self.name
+
 
 class Reason(models.Model):
     description = models.TextField()
@@ -29,6 +32,9 @@ class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
 
+    def __str__(self):
+        return self.name
+
 
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -37,8 +43,8 @@ class Location(models.Model):
     city = models.CharField(max_length=64)
     state = models.CharField(max_length=64)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    latitude = models.CharField(max_length=128)
-    longitude = models.CharField(max_length=128)
+    latitude = models.CharField(max_length=128, null=True, blank=True)
+    longitude = models.CharField(max_length=128, null=True, blank=True)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -54,6 +60,9 @@ class Location(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.city + " " + self.state
 
 
 class Project(models.Model):

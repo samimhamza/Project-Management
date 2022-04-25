@@ -10,12 +10,14 @@ class User(AbstractUser):
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
         related_name="user_created_by",
     )
     updated_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
         related_name="user_updated_by",
     )
