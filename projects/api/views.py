@@ -135,6 +135,14 @@ class FocalPointListCreateAPIView(
         return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(created_by=request.user.id)
+                request.data.update(updated_by=request.user.id)
+        except:
+            request.data.update(created_by=request.user.id)
+            request.data.update(updated_by=request.user.id)
         return self.create(request, *args, **kwargs)
 
 
@@ -154,6 +162,7 @@ class FocalPointDetailAPIView(
         return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
+        request.data.update(updated_by=request.user)
         return self.update(request, *args, **kwargs)
 
 
