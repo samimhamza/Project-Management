@@ -39,6 +39,21 @@ class Location(models.Model):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     latitude = models.CharField(max_length=128)
     longtitude = models.CharField(max_length=128)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="location_created_by",
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="location_updated_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
 
 class Project(models.Model):
@@ -94,6 +109,20 @@ class Income(models.Model):
     type = models.CharField(
         max_length=24, choices=Types.choices, default="initial_cost"
     )
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="income_created_by",
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="income_updated_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
 
@@ -102,7 +131,6 @@ class Payment(models.Model):
     income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
     source = models.CharField(max_length=255)
     amount = models.FloatField()
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class PaymentMethods(models.TextChoices):
         cash = "cash"
@@ -112,6 +140,21 @@ class Payment(models.Model):
     payment_method = models.CharField(
         max_length=24, choices=PaymentMethods.choices, default="cash"
     )
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="payment_created_by",
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="payment_updated_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
 
 class FocalPoint(models.Model):
@@ -127,6 +170,20 @@ class FocalPoint(models.Model):
     phone = models.CharField(validators=[phone_regex], max_length=17)
     whatsapp = models.CharField(validators=[phone_regex], max_length=17)
     position = models.CharField(max_length=64)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="focalPoint_created_by",
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="focalPoint_updated_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
     class PeferMethods(models.TextChoices):

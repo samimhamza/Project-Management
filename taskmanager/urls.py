@@ -11,4 +11,5 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view()),
     path("api/token/verify/", TokenVerifyView.as_view()),
     path("admin/", admin.site.urls),
+    path("api/", include("projects.api.urls")),
 ]
