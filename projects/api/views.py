@@ -1,7 +1,7 @@
 from rest_framework import generics, mixins, status
 from rest_framework.views import APIView
-from projects.models import Project
-from projects.api.serializers import ProjectSerializer
+from projects.models import Project, Country
+from projects.api.serializers import ProjectSerializer, CountrySerializer
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 import datetime
@@ -18,7 +18,7 @@ import datetime
 #     def post(self, request, *args, **kwargs):
 #         return self.create(request, *args, **kwargs)
 
-
+# Project CRUD
 class ProjectListCreateAPIView(APIView):
     def get(self, request):
         projects = Project.objects.filter(deleted_at__isnull=True)
@@ -58,13 +58,41 @@ class ProjectDetailAPIView(APIView):
         project = self.get_object(pk)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        # project = self.get_object(pk)
-        # serializer = ProjectSerializer(project, data=request.data)
-        # if serializer.is_valid():
-        #     if serializer.validated_data["deleted_at"]:
-        #         project.delete()
-        #     else:
-        #         datetimepicker1 = datetime.datetime.now().date()
-        #         serializer.validated_data["deleted_at"] = datetimepicker1
-        #         serializer.save()
-        # return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# end of Project CRUD
+
+# Country CRUD
+class CountryListCreateAPIView(
+    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
+):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class CountryDetailAPIView(
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    generics.GenericAPIView,
+):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+
+# end of Country CRUD
