@@ -18,7 +18,7 @@ class CountrySerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        exclude = ["deleted_at"]
+        fields = "__all__"
 
 
 class FocalPointSerializer(serializers.ModelSerializer):

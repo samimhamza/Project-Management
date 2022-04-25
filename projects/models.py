@@ -45,21 +45,8 @@ class Location(models.Model):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     latitude = models.CharField(max_length=128, null=True, blank=True)
     longitude = models.CharField(max_length=128, null=True, blank=True)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="location_created_by",
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="location_updated_by",
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.city + " " + self.state

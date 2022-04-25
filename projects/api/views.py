@@ -1,22 +1,13 @@
 from rest_framework import generics, mixins, status
 from rest_framework.views import APIView
-from projects.models import Project, Country
-from projects.api.serializers import ProjectSerializer, CountrySerializer
+from projects.models import Project, Country, Location
+from projects.api.serializers import (
+    ProjectSerializer,
+    CountrySerializer,
+    LocationSerializer,
+)
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
-import datetime
-
-# class ProjectListCreateAPIView(
-#     mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
-# ):
-#     queryset = Project.objects.filter(deleted_at__isnull=True)
-#     serializer_class = ProjectSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
 
 # Project CRUD
 class ProjectListCreateAPIView(APIView):
@@ -95,4 +86,39 @@ class CountryDetailAPIView(
         return self.update(request, *args, **kwargs)
 
 
-# end of Country CRUD
+# end of Location CRUD
+
+# Location CRUD
+class LocationListCreateAPIView(
+    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
+):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class LocationDetailAPIView(
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    generics.GenericAPIView,
+):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+
+# end of Location CRUD
