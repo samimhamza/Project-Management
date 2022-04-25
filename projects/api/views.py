@@ -4,6 +4,7 @@ from projects.models import Project
 from projects.api.serializers import ProjectSerializer
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
+import datetime
 
 # class ProjectListCreateAPIView(
 #     mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
@@ -27,6 +28,8 @@ class ProjectListCreateAPIView(APIView):
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.validated_data["created_by"] = request.user
+            serializer.validated_data["updated_by"] = request.user
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -46,11 +49,22 @@ class ProjectDetailAPIView(APIView):
         project = self.get_object(pk)
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
+            serializer.validated_data["updated_by"] = request.user
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-      project = self.get_object(pk)
-      project.delete()
-      return Response(status=status.HTTP_204_NO_CONTENT)
+        project = self.get_object(pk)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        # project = self.get_object(pk)
+        # serializer = ProjectSerializer(project, data=request.data)
+        # if serializer.is_valid():
+        #     if serializer.validated_data["deleted_at"]:
+        #         project.delete()
+        #     else:
+        #         datetimepicker1 = datetime.datetime.now().date()
+        #         serializer.validated_data["deleted_at"] = datetimepicker1
+        #         serializer.save()
+        # return Response(status=status.HTTP_204_NO_CONTENT)
