@@ -8,6 +8,10 @@ from projects.api.views import (
     LocationDetailAPIView,
     FocalPointListCreateAPIView,
     FocalPointDetailAPIView,
+    IncomeListCreateAPIView,
+    IncomeDetailAPIView,
+    PaymentListCreateAPIView,
+    PaymentDetailAPIView,
 )
 
 
@@ -23,11 +27,23 @@ urlpatterns = [
         "locations/<uuid:pk>", LocationDetailAPIView.as_view(), name="locations-detail"
     ),
     path(
-        "focal-point/", FocalPointListCreateAPIView.as_view(), name="focal-point-list"
+        "focal-points/", FocalPointListCreateAPIView.as_view(), name="focal-point-list"
     ),
     path(
-        "focal-point/<uuid:pk>",
+        "focal-points/<uuid:pk>",
         FocalPointDetailAPIView.as_view(),
         name="focal-point-detail",
+    ),
+    path("incomes/", IncomeListCreateAPIView.as_view(), name="income-list"),
+    path(
+        "incomes/<uuid:pk>",
+        IncomeDetailAPIView.as_view(),
+        name="income-detail",
+    ),
+    path("payments/", PaymentListCreateAPIView.as_view(), name="payments-list"),
+    path(
+        "payments/<uuid:pk>",
+        PaymentDetailAPIView.as_view(),
+        name="payments-detail",
     ),
 ]

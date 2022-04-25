@@ -121,6 +121,9 @@ class Income(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
 
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -151,6 +154,9 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.amount
 
 
 class FocalPoint(models.Model):
@@ -190,3 +196,6 @@ class FocalPoint(models.Model):
     prefer_communication_way = models.CharField(
         max_length=16, choices=PreferMethods.choices, default="email"
     )
+
+    def __str__(self):
+        return self.contact_name + " " + self.contact_last_name

@@ -1,11 +1,13 @@
 from rest_framework import generics, mixins, status
 from rest_framework.views import APIView
-from projects.models import Project, Country, Location, FocalPoint
+from projects.models import Project, Country, Location, FocalPoint, Income, Payment
 from projects.api.serializers import (
     ProjectSerializer,
     CountrySerializer,
     LocationSerializer,
     FocalPointSerializer,
+    IncomeSerializer,
+    PaymentSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -123,6 +125,94 @@ class LocationDetailAPIView(
 
 
 # end of Location CRUD
+
+# Payment CRUD
+class PaymentListCreateAPIView(
+    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
+):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(created_by=request.user.id)
+                request.data.update(updated_by=request.user.id)
+        except:
+            request.data.update(created_by=request.user.id)
+            request.data.update(updated_by=request.user.id)
+        return self.create(request, *args, **kwargs)
+
+
+class PaymentDetailAPIView(
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    generics.GenericAPIView,
+):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        request.data.update(updated_by=request.user)
+        return self.update(request, *args, **kwargs)
+
+
+# end of Payment CRUD
+
+# Income CRUD
+class IncomeListCreateAPIView(
+    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
+):
+    queryset = Income.objects.all()
+    serializer_class = IncomeSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(created_by=request.user.id)
+                request.data.update(updated_by=request.user.id)
+        except:
+            request.data.update(created_by=request.user.id)
+            request.data.update(updated_by=request.user.id)
+        return self.create(request, *args, **kwargs)
+
+
+class IncomeDetailAPIView(
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    generics.GenericAPIView,
+):
+    queryset = Income.objects.all()
+    serializer_class = IncomeSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        request.data.update(updated_by=request.user)
+        return self.update(request, *args, **kwargs)
+
+
+# end of Income CRUD
 
 # FocalPoint CRUD
 class FocalPointListCreateAPIView(
