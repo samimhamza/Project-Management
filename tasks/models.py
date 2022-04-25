@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from projects.models import Project, Attachement, Reason
+from projects.models import Project, Attachment, Reason
 from django.contrib.contenttypes.fields import GenericRelation
 
 # Start of Task Table
@@ -54,7 +54,7 @@ class Task(models.Model):
         null=True,
         related_name="task_updated_by",
     )
-    attachements = GenericRelation(Attachement)
+    attachments = GenericRelation(Attachment)
     reasons = GenericRelation(Reason)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -110,7 +110,7 @@ class Comments(models.Model):
     body = models.TextField()
     task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True)
     commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
-    attachements = GenericRelation(Attachement)
+    attachments = GenericRelation(Attachment)
 
     def __str__(self):
         return self.body
@@ -118,7 +118,7 @@ class Comments(models.Model):
 
 # end of Comments Table
 
-# class Attachement(models.Model):
+# class Attachment(models.Model):
 #     attachmentable_id = models.CharField(max_length=64)
 #     attachmentable_type = models.CharField(max_length=32)
 #     name = models.CharField(max_length=64)

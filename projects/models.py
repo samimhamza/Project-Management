@@ -6,7 +6,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
 
 
-class Attachement(models.Model):
+class Attachment(models.Model):
     name = models.CharField(max_length=64)
     path = models.CharField(max_length=255)
 
@@ -38,7 +38,7 @@ class Location(models.Model):
     state = models.CharField(max_length=64)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     latitude = models.CharField(max_length=128)
-    longtitude = models.CharField(max_length=128)
+    longitude = models.CharField(max_length=128)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -83,12 +83,12 @@ class Project(models.Model):
         null=True,
         related_name="project_updated_by",
     )
-    attachements = GenericRelation(Attachement)
+    attachments = GenericRelation(Attachment)
     reasons = GenericRelation(Reason)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
-    user = models.ManyToManyField("users.User", related_name="project_user")
+    users = models.ManyToManyField("users.User", related_name="project_user")
 
     def __str__(self):
         return self.name
@@ -103,7 +103,7 @@ class Income(models.Model):
 
     class Types(models.TextChoices):
         initial_cost = "initial_cost"
-        maintanance = "maintanance"
+        maintenance = "maintenance"
         upgrades = "upgrades"
 
     type = models.CharField(
@@ -186,11 +186,11 @@ class FocalPoint(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
-    class PeferMethods(models.TextChoices):
+    class PreferMethods(models.TextChoices):
         email = "email"
         whatsapp = "whatsapp"
         phone = "phone"
 
     prefer_communication_way = models.CharField(
-        max_length=16, choices=PeferMethods.choices, default="email"
+        max_length=16, choices=PreferMethods.choices, default="email"
     )

@@ -5,7 +5,7 @@ from .models import (
     Payment,
     FocalPoint,
     Reason,
-    Attachement,
+    Attachment,
     Country,
     Location,
 )
@@ -15,6 +15,6 @@ admin.site.register(Income)
 admin.site.register(Payment)
 admin.site.register(Location)
 admin.site.register(Country)
-admin.site.register(Attachement)
+admin.site.register(Attachment)
 admin.site.register(Reason)
 admin.site.register(FocalPoint)
