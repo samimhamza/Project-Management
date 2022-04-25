@@ -1,10 +1,11 @@
 from rest_framework import generics, mixins, status
 from rest_framework.views import APIView
-from projects.models import Project, Country, Location
+from projects.models import Project, Country, Location, FocalPoint
 from projects.api.serializers import (
     ProjectSerializer,
     CountrySerializer,
     LocationSerializer,
+    FocalPointSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -122,3 +123,38 @@ class LocationDetailAPIView(
 
 
 # end of Location CRUD
+
+# FocalPoint CRUD
+class FocalPointListCreateAPIView(
+    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
+):
+    queryset = FocalPoint.objects.all()
+    serializer_class = FocalPointSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class FocalPointDetailAPIView(
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    generics.GenericAPIView,
+):
+    queryset = FocalPoint.objects.all()
+    serializer_class = FocalPointSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+
+# end of FocalPoint CRUD

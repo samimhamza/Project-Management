@@ -6,6 +6,8 @@ from projects.api.views import (
     CountryDetailAPIView,
     LocationListCreateAPIView,
     LocationDetailAPIView,
+    FocalPointListCreateAPIView,
+    FocalPointDetailAPIView,
 )
 
 
@@ -19,5 +21,13 @@ urlpatterns = [
     path("locations/", LocationListCreateAPIView.as_view(), name="locations-list"),
     path(
         "locations/<uuid:pk>", LocationDetailAPIView.as_view(), name="locations-detail"
+    ),
+    path(
+        "focal-point/", FocalPointListCreateAPIView.as_view(), name="focal-point-list"
+    ),
+    path(
+        "focal-point/<uuid:pk>",
+        FocalPointDetailAPIView.as_view(),
+        name="focal-point-detail",
     ),
 ]
