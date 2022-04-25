@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from projects.models import Project, Attachement
+from projects.models import Project, Attachement, Reason
 from django.contrib.contenttypes.fields import GenericRelation
 
 # Start of Task Table
@@ -55,6 +55,7 @@ class Task(models.Model):
         related_name="task_updated_by",
     )
     attachements = GenericRelation(Attachement)
+    reasons = GenericRelation(Reason)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
@@ -92,6 +93,7 @@ class UserTask(models.Model):
         null=True,
         related_name="user_task_updated_by",
     )
+    reasons = GenericRelation(Reason)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
