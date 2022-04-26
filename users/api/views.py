@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 from users.api.serializers import (
     UserSerializer,
     TeamSerializer,
@@ -10,6 +10,66 @@ from users.api.serializers import (
 )
 from users.models import User, Team, TeamUser, UserNote, Reminder, Holiday, Notification
 import datetime
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+
+class RegisterView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        try:
+            data = request.data
+            first_name = data["first_name"]
+            last_name = data["last_name"]
+            username = data["username"]
+            email = data["email"]
+            password = data["password"]
+            re_password = data["re_password"]
+
+            if password == re_password:
+                if len(password) >= 8:
+                    if not User.objects.filter(username=username).exists():
+                        user = User.objects.create_user(
+                            first_name=first_name,
+                            last_name=last_name,
+                            username=username,
+                            password=password,
+                        )
+                        user.save()
+                        if User.objects.filter(username=username).exists():
+                            return Response(
+                                {"success": "Account Successfully Created"},
+                                status=status.HTTP_201_CREATED,
+                            )
+                        else:
+                            return Response(
+                                {
+                                    "error": "Something went wrong when registering account"
+                                },
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            )
+                    else:
+                        return Response(
+                            {"error": "Username Already Exists"},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                else:
+                    return Response(
+                        {"error": "Password must be at least 8 characters in length"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            else:
+                return Response(
+                    {"error": "Passwords do not match"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except:
+            return Response(
+                {"error": "Something went wrong while trying to register account"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
 
 # User CRUD
 class UserListCreateAPIView(generics.ListCreateAPIView):
