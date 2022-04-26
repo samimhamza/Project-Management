@@ -18,5 +18,5 @@ urlpatterns = [
         name="user-tasks-detail",
     ),
     path("comments/", CommentListCreateAPIView.as_view(), name="comments-list"),
-    path("comments/<uuid:pk>", CommentDetailAPIView.as_view(), name="tasks-detail"),
+    path("comments/<uuid:pk>", CommentDetailAPIView.as_view(), name="comments-detail"),
 ]

@@ -45,7 +45,7 @@ class Team(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    teamusers = models.ManyToManyField(
+    team_users = models.ManyToManyField(
         User,
         through="TeamUser",
         through_fields=("team", "user"),
