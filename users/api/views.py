@@ -26,15 +26,17 @@ class RegisterView(APIView):
             email = data["email"]
             password = data["password"]
             re_password = data["re_password"]
-
             if password == re_password:
                 if len(password) >= 8:
-                    if not User.objects.filter(username=username).exists():
+                    if not User.objects.filter(username=username, email=email).exists():
                         user = User.objects.create_user(
                             first_name=first_name,
                             last_name=last_name,
                             username=username,
+                            email=email,
                             password=password,
+                            created_by=request.user.id,
+                            updated_by=request.user.id,
                         )
                         user.save()
                         if User.objects.filter(username=username).exists():
@@ -51,7 +53,7 @@ class RegisterView(APIView):
                             )
                     else:
                         return Response(
-                            {"error": "Username Already Exists"},
+                            {"error": "User Already Exists"},
                             status=status.HTTP_400_BAD_REQUEST,
                         )
                 else:

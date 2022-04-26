@@ -34,7 +34,7 @@ class Expense(models.Model):
     )
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     body = models.TextField()
-    coast = models.DecimalField(max_digits=19, decimal_places=2)
+    cost = models.DecimalField(max_digits=19, decimal_places=2)
 
     class Types(models.TextChoices):
         estimate = "estimate"
