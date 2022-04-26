@@ -1,4 +1,4 @@
-from rest_framework import generics, mixins, status
+from rest_framework import generics, status
 from rest_framework.views import APIView
 from projects.models import Project, Country, Location, FocalPoint, Income, Payment
 from projects.api.serializers import (
@@ -11,6 +11,7 @@ from projects.api.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
+import datetime
 
 # Project CRUD
 class ProjectListCreateAPIView(APIView):
@@ -57,9 +58,7 @@ class ProjectDetailAPIView(APIView):
 # end of Project CRUD
 
 # Country CRUD
-class CountryListCreateAPIView(
-    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
-):
+class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
@@ -70,12 +69,7 @@ class CountryListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 
-class CountryDetailAPIView(
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    generics.GenericAPIView,
-):
+class CountryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
@@ -92,9 +86,7 @@ class CountryDetailAPIView(
 # end of Location CRUD
 
 # Location CRUD
-class LocationListCreateAPIView(
-    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
-):
+class LocationListCreateAPIView(generics.ListCreateAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
@@ -105,12 +97,7 @@ class LocationListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 
-class LocationDetailAPIView(
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    generics.GenericAPIView,
-):
+class LocationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
@@ -127,11 +114,10 @@ class LocationDetailAPIView(
 # end of Location CRUD
 
 # Payment CRUD
-class PaymentListCreateAPIView(
-    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
-):
-    queryset = Payment.objects.all()
+class PaymentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
+    paginate_by = 10
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -148,32 +134,40 @@ class PaymentListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 
-class PaymentDetailAPIView(
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    generics.GenericAPIView,
-):
-    queryset = Payment.objects.all()
+class PaymentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
+        # queryset = self.retrieve(request, *args, **kwargs)
+        # serializer = PaymentSerializer(queryset)
+
+        # if serializer.data.deleted_at:
+        #     serializer.validated_data["deleted_at"] = datetime.datetime.now()
+        #     serializer.save()
+        #     return Response(status=status.HTTP_204_NO_CONTENT)
+
         return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        request.data.update(updated_by=request.user)
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(updated_by=request.user.id)
+                request.data.update(updated_at=datetime.datetime.now())
+        except:
+            request.data.update(updated_by=request.user.id)
+            request.data.update(updated_at=datetime.datetime.now())
         return self.update(request, *args, **kwargs)
 
 
 # end of Payment CRUD
 
 # Income CRUD
-class IncomeListCreateAPIView(
-    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
-):
+class IncomeListCreateAPIView(generics.ListCreateAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
 
@@ -192,12 +186,7 @@ class IncomeListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 
-class IncomeDetailAPIView(
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    generics.GenericAPIView,
-):
+class IncomeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
 
@@ -215,9 +204,7 @@ class IncomeDetailAPIView(
 # end of Income CRUD
 
 # FocalPoint CRUD
-class FocalPointListCreateAPIView(
-    mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView
-):
+class FocalPointListCreateAPIView(generics.ListCreateAPIView):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
 
@@ -236,12 +223,7 @@ class FocalPointListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 
-class FocalPointDetailAPIView(
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    generics.GenericAPIView,
-):
+class FocalPointDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
 
