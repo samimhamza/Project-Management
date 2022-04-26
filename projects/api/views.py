@@ -142,14 +142,6 @@ class PaymentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         return self.retrieve(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
-        # queryset = self.retrieve(request, *args, **kwargs)
-        # serializer = PaymentSerializer(queryset)
-
-        # if serializer.data.deleted_at:
-        #     serializer.validated_data["deleted_at"] = datetime.datetime.now()
-        #     serializer.save()
-        #     return Response(status=status.HTTP_204_NO_CONTENT)
-
         return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
@@ -197,7 +189,14 @@ class IncomeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        request.data.update(updated_by=request.user)
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(updated_by=request.user.id)
+                request.data.update(updated_at=datetime.datetime.now())
+        except:
+            request.data.update(updated_by=request.user.id)
+            request.data.update(updated_at=datetime.datetime.now())
         return self.update(request, *args, **kwargs)
 
 
@@ -234,7 +233,14 @@ class FocalPointDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        request.data.update(updated_by=request.user)
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(updated_by=request.user.id)
+                request.data.update(updated_at=datetime.datetime.now())
+        except:
+            request.data.update(updated_by=request.user.id)
+            request.data.update(updated_at=datetime.datetime.now())
         return self.update(request, *args, **kwargs)
 
 

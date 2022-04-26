@@ -6,7 +6,7 @@ from projects.models import Project, Country, Location, FocalPoint, Income, Paym
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        exclude = ["deleted_at"]
+        fields = "__all__"
 
 
 class CountrySerializer(serializers.ModelSerializer):
