@@ -1,4 +1,3 @@
-from pyexpat import model
 from rest_framework import serializers
 from projects.models import Project, Country, Location, FocalPoint, Income, Payment
 
@@ -24,16 +23,16 @@ class LocationSerializer(serializers.ModelSerializer):
 class FocalPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = FocalPoint
-        exclude = ["deleted_at"]
+        fields = "__all__"
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        exclude = ["deleted_at"]
+        fields = "__all__"
 
 
 class IncomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Income
-        exclude = ["deleted_at"]
+        fields = "__all__"

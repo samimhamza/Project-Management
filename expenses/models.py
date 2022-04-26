@@ -16,7 +16,7 @@ class Expense(models.Model):
     )
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     body = models.TextField()
-    coast = models.FloatField()
+    coast = models.DecimalField(max_digits=19, decimal_places=2)
 
     class Types(models.TextChoices):
         estimate = "estimate"
@@ -45,10 +45,11 @@ class Expense(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
+
 class ExpenseItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     expense = models.ForeignKey(Expense, on_delete=models.SET_NULL, null=True)
     item = models.CharField(max_length=255)
     quantity = models.IntegerField()
-    cpp = models.FloatField()
+    cpp = models.DecimalField(max_digits=19, decimal_places=2)
     unit = models.CharField(max_length=64)

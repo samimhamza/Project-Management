@@ -95,7 +95,7 @@ class Income(models.Model):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
     description = models.TextField()
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=19, decimal_places=2)
 
     class Types(models.TextChoices):
         initial_cost = "initial_cost"
@@ -129,7 +129,7 @@ class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
     source = models.CharField(max_length=255)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=19, decimal_places=2)
 
     class PaymentMethods(models.TextChoices):
         cash = "cash"

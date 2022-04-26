@@ -6,7 +6,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 # Start of Task Table
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    projects = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, null=True)
     p_start_date = models.DateTimeField(blank=True, null=True)
@@ -72,7 +72,7 @@ class UserTask(models.Model):
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True)
     task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True)
-    progress = models.FloatField()
+    progress = models.IntegerField()
 
     class UserTaskTypes(models.TextChoices):
         assign = "assign"
@@ -105,7 +105,7 @@ class UserTask(models.Model):
 # End of UserTask Table
 
 # Start of Comments Table
-class Comments(models.Model):
+class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     body = models.TextField()
     task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True)
