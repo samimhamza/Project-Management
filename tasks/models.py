@@ -6,6 +6,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 # Start of Task Table
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, null=True)
@@ -42,6 +43,7 @@ class Task(models.Model):
         independent = "independent"
 
     type = models.CharField(max_length=24, choices=Types.choices, default="independent")
+    dependencies = models.JSONField(blank=True, null=True)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,

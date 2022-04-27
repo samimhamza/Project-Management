@@ -74,7 +74,7 @@ class Project(models.Model):
     priority = models.CharField(
         max_length=24, choices=Priority.choices, default="normal"
     )
-    project_details = models.JSONField()
+    project_details = models.JSONField(blank=True, null=True)
     company_name = models.CharField(max_length=100)
     company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
