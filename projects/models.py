@@ -63,7 +63,17 @@ class Project(models.Model):
     banner = models.CharField(max_length=120)
     status = models.IntegerField()
     progress = models.IntegerField()
-    priority = models.IntegerField()
+
+    class Priority(models.TextChoices):
+        critical = "critical"
+        very_important = "very_important"
+        important = "important"
+        normal = "normal"
+        less_important = "less_important"
+
+    priority = models.CharField(
+        max_length=24, choices=Priority.choices, default="normal"
+    )
     project_details = models.JSONField()
     company_name = models.CharField(max_length=100)
     company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
