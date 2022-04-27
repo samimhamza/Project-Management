@@ -5,7 +5,7 @@ from users.models import User, Team, UserNote, Reminder, Holiday, Notification, 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ["username", "password", "first_name", "last_name", "email"]
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
