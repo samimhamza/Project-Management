@@ -20,8 +20,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project_management_backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_management_backend.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taskmanager/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projects/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/FocalPoint.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/FocalPoint.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +37,10 @@
     <execution />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../project_management_froentend" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="28Be3CgJ9DFP6LBckYEgTQmTsY9" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -41,19 +49,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../project_management_froentend/pages" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/project/focalPoint&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\pages" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\focalPoint" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\test" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\customComponents" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
     </key>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -66,11 +84,34 @@
       <updated>1650694204573</updated>
       <workItem from="1650694207466" duration="5411000" />
       <workItem from="1650857534523" duration="1751000" />
+      <workItem from="1651032595064" duration="60000" />
+      <workItem from="1651043752135" duration="1622000" />
+      <workItem from="1651048420068" duration="3528000" />
+      <workItem from="1651289456673" duration="15658000" />
+      <workItem from="1651308788720" duration="1225000" />
+      <workItem from="1651310221409" duration="3724000" />
+      <workItem from="1651635168798" duration="28762000" />
+      <workItem from="1651721609854" duration="682000" />
+      <workItem from="1651724516106" duration="214000" />
+      <workItem from="1651725168835" duration="2092000" />
+      <workItem from="1651732360732" duration="16867000" />
+      <workItem from="1651894660923" duration="764000" />
+      <workItem from="1651896446874" duration="10295000" />
+      <workItem from="1651907681475" duration="2631000" />
+      <workItem from="1651914446885" duration="12673000" />
+      <workItem from="1651981120865" duration="10772000" />
+      <workItem from="1651992338036" duration="3768000" />
+      <workItem from="1652001069510" duration="12113000" />
+      <workItem from="1652067189225" duration="15824000" />
+      <workItem from="1652086628849" duration="12516000" />
+      <workItem from="1652153590123" duration="542000" />
+      <workItem from="1652154705002" duration="414000" />
+      <workItem from="1652155253728" duration="5263000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -82,16 +123,39 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="500" y="190" key="FileChooserDialogImpl" timestamp="1650694240503">
-      <screen x="0" y="0" width="1440" height="870" />
-    </state>
-    <state x="500" y="190" key="FileChooserDialogImpl/0.0.1440.870@0.0.1440.870" timestamp="1650694240503" />
-    <state x="221" y="80" key="SettingsEditor" timestamp="1650778179917">
-      <screen x="0" y="0" width="1440" height="870" />
-    </state>
-    <state x="221" y="80" key="SettingsEditor/0.0.1440.870@0.0.1440.870" timestamp="1650778179917" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/DateAndProgress.js</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/PageHeader.js</url>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/TaskBadge.js</url>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/pages/projects/show.js</url>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/income/Create.js</url>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js</url>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js</url>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
