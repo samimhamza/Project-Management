@@ -15,5 +15,9 @@ taskmanager/migrations/__pycache__
 projects/migrations/__pycache__ 
 incomes/migrations/__pycache__ 
 expenses/migrations/__pycache__ 
+projects/api/__pycache__ 
+tasks/api/__pycache__ 
+expenses/api/__pycache__  
+users/api/__pycache__ 
 
 

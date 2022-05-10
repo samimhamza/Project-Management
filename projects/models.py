@@ -45,21 +45,8 @@ class Location(models.Model):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     latitude = models.CharField(max_length=128, null=True, blank=True)
     longitude = models.CharField(max_length=128, null=True, blank=True)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="location_created_by",
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="location_updated_by",
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.city + " " + self.state
@@ -76,8 +63,18 @@ class Project(models.Model):
     banner = models.CharField(max_length=120)
     status = models.IntegerField()
     progress = models.IntegerField()
-    priority = models.IntegerField()
-    project_details = models.JSONField()
+
+    class Priority(models.TextChoices):
+        critical = "critical"
+        very_important = "very_important"
+        important = "important"
+        normal = "normal"
+        less_important = "less_important"
+
+    priority = models.CharField(
+        max_length=24, choices=Priority.choices, default="normal"
+    )
+    project_details = models.JSONField(blank=True, null=True)
     company_name = models.CharField(max_length=100)
     company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
@@ -108,7 +105,7 @@ class Income(models.Model):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
     description = models.TextField()
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=19, decimal_places=2)
 
     class Types(models.TextChoices):
         initial_cost = "initial_cost"
@@ -134,12 +131,15 @@ class Income(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
 
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
     source = models.CharField(max_length=255)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=19, decimal_places=2)
 
     class PaymentMethods(models.TextChoices):
         cash = "cash"
@@ -164,6 +164,9 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.amount
 
 
 class FocalPoint(models.Model):
@@ -203,3 +206,6 @@ class FocalPoint(models.Model):
     prefer_communication_way = models.CharField(
         max_length=16, choices=PreferMethods.choices, default="email"
     )
+
+    def __str__(self):
+        return self.contact_name + " " + self.contact_last_name
