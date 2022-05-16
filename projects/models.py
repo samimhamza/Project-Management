@@ -56,13 +56,13 @@ class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=30)
     description = models.TextField()
-    p_start_date = models.DateTimeField()
-    p_end_date = models.DateTimeField()
-    a_start_date = models.DateTimeField()
-    a_end_date = models.DateTimeField()
-    banner = models.CharField(max_length=120)
-    status = models.IntegerField()
-    progress = models.IntegerField()
+    p_start_date = models.DateTimeField(null=True, blank=True)
+    p_end_date = models.DateTimeField(null=True, blank=True)
+    a_start_date = models.DateTimeField(null=True, blank=True)
+    a_end_date = models.DateTimeField(null=True, blank=True)
+    banner = models.CharField(max_length=120,null=True, blank=True)
+    status = models.IntegerField(default=1)
+    progress = models.IntegerField(default=0)
 
     class Priority(models.TextChoices):
         critical = "critical"
@@ -74,9 +74,9 @@ class Project(models.Model):
     priority = models.CharField(
         max_length=24, choices=Priority.choices, default="normal"
     )
-    project_details = models.JSONField()
-    company_name = models.CharField(max_length=100)
-    company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    project_details = models.JSONField(null=True, blank=True)
+    company_name = models.CharField(max_length=100,null=True, blank=True)
+    company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
