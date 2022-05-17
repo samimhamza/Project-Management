@@ -12,6 +12,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     company_location = LocationSerializer(read_only=True)
     users = UserSerializer(many=True, read_only=True)
+    teams = UserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
