@@ -45,11 +45,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     teams = LessFieldsTeamSerializer(many=True, read_only=True)
     created_by = LessFieldsUserSerializer(read_only=True)
     updated_by = LessFieldsUserSerializer(read_only=True)
-    # tasks = TaskSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = "__all__"
+        fields = "tasks"
 
 
 class FocalPointSerializer(serializers.ModelSerializer):
