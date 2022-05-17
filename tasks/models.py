@@ -7,7 +7,9 @@ from django.contrib.contenttypes.fields import GenericRelation
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
+    project = models.ForeignKey(
+        Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
+    )
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, null=True)
     p_start_date = models.DateTimeField(blank=True, null=True)
