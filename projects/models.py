@@ -76,7 +76,7 @@ class Project(models.Model):
     )
     project_details = models.JSONField(null=True, blank=True)
     company_name = models.CharField(max_length=100, null=True, blank=True)
-    company_email = models.CharField(max_length=255, null=True, blank=True)
+    company_email = models.EmailField()
     company_location = models.ForeignKey(
         Location, on_delete=models.SET_NULL, null=True, blank=True
     )
