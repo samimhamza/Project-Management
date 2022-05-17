@@ -61,17 +61,30 @@ class Project(models.Model):
     a_start_date = models.DateTimeField(null=True, blank=True)
     a_end_date = models.DateTimeField(null=True, blank=True)
     banner = models.CharField(max_length=120, null=True, blank=True)
-    status = models.IntegerField(default=1)
+
+    class StatusChoices(models.TextChoices):
+        pending = "pending"
+        in_progress = "in_progress"
+        completed = "completed"
+        very_important = "issue_faced"
+        failed = "failed"
+        cancelled = "cancelled"
+
+    status = models.CharField(
+        max_length=24, choices=StatusChoices.choices, default="pending"
+    )
     progress = models.IntegerField(default=0)
 
     class Priority(models.TextChoices):
-        critical = 1
-        very_important = 2
-        important = 3
-        normal = 4
-        less_important = 5
+        critical = "critical"
+        very_important = "very_important"
+        important = "important"
+        normal = "normal"
+        less_important = "less_important"
 
-    priority = models.CharField(max_length=24, choices=Priority.choices, default=4)
+    priority = models.CharField(
+        max_length=24, choices=Priority.choices, default="normal"
+    )
     project_details = models.JSONField(null=True, blank=True)
     company_name = models.CharField(max_length=100, null=True, blank=True)
     company_email = models.EmailField(null=True, blank=True)
