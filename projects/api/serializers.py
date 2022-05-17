@@ -3,16 +3,18 @@ from projects.models import Project, Country, Location, FocalPoint, Income, Paym
 from users.models import User, Team
 
 
-class UserSerializer(serializers.ModelSerializer):
+class LessFieldsUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["first_name", "last_name", "email"]
 
 
-class TeamSerializer(serializers.ModelSerializer):
+class LessFieldsTeamSerializer(serializers.ModelSerializer):
+    team_users = LessFieldsUserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Team
-        fields = ["name", "description"]
+        fields = ["name", "description", "team_users"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -29,7 +31,7 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CustomLocationSerializer(serializers.ModelSerializer):
+class LessFieldsLocationSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
 
     class Meta:
@@ -38,11 +40,12 @@ class CustomLocationSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    company_location = CustomLocationSerializer(read_only=True)
-    users = UserSerializer(many=True, read_only=True)
-    teams = TeamSerializer(many=True, read_only=True)
-    created_by = UserSerializer(read_only=True)
-    updated_by = UserSerializer(read_only=True)
+    company_location = LessFieldsLocationSerializer(read_only=True)
+    users = LessFieldsUserSerializer(many=True, read_only=True)
+    teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    created_by = LessFieldsUserSerializer(read_only=True)
+    updated_by = LessFieldsUserSerializer(read_only=True)
+    # tasks = TaskSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
