@@ -65,17 +65,18 @@ class Project(models.Model):
     progress = models.IntegerField(default=0)
 
     class Priority(models.TextChoices):
-        critical = "critical"
-        very_important = "very_important"
-        important = "important"
-        normal = "normal"
-        less_important = "less_important"
+        "critical"
+        "very_important"
+        "important"
+        "normal"
+        "less_important"
 
     priority = models.CharField(
         max_length=24, choices=Priority.choices, default="normal"
     )
     project_details = models.JSONField(null=True, blank=True)
     company_name = models.CharField(max_length=100, null=True, blank=True)
+    company_email = models.CharField(max_length=255, null=True, blank=True)
     company_location = models.ForeignKey(
         Location, on_delete=models.SET_NULL, null=True, blank=True
     )

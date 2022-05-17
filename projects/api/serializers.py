@@ -1,8 +1,18 @@
 from rest_framework import serializers
 from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from users.api.serializers import UserSerializer
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = "__all__"
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    company_location = LocationSerializer(read_only=True)
+    users = UserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Project
         fields = "__all__"
@@ -11,12 +21,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = "__all__"
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
         fields = "__all__"
 
 
