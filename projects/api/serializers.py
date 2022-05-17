@@ -6,7 +6,7 @@ from users.models import User, Team
 class LessFieldsUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["id", "first_name", "last_name", "email"]
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class LessFieldsTeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ["name", "description", "team_users"]
+        fields = ["id", "name", "description", "team_users"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -36,7 +36,14 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ["address_line_one", "address_line_two", "city", "state", "country"]
+        fields = [
+            "id",
+            "address_line_one",
+            "address_line_two",
+            "city",
+            "state",
+            "country",
+        ]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -48,7 +55,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = "tasks"
+        fields = "__all__"
 
 
 class FocalPointSerializer(serializers.ModelSerializer):

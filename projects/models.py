@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import RegexValidator
 
+
 class Attachment(models.Model):
     name = models.CharField(max_length=64)
     path = models.CharField(max_length=255)
@@ -109,6 +110,7 @@ class Project(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
     teams = models.ManyToManyField("users.Team", related_name="project_team")
+    comments = GenericRelation("tasks.Comment")
     tasks = models.ManyToOneRel(to="tasks.Task", field="project", field_name="project")
 
     def __str__(self):
