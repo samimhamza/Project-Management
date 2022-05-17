@@ -60,7 +60,7 @@ class Project(models.Model):
     p_end_date = models.DateTimeField(null=True, blank=True)
     a_start_date = models.DateTimeField(null=True, blank=True)
     a_end_date = models.DateTimeField(null=True, blank=True)
-    banner = models.CharField(max_length=120,null=True, blank=True)
+    banner = models.CharField(max_length=120, null=True, blank=True)
     status = models.IntegerField(default=1)
     progress = models.IntegerField(default=0)
 
@@ -75,8 +75,10 @@ class Project(models.Model):
         max_length=24, choices=Priority.choices, default="normal"
     )
     project_details = models.JSONField(null=True, blank=True)
-    company_name = models.CharField(max_length=100,null=True, blank=True)
-    company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+    company_name = models.CharField(max_length=100, null=True, blank=True)
+    company_location = models.ForeignKey(
+        Location, on_delete=models.SET_NULL, null=True, blank=True
+    )
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -95,6 +97,7 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
+    teams = models.ManyToManyField("users.Team", related_name="project_team")
 
     def __str__(self):
         return self.name
