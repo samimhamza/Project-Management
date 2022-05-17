@@ -49,13 +49,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProjectTasksSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = ["tasks"]
-        depth = 1
-
-
 class FocalPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = FocalPoint
