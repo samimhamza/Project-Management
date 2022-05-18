@@ -1,11 +1,14 @@
 from rest_framework import serializers
 from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from tasks.api.serializers import TaskSerializer
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    # task = TaskSerializer(many=True, read_only=True)
     class Meta:
         model = Project
         fields = "__all__"
+        # depth = 1
 
 
 class CountrySerializer(serializers.ModelSerializer):

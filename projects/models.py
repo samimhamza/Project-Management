@@ -95,6 +95,7 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
+    # tasks = models.ManyToOneRel("tasks.Task",related_name="project_task" )
 
     def __str__(self):
         return self.name

@@ -57,6 +57,10 @@ class ProjectDetailAPIView(APIView):
 
 # end of Project CRUD
 
+class ProjectTasksListAPIView(APIView):
+    def get(self, request,pk):
+        return Response('everything we want we can response')
+
 # Country CRUD
 class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
@@ -72,15 +76,6 @@ class CountryListCreateAPIView(generics.ListCreateAPIView):
 class CountryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 
 # end of Location CRUD
