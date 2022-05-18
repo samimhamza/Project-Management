@@ -61,6 +61,26 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         ]
 
 
+class ProjectUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = [
+            "name",
+            "description",
+            "p_start_date",
+            "p_end_date",
+            "a_start_date",
+            "a_end_date",
+            "status",
+            "priority",
+            "progress",
+            "company_name",
+            "company_email",
+            "users",
+            "teams",
+        ]
+
+
 class DescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
