@@ -1,6 +1,47 @@
 from rest_framework import serializers
-from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from projects.models import (
+    Country,
+    Location,
+    FocalPoint,
+    Income,
+    Payment,
+    Project,
+    Attachment,
+)
 from users.models import User, Team
+from tasks.api.serializers import TaskSerializer
+
+
+class AttachmentObjectRelatedField(serializers.RelatedField):
+    """
+    A custom field to use for the `Attachment_object` generic relationship.
+    """
+
+    def to_representation(self, value):
+        """
+        Serialize Attachment objects to a simple textual representation.
+        """
+        # if isinstance(value, Project):
+        #     return "Project: " + value.name
+        # raise Exception("Unexpected type of Attachment object")
+
+    def to_representation(self, value):
+        """
+        Serialize bookmark instances using a bookmark serializer,
+        and note instances using a note serializer.
+        """
+        if isinstance(value, Project):
+            serializer = ProjectSerializer(value)
+        else:
+            raise Exception("Unexpected type of Attachment object")
+
+        return serializer.data
+
+
+class AttachmentSerializer(serializers.Serializer):
+    class Meta:
+        model = Attachment
+        fields = "__all__"
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -47,15 +88,26 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(read_only=True)
-    users = LessFieldsUserSerializer(many=True, read_only=True)
-    teams = LessFieldsTeamSerializer(many=True, read_only=True)
-    created_by = LessFieldsUserSerializer(read_only=True)
-    updated_by = LessFieldsUserSerializer(read_only=True)
+    # company_location = LessFieldsLocationSerializer(read_only=True)
+    # users = LessFieldsUserSerializer(many=True, read_only=True)
+    # teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    # created_by = LessFieldsUserSerializer(read_only=True)
+    # updated_by = LessFieldsUserSerializer(read_only=True)
+    tasks = TaskSerializer(many=True, read_only=True)
+    # attachments = AttachmentObjectRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = "__all__"
+        fields = [
+            # "id",
+            # "name",
+            "tasks",
+            # "company_location",
+            # "users",
+            # "teams",
+            # "created_by",
+            # "updated_by",
+        ]
 
 
 class FocalPointSerializer(serializers.ModelSerializer):

@@ -1,6 +1,14 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
-from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from projects.models import (
+    Project,
+    Country,
+    Location,
+    FocalPoint,
+    Income,
+    Payment,
+    Attachment,
+)
 from projects.api.serializers import (
     ProjectSerializer,
     CountrySerializer,
@@ -8,6 +16,7 @@ from projects.api.serializers import (
     FocalPointSerializer,
     IncomeSerializer,
     PaymentSerializer,
+    AttachmentSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -38,6 +47,16 @@ class ProjectListCreateAPIView(generics.ListCreateAPIView):
 class ProjectDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+
+class AttachmentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Attachment.objects.all()
+    serializer_class = AttachmentSerializer
+
+
+class AttachmentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Attachment.objects.all()
+    serializer_class = AttachmentSerializer
 
 
 # class ProjectDetailAPIView(APIView):
