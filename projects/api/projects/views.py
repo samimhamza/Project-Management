@@ -9,12 +9,12 @@ from projects.api.projects.serializers import (
     ProjectUpdateSerializer,
 )
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
+import datetime
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(deleted_at__isnull=True)
     serializer_class = ProjectListSerializer
     serializer_action_classes = {
         "create": ProjectCreateSerializer,
@@ -75,10 +75,31 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectListSerializer(project)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
+    def destroy(self, request, pk=None):
+        project = self.get_object()
+        if project.deleted_at:
+            project.delete()
+        else:
+            project.deleted_at = datetime.datetime.now()
+            project.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectTasksSerializer(project)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        queryset = Project.objects.all()
+        serializer = ProjectListSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        queryset = Project.objects.filter(deleted_at__isnull=False)
+        serializer = ProjectListSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def get_serializer_class(self):
