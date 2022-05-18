@@ -8,6 +8,7 @@ from projects.models import (
     Project,
     Attachment,
 )
+from projects.api.projects import serializers as api_serializers
 
 
 class AttachmentObjectRelatedField(serializers.RelatedField):
@@ -21,7 +22,7 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
         and note instances using a note serializer.
         """
         if isinstance(value, Project):
-            serializer = ProjectListSerializer(value)
+            serializer = api_serializers.ProjectListSerializer(value)
         else:
             raise Exception("Unexpected type of Attachment object")
 
