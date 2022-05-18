@@ -1,4 +1,3 @@
-import re
 from rest_framework import viewsets, status
 from projects.models import Project
 from users.models import User, Team
