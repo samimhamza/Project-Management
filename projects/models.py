@@ -12,8 +12,8 @@ class Attachment(models.Model):
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey()
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
         return self.name
@@ -24,7 +24,7 @@ class Reason(models.Model):
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.UUIDField()
     content_object = GenericForeignKey()
 
 
@@ -54,8 +54,8 @@ class Location(models.Model):
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=30)
-    description = models.TextField()
+    name = models.CharField(max_length=30, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     p_start_date = models.DateTimeField(null=True, blank=True)
     p_end_date = models.DateTimeField(null=True, blank=True)
     a_start_date = models.DateTimeField(null=True, blank=True)
@@ -103,8 +103,14 @@ class Project(models.Model):
         null=True,
         related_name="project_updated_by",
     )
-    attachments = GenericRelation(Attachment)
-    reasons = GenericRelation(Reason)
+    attachments = GenericRelation(
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+    )
+    reasons = GenericRelation(
+        Reason, content_type_field="content_type", object_id_field="object_id"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
@@ -138,9 +144,9 @@ class Income(models.Model):
     )
     updated_by = models.ForeignKey(
         "users.User",
-        on_delete=models.SET_NULL,
         null=True,
         related_name="income_updated_by",
+        on_delete=models.SET_NULL,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

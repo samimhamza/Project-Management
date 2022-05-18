@@ -1,13 +1,25 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
-from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from projects.models import (
+    Project,
+    Country,
+    Location,
+    FocalPoint,
+    Income,
+    Payment,
+    Attachment,
+)
 from projects.api.serializers import (
-    ProjectSerializer,
+    ProjectListSerializer,
+    ProjectCreateSerializer,
     CountrySerializer,
     LocationSerializer,
     FocalPointSerializer,
     IncomeSerializer,
     PaymentSerializer,
+    AttachmentSerializer,
+    ProjectTasksSerializer,
+    PDescriptionSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -30,14 +42,50 @@ import datetime
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectListCreateAPIView(generics.ListCreateAPIView):
+class ProjectListAPIView(generics.ListAPIView):
     queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectListSerializer
 
 
-class ProjectDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+class ProjectRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectCreateSerializer
+
+
+class ProjectDescriptionUpdateAPIView(APIView):
+    def get_object(self, pk):
+        project = get_object_or_404(Project, pk=pk)
+        return project
+
+    def put(self, request, pk):
+        project = self.get_object(pk)
+        serializer = PDescriptionSerializer(project, data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data["updated_by"] = request.user
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectTaskLlistAPIView(APIView):
+    def get_object(self, pk):
+        project = get_object_or_404(Project, pk=pk)
+        return project
+
+    def get(self, request, pk):
+        project = self.get_object(pk)
+        serializer = ProjectTasksSerializer(project)
+        return Response(serializer.data)
+
+
+class AttachmentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Attachment.objects.all()
+    serializer_class = AttachmentSerializer
+
+
+class AttachmentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Attachment.objects.all()
+    serializer_class = AttachmentSerializer
 
 
 # class ProjectDetailAPIView(APIView):
@@ -67,30 +115,21 @@ class ProjectDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 # end of Project CRUD
 
+
+class ProjectTasksListAPIView(APIView):
+    def get(self, request, pk):
+        return Response("everything we want we can response")
+
+
 # Country CRUD
 class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
 
 class CountryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 
 # end of Location CRUD
@@ -100,25 +139,10 @@ class LocationListCreateAPIView(generics.ListCreateAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
 
 class LocationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 
 # end of Location CRUD
@@ -128,9 +152,6 @@ class PaymentListCreateAPIView(generics.ListCreateAPIView):
     queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
     paginate_by = 10
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -147,12 +168,6 @@ class PaymentListCreateAPIView(generics.ListCreateAPIView):
 class PaymentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         try:
@@ -173,9 +188,6 @@ class IncomeListCreateAPIView(generics.ListCreateAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         try:
             if not request.data._mutable:
@@ -191,12 +203,6 @@ class IncomeListCreateAPIView(generics.ListCreateAPIView):
 class IncomeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         try:
@@ -217,9 +223,6 @@ class FocalPointListCreateAPIView(generics.ListCreateAPIView):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         try:
             if not request.data._mutable:
@@ -235,12 +238,6 @@ class FocalPointListCreateAPIView(generics.ListCreateAPIView):
 class FocalPointDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         try:

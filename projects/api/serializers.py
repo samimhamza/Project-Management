@@ -1,18 +1,55 @@
 from rest_framework import serializers
-from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from projects.models import (
+    Country,
+    Location,
+    FocalPoint,
+    Income,
+    Payment,
+    Project,
+    Attachment,
+)
 from users.models import User, Team
+from tasks.api.serializers import TaskSerializer
 
 
-class UserSerializer(serializers.ModelSerializer):
+class AttachmentObjectRelatedField(serializers.RelatedField):
+    """
+    A custom field to use for the `Attachment_object` generic relationship.
+    """
+
+    def to_representation(self, value):
+        """
+        Serialize bookmark instances using a bookmark serializer,
+        and note instances using a note serializer.
+        """
+        if isinstance(value, Project):
+            serializer = ProjectListSerializer(value)
+        else:
+            raise Exception("Unexpected type of Attachment object")
+
+        return serializer.data
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    project = AttachmentObjectRelatedField(read_only=True)
+
+    class Meta:
+        model = Attachment
+        fields = ["name", "path", "object_id", "project"]
+
+
+class LessFieldsUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["id", "first_name", "last_name", "email"]
 
 
-class TeamSerializer(serializers.ModelSerializer):
+class LessFieldsTeamSerializer(serializers.ModelSerializer):
+    team_users = LessFieldsUserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Team
-        fields = ["name", "description"]
+        fields = ["id", "name", "description", "team_users"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -29,25 +66,61 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CustomLocationSerializer(serializers.ModelSerializer):
+class LessFieldsLocationSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
 
     class Meta:
         model = Location
-        fields = ["address_line_one", "address_line_two", "city", "state", "country"]
+        fields = [
+            "id",
+            "address_line_one",
+            "address_line_two",
+            "city",
+            "state",
+            "country",
+        ]
 
 
-class ProjectSerializer(serializers.ModelSerializer):
-    company_location = CustomLocationSerializer(read_only=True)
-    users = UserSerializer(many=True, read_only=True)
-    teams = TeamSerializer(many=True, read_only=True)
-    created_by = UserSerializer(read_only=True)
-    updated_by = UserSerializer(read_only=True)
+class ProjectTasksSerializer(serializers.ModelSerializer):
+    tasks = TaskSerializer(many=True)
 
     class Meta:
         model = Project
+        fields = ["tasks"]
+
+
+class ProjectListSerializer(serializers.ModelSerializer):
+    company_location = LessFieldsLocationSerializer(read_only=True)
+    users = LessFieldsUserSerializer(many=True, read_only=True)
+    teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    created_by = LessFieldsUserSerializer(read_only=True)
+    updated_by = LessFieldsUserSerializer(read_only=True)
+    tasks = TaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
+            "tasks",
+            "company_location",
+            "users",
+            "teams",
+            "created_by",
+            "updated_by",
+        ]
+
+
+class ProjectCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
         fields = "__all__"
-        depth = 2
+
+
+class PDescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["description"]
 
 
 class FocalPointSerializer(serializers.ModelSerializer):
