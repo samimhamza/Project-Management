@@ -1,5 +1,8 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
+import datetime
 from projects.models import (
     Project,
     Country,
@@ -21,9 +24,6 @@ from projects.api.serializers import (
     ProjectTasksSerializer,
     PDescriptionSerializer,
 )
-from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
-import datetime
 
 # Project CRUD
 # class ProjectListCreateAPIView(APIView):
@@ -42,9 +42,20 @@ import datetime
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectListAPIView(generics.ListAPIView):
+class ProjectListCreateAPIView(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectListSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            if not request.data._mutable:
+                request.data._mutable = True
+                request.data.update(created_by=request.user.id)
+                request.data.update(updated_by=request.user.id)
+        except:
+            request.data.update(created_by=request.user.id)
+            request.data.update(updated_by=request.user.id)
+        return self.create(request, *args, **kwargs)
 
 
 class ProjectRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):

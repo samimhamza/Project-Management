@@ -8,8 +8,6 @@ from projects.models import (
     Project,
     Attachment,
 )
-from users.models import User, Team
-from tasks.api.serializers import TaskSerializer
 
 
 class AttachmentObjectRelatedField(serializers.RelatedField):
@@ -36,20 +34,6 @@ class AttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
         fields = ["name", "path", "object_id", "project"]
-
-
-class LessFieldsUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "first_name", "last_name", "email"]
-
-
-class LessFieldsTeamSerializer(serializers.ModelSerializer):
-    team_users = LessFieldsUserSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Team
-        fields = ["id", "name", "description", "team_users"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -79,48 +63,6 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
             "state",
             "country",
         ]
-
-
-class ProjectTasksSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True)
-
-    class Meta:
-        model = Project
-        fields = ["tasks"]
-
-
-class ProjectListSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(read_only=True)
-    users = LessFieldsUserSerializer(many=True, read_only=True)
-    teams = LessFieldsTeamSerializer(many=True, read_only=True)
-    created_by = LessFieldsUserSerializer(read_only=True)
-    updated_by = LessFieldsUserSerializer(read_only=True)
-    tasks = TaskSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
-            "tasks",
-            "company_location",
-            "users",
-            "teams",
-            "created_by",
-            "updated_by",
-        ]
-
-
-class ProjectCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = "__all__"
-
-
-class PDescriptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = ["description"]
 
 
 class FocalPointSerializer(serializers.ModelSerializer):
