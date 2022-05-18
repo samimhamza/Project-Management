@@ -23,17 +23,19 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
         and note instances using a note serializer.
         """
         if isinstance(value, Project):
-            serializer = ProjectSerializer(value)
+            serializer = ProjectListSerializer(value)
         else:
             raise Exception("Unexpected type of Attachment object")
 
         return serializer.data
 
 
-class AttachmentSerializer(serializers.RelatedField):
+class AttachmentSerializer(serializers.ModelSerializer):
+    project = AttachmentObjectRelatedField(read_only=True)
+
     class Meta:
         model = Attachment
-        fields = ["name", "path", "project"]
+        fields = ["name", "path", "object_id", "project"]
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -87,7 +89,7 @@ class ProjectTasksSerializer(serializers.ModelSerializer):
         fields = ["tasks"]
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(read_only=True)
     users = LessFieldsUserSerializer(many=True, read_only=True)
     teams = LessFieldsTeamSerializer(many=True, read_only=True)
@@ -107,6 +109,18 @@ class ProjectSerializer(serializers.ModelSerializer):
             "created_by",
             "updated_by",
         ]
+
+
+class ProjectCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = "__all__"
+
+
+class PDescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["description"]
 
 
 class FocalPointSerializer(serializers.ModelSerializer):
