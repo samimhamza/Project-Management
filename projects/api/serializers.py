@@ -88,25 +88,25 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(read_only=True)
-    users = LessFieldsUserSerializer(many=True, read_only=True)
-    teams = LessFieldsTeamSerializer(many=True, read_only=True)
-    created_by = LessFieldsUserSerializer(read_only=True)
-    updated_by = LessFieldsUserSerializer(read_only=True)
+    # company_location = LessFieldsLocationSerializer(read_only=True)
+    # users = LessFieldsUserSerializer(many=True, read_only=True)
+    # teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    # created_by = LessFieldsUserSerializer(read_only=True)
+    # updated_by = LessFieldsUserSerializer(read_only=True)
     tasks = TaskSerializer(many=True, read_only=True)
     # attachments = AttachmentObjectRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Project
         fields = [
-            "id",
-            "name",
+            # "id",
+            # "name",
             "tasks",
-            "company_location",
-            "users",
-            "teams",
-            "created_by",
-            "updated_by",
+            # "company_location",
+            # "users",
+            # "teams",
+            # "created_by",
+            # "updated_by",
         ]
 
 
