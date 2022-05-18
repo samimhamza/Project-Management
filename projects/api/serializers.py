@@ -19,14 +19,6 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
         """
-        Serialize Attachment objects to a simple textual representation.
-        """
-        # if isinstance(value, Project):
-        #     return "Project: " + value.name
-        # raise Exception("Unexpected type of Attachment object")
-
-    def to_representation(self, value):
-        """
         Serialize bookmark instances using a bookmark serializer,
         and note instances using a note serializer.
         """
@@ -38,10 +30,10 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
         return serializer.data
 
 
-class AttachmentSerializer(serializers.Serializer):
+class AttachmentSerializer(serializers.RelatedField):
     class Meta:
         model = Attachment
-        fields = "__all__"
+        fields = ["name", "path"]
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -87,26 +79,33 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProjectSerializer(serializers.ModelSerializer):
-    # company_location = LessFieldsLocationSerializer(read_only=True)
-    # users = LessFieldsUserSerializer(many=True, read_only=True)
-    # teams = LessFieldsTeamSerializer(many=True, read_only=True)
-    # created_by = LessFieldsUserSerializer(read_only=True)
-    # updated_by = LessFieldsUserSerializer(read_only=True)
+class ProjectTasksSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)
-    # attachments = AttachmentObjectRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = ["tasks"]
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    company_location = LessFieldsLocationSerializer(read_only=True)
+    users = LessFieldsUserSerializer(many=True, read_only=True)
+    teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    created_by = LessFieldsUserSerializer(read_only=True)
+    updated_by = LessFieldsUserSerializer(read_only=True)
+    tasks = TaskSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
         fields = [
-            # "id",
-            # "name",
+            "id",
+            "name",
             "tasks",
-            # "company_location",
-            # "users",
-            # "teams",
-            # "created_by",
-            # "updated_by",
+            "company_location",
+            "users",
+            "teams",
+            "created_by",
+            "updated_by",
         ]
 
 

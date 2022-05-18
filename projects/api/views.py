@@ -17,6 +17,7 @@ from projects.api.serializers import (
     IncomeSerializer,
     PaymentSerializer,
     AttachmentSerializer,
+    ProjectTasksSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -47,6 +48,17 @@ class ProjectListCreateAPIView(generics.ListCreateAPIView):
 class ProjectDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+
+class ProjectTaskLlistAPIView(APIView):
+    def get_object(self, pk):
+        project = get_object_or_404(Project, pk=pk)
+        return project
+
+    def get(self, request, pk):
+        project = self.get_object(pk)
+        serializer = ProjectTasksSerializer(project)
+        return Response(serializer.data)
 
 
 class AttachmentListCreateAPIView(generics.ListCreateAPIView):

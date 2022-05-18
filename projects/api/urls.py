@@ -14,6 +14,7 @@ from projects.api.views import (
     PaymentDetailAPIView,
     AttachmentListCreateAPIView,
     AttachmentDetailAPIView,
+    ProjectTaskLlistAPIView,
 )
 
 
@@ -21,6 +22,11 @@ urlpatterns = [
     path("projects/", ProjectListCreateAPIView.as_view(), name="projects-list"),
     path("projects/create", ProjectListCreateAPIView.as_view(), name="projects-create"),
     path("projects/<uuid:pk>", ProjectDetailAPIView.as_view(), name="projects-detail"),
+    path(
+        "projects/<uuid:pk>/tasks",
+        ProjectTaskLlistAPIView.as_view(),
+        name="projects-tasks",
+    ),
     path("countries/", CountryListCreateAPIView.as_view(), name="countries-list"),
     path(
         "countries/<uuid:pk>", CountryDetailAPIView.as_view(), name="countries-detail"
