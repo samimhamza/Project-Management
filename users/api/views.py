@@ -124,20 +124,7 @@ class TeamListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TeamSerializer
     paginate_by = 10
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(created_by=request.user.id)
-                request.data.update(updated_by=request.user.id)
-        except:
-            request.data.update(created_by=request.user.id)
-            request.data.update(updated_by=request.user.id)
-        return self.create(request, *args, **kwargs)
-
+  
 
 class TeamDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Team.objects.filter(deleted_at__isnull=True)
