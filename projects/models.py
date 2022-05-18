@@ -12,7 +12,7 @@ class Attachment(models.Model):
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    object_id = models.UUIDField()
     content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
@@ -24,7 +24,7 @@ class Reason(models.Model):
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    object_id = models.UUIDField()
     content_object = GenericForeignKey()
 
 
@@ -104,7 +104,9 @@ class Project(models.Model):
         related_name="project_updated_by",
     )
     attachments = GenericRelation(
-        Attachment, content_type_field="content_type", object_id_field="object_id"
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
     )
     reasons = GenericRelation(
         Reason, content_type_field="content_type", object_id_field="object_id"
@@ -114,7 +116,6 @@ class Project(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
     teams = models.ManyToManyField("users.Team", related_name="project_team")
-    tasks = models.ManyToOneRel(to="tasks.Task", field="project", field_name="project")
 
     def __str__(self):
         return self.name

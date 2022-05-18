@@ -12,6 +12,8 @@ from projects.api.views import (
     IncomeDetailAPIView,
     PaymentListCreateAPIView,
     PaymentDetailAPIView,
+    AttachmentListCreateAPIView,
+    AttachmentDetailAPIView,
 )
 
 
@@ -46,5 +48,13 @@ urlpatterns = [
         "payments/<uuid:pk>",
         PaymentDetailAPIView.as_view(),
         name="payments-detail",
+    ),
+    path(
+        "attachments/", AttachmentListCreateAPIView.as_view(), name="attachments-list"
+    ),
+    path(
+        "attachments/<uuid:pk>",
+        AttachmentDetailAPIView.as_view(),
+        name="attachments-detail",
     ),
 ]
