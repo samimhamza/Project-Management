@@ -33,7 +33,7 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
 class AttachmentSerializer(serializers.RelatedField):
     class Meta:
         model = Attachment
-        fields = ["name", "path"]
+        fields = ["name", "path", "project"]
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -80,7 +80,7 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
 
 
 class ProjectTasksSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True, read_only=True)
+    tasks = TaskSerializer(many=True)
 
     class Meta:
         model = Project
