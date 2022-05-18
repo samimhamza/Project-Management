@@ -98,6 +98,10 @@ class AttachmentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 # end of Project CRUD
 
+class ProjectTasksListAPIView(APIView):
+    def get(self, request,pk):
+        return Response('everything we want we can response')
+
 # Country CRUD
 class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()

@@ -12,6 +12,7 @@ from projects.api.views import (
     IncomeDetailAPIView,
     PaymentListCreateAPIView,
     PaymentDetailAPIView,
+    ProjectTasksListAPIView,
     AttachmentListCreateAPIView,
     AttachmentDetailAPIView,
     ProjectTaskLlistAPIView,
