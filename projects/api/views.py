@@ -72,25 +72,10 @@ class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
 
 class CountryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 
 # end of Location CRUD
@@ -100,25 +85,10 @@ class LocationListCreateAPIView(generics.ListCreateAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
 
 class LocationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 
 # end of Location CRUD
@@ -128,9 +98,6 @@ class PaymentListCreateAPIView(generics.ListCreateAPIView):
     queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
     paginate_by = 10
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -147,12 +114,6 @@ class PaymentListCreateAPIView(generics.ListCreateAPIView):
 class PaymentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         try:
@@ -173,9 +134,6 @@ class IncomeListCreateAPIView(generics.ListCreateAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         try:
             if not request.data._mutable:
@@ -191,12 +149,6 @@ class IncomeListCreateAPIView(generics.ListCreateAPIView):
 class IncomeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         try:
@@ -217,9 +169,6 @@ class FocalPointListCreateAPIView(generics.ListCreateAPIView):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         try:
             if not request.data._mutable:
@@ -235,12 +184,6 @@ class FocalPointListCreateAPIView(generics.ListCreateAPIView):
 class FocalPointDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         try:

@@ -110,7 +110,6 @@ class Project(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
     teams = models.ManyToManyField("users.Team", related_name="project_team")
-    comments = GenericRelation("tasks.Comment")
     tasks = models.ManyToOneRel(to="tasks.Task", field="project", field_name="project")
 
     def __str__(self):

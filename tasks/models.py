@@ -112,16 +112,18 @@ class UserTask(models.Model):
 
 # Start of Comments Table
 class Comment(models.Model):
+    commentable_id = models.CharField(max_length=64)
+    commentable_type = models.CharField(max_length=32)
     body = models.TextField()
     commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
     attachments = GenericRelation(Attachment)
 
     # Below the mandatory fields for generic relation
-    content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, blank=True, null=True
-    )
-    object_id = models.PositiveIntegerField(blank=True, null=True)
-    content_object = GenericForeignKey()
+    # content_type = models.ForeignKey(
+    #     ContentType, on_delete=models.CASCADE, blank=True, null=True
+    # )
+    # object_id = models.PositiveIntegerField(blank=True, null=True)
+    # content_object = GenericForeignKey()
 
     def __str__(self):
         return self.body
