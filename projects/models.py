@@ -60,8 +60,19 @@ class Project(models.Model):
     p_end_date = models.DateTimeField(null=True, blank=True)
     a_start_date = models.DateTimeField(null=True, blank=True)
     a_end_date = models.DateTimeField(null=True, blank=True)
-    banner = models.CharField(max_length=120,null=True, blank=True)
-    status = models.IntegerField(default=1)
+    banner = models.CharField(max_length=120, null=True, blank=True)
+
+    class StatusChoices(models.TextChoices):
+        pending = "pending"
+        in_progress = "in_progress"
+        completed = "completed"
+        very_important = "issue_faced"
+        failed = "failed"
+        cancelled = "cancelled"
+
+    status = models.CharField(
+        max_length=24, choices=StatusChoices.choices, default="pending"
+    )
     progress = models.IntegerField(default=0)
 
     class Priority(models.TextChoices):
@@ -75,8 +86,11 @@ class Project(models.Model):
         max_length=24, choices=Priority.choices, default="normal"
     )
     project_details = models.JSONField(null=True, blank=True)
-    company_name = models.CharField(max_length=100,null=True, blank=True)
-    company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+    company_name = models.CharField(max_length=100, null=True, blank=True)
+    company_email = models.EmailField(null=True, blank=True)
+    company_location = models.ForeignKey(
+        Location, on_delete=models.SET_NULL, null=True, blank=True
+    )
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -95,7 +109,8 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
-    # tasks = models.ManyToOneRel("tasks.Task",related_name="project_task" )
+    teams = models.ManyToManyField("users.Team", related_name="project_team")
+    tasks = models.ManyToOneRel(to="tasks.Task", field="project", field_name="project")
 
     def __str__(self):
         return self.name
@@ -124,9 +139,9 @@ class Income(models.Model):
     )
     updated_by = models.ForeignKey(
         "users.User",
-        on_delete=models.SET_NULL,
         null=True,
         related_name="income_updated_by",
+        on_delete=models.SET_NULL,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

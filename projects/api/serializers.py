@@ -1,14 +1,20 @@
 from rest_framework import serializers
 from projects.models import Project, Country, Location, FocalPoint, Income, Payment
-from tasks.api.serializers import TaskSerializer
+from users.models import User, Team
 
 
-class ProjectSerializer(serializers.ModelSerializer):
-    # task = TaskSerializer(many=True, read_only=True)
+class LessFieldsUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Project
-        fields = "__all__"
-        # depth = 1
+        model = User
+        fields = ["id", "first_name", "last_name", "email"]
+
+
+class LessFieldsTeamSerializer(serializers.ModelSerializer):
+    team_users = LessFieldsUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Team
+        fields = ["id", "name", "description", "team_users"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -18,8 +24,37 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+
     class Meta:
         model = Location
+        fields = "__all__"
+
+
+class LessFieldsLocationSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+
+    class Meta:
+        model = Location
+        fields = [
+            "id",
+            "address_line_one",
+            "address_line_two",
+            "city",
+            "state",
+            "country",
+        ]
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    company_location = LessFieldsLocationSerializer(read_only=True)
+    users = LessFieldsUserSerializer(many=True, read_only=True)
+    teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    created_by = LessFieldsUserSerializer(read_only=True)
+    updated_by = LessFieldsUserSerializer(read_only=True)
+
+    class Meta:
+        model = Project
         fields = "__all__"
 
 

@@ -2,12 +2,16 @@ import uuid
 from django.db import models
 from projects.models import Project, Attachment, Reason
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 # Start of Task Table
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
+    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True)
+    project = models.ForeignKey(
+        Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
+    )
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, null=True)
     p_start_date = models.DateTimeField(blank=True, null=True)
@@ -108,11 +112,18 @@ class UserTask(models.Model):
 
 # Start of Comments Table
 class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    commentable_id = models.CharField(max_length=64)
+    commentable_type = models.CharField(max_length=32)
     body = models.TextField()
-    task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True)
     commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
     attachments = GenericRelation(Attachment)
+
+    # Below the mandatory fields for generic relation
+    # content_type = models.ForeignKey(
+    #     ContentType, on_delete=models.CASCADE, blank=True, null=True
+    # )
+    # object_id = models.PositiveIntegerField(blank=True, null=True)
+    # content_object = GenericForeignKey()
 
     def __str__(self):
         return self.body
