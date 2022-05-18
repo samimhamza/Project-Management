@@ -1,4 +1,4 @@
-from rest_framework import generics, status, viewsets
+from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -13,80 +13,13 @@ from projects.models import (
     Attachment,
 )
 from projects.api.serializers import (
-    ProjectListSerializer,
-    ProjectCreateSerializer,
     CountrySerializer,
     LocationSerializer,
     FocalPointSerializer,
     IncomeSerializer,
     PaymentSerializer,
     AttachmentSerializer,
-    ProjectTasksSerializer,
-    PDescriptionSerializer,
 )
-
-# Project CRUD
-# class ProjectListCreateAPIView(APIView):
-#     def get(self, request):
-#         projects = Project.objects.filter(deleted_at__isnull=True)
-#         serializers = ProjectSerializer(projects, many=True)
-#         return Response(serializers.data)
-
-#     def post(self, request):
-#         serializer = ProjectSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.validated_data["created_by"] = request.user
-#             serializer.validated_data["updated_by"] = request.user
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProjectListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectListSerializer
-
-    def post(self, request, *args, **kwargs):
-        try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(created_by=request.user.id)
-                request.data.update(updated_by=request.user.id)
-        except:
-            request.data.update(created_by=request.user.id)
-            request.data.update(updated_by=request.user.id)
-        return self.create(request, *args, **kwargs)
-
-
-class ProjectRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectCreateSerializer
-
-
-class ProjectDescriptionUpdateAPIView(APIView):
-    def get_object(self, pk):
-        project = get_object_or_404(Project, pk=pk)
-        return project
-
-    def put(self, request, pk):
-        project = self.get_object(pk)
-        serializer = PDescriptionSerializer(project, data=request.data)
-        if serializer.is_valid():
-            serializer.validated_data["updated_by"] = request.user
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProjectTaskLlistAPIView(APIView):
-    def get_object(self, pk):
-        project = get_object_or_404(Project, pk=pk)
-        return project
-
-    def get(self, request, pk):
-        project = self.get_object(pk)
-        serializer = ProjectTasksSerializer(project)
-        return Response(serializer.data)
 
 
 class AttachmentListCreateAPIView(generics.ListCreateAPIView):
@@ -97,39 +30,6 @@ class AttachmentListCreateAPIView(generics.ListCreateAPIView):
 class AttachmentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
-
-
-# class ProjectDetailAPIView(APIView):
-#     def get_object(self, pk):
-#         project = get_object_or_404(Project, pk=pk)
-#         return project
-
-#     def get(self, request, pk):
-#         project = self.get_object(pk)
-#         serializer = ProjectSerializer(project)
-#         return Response(serializer.data)
-
-#     def put(self, request, pk):
-#         project = self.get_object(pk)
-#         serializer = ProjectSerializer(project, data=request.data)
-#         if serializer.is_valid():
-#             serializer.validated_data["updated_by"] = request.user
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def delete(self, request, pk):
-#         project = self.get_object(pk)
-#         project.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# end of Project CRUD
-
-
-class ProjectTasksListAPIView(APIView):
-    def get(self, request, pk):
-        return Response("everything we want we can response")
 
 
 # Country CRUD
