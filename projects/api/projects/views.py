@@ -84,7 +84,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("teams"):
             teams = Team.objects.filter(pk__in=request.data.get("teams"))
             project.teams.set(teams)
-        project.updated_by = request.user
+        # project.updated_by = request.user
         project.save()
         serializer = ProjectListSerializer(project)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
