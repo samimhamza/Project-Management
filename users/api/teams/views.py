@@ -20,7 +20,11 @@ class TeamViewSet(viewsets.ModelViewSet):
         "create": TeamCreateSerializer,
         "update": TeamUpdateSerializer,
     }
-    queryset_actions = {}
+    queryset_actions = {
+        "destroy": Team.objects.all(),
+        "trashed": Team.objects.all(),
+        "restore": Team.objects.all(),
+    }
 
     def create(self, request):
         data = request.data
@@ -55,10 +59,42 @@ class TeamViewSet(viewsets.ModelViewSet):
         serializer = TeamListSerializer(team)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
+    def destroy(self, request, pk=None):
+        team = self.get_object()
+        if team.deleted_at:
+            team.delete()
+        else:
+            team.deleted_at = datetime.datetime.now()
+            team.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=["get"])
     def team_users(self, request, pk=None):
         projects = TeamUser.objects.select_related("user", "team")
         serializer = TeamUserSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        queryset = Team.objects.all()
+        serializer = TeamListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        queryset = Team.objects.filter(deleted_at__isnull=False)
+        serializer = TeamListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        data = request.data
+        teams = Team.objects.filter(pk__in=data["ids"])
+        for team in teams:
+            team.deleted_at = None
+            team.save()
+        serializer = TeamListSerializer(teams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
