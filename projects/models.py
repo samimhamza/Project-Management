@@ -54,8 +54,8 @@ class Location(models.Model):
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=30)
-    description = models.TextField()
+    name = models.CharField(max_length=30, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     p_start_date = models.DateTimeField(null=True, blank=True)
     p_end_date = models.DateTimeField(null=True, blank=True)
     a_start_date = models.DateTimeField(null=True, blank=True)

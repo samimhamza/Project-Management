@@ -65,6 +65,11 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    task_users = models.ManyToManyField(
+        "users.User",
+        through="UserTask",
+        through_fields=("task", "user"),
+    )
 
     def __str__(self):
         return self.name
@@ -76,8 +81,12 @@ class Task(models.Model):
 class UserTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(blank=True, null=True)
-    user = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True)
-    task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(
+        "users.User", on_delete=models.SET_NULL, null=True, related_name="user_tasks"
+    )
+    task = models.ForeignKey(
+        Task, on_delete=models.SET_NULL, null=True, related_name="users"
+    )
     progress = models.IntegerField()
 
     class UserTaskTypes(models.TextChoices):

@@ -8,8 +8,7 @@ from projects.models import (
     Project,
     Attachment,
 )
-from users.models import User, Team
-from tasks.api.serializers import TaskSerializer
+from projects.api.projects import serializers as api_serializers
 
 
 class AttachmentObjectRelatedField(serializers.RelatedField):
@@ -23,31 +22,19 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
         and note instances using a note serializer.
         """
         if isinstance(value, Project):
-            serializer = ProjectSerializer(value)
+            serializer = api_serializers.ProjectListSerializer(value)
         else:
             raise Exception("Unexpected type of Attachment object")
 
         return serializer.data
 
 
-class AttachmentSerializer(serializers.RelatedField):
+class AttachmentSerializer(serializers.ModelSerializer):
+    project = AttachmentObjectRelatedField(read_only=True)
+
     class Meta:
         model = Attachment
-        fields = ["name", "path", "project"]
-
-
-class LessFieldsUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "first_name", "last_name", "email"]
-
-
-class LessFieldsTeamSerializer(serializers.ModelSerializer):
-    team_users = LessFieldsUserSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Team
-        fields = ["id", "name", "description", "team_users"]
+        fields = ["name", "path", "object_id", "project"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -79,6 +66,7 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
         ]
 
 
+<<<<<<< HEAD
 class ProjectTasksSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True)
 
@@ -110,6 +98,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         ]
 
 
+=======
+>>>>>>> 79facaa960cb24524fc943b6dc1029d839856683
 class FocalPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = FocalPoint

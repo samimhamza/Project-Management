@@ -20,13 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project_management_backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_management_backend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/FocalPoint.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/FocalPoint.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/api/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/AddMemberModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/AddMemberModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/team/ViewModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/team/ViewModal.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,23 +46,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/project/focalPoint&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/Dell/Documents/GitHub/project_management_backend",
+    "nodejs_package_manager_path": "yarn",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\focalPoint" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\test" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\customComponents" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
@@ -107,6 +106,7 @@
       <workItem from="1652153590123" duration="542000" />
       <workItem from="1652154705002" duration="414000" />
       <workItem from="1652155253728" duration="5263000" />
+      <workItem from="1652846090064" duration="2172000" />
     </task>
     <servers />
   </component>
