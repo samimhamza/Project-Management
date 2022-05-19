@@ -41,6 +41,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
+        "restore": Project.objects.all(),
     }
 
     def create(self, request):
@@ -109,25 +110,30 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def tasks(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectTasksSerializer(project)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def all(self, request):
         queryset = Project.objects.all()
         serializer = ProjectListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
         queryset = Project.objects.filter(deleted_at__isnull=False)
         serializer = ProjectListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
-    def trashed(self, request, pk=None):
-        project = self.get_object()
-        serializer = ProjectListSerializer(project)
-        return Response(serializer.data)
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        data = request.data
+        projects = Project.objects.filter(pk__in=data["ids"])
+        for project in projects:
+            project.deleted_at = None
+            project.save()
+        serializer = ProjectListSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         try:
