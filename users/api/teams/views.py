@@ -69,10 +69,30 @@ class TeamViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["get"])
-    def team_users(self, request, pk=None):
-        projects = TeamUser.objects.select_related("user", "team")
-        serializer = TeamUserSerializer(projects, many=True)
+    def users(self, request, pk=None):
+        team = self.get_object()
+        team_users = TeamUser.objects.filter(team=team)
+        serializer = TeamUserSerializer(team_users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    def user(self, request, pk=None):
+        data = request.data
+        team = self.get_object()
+        user = get_object_or_404(User, pk=data["id"])
+        team_user, created = TeamUser.objects.get_or_create(team=team, user=user)
+        team_user.position = data["position"]
+        team_user.save()
+        serializer = TeamUserSerializer(team_user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"])
+    def delete_user(self, request, pk=None):
+        data = request.data
+        team = self.get_object()
+        team_user = TeamUser.objects.get(team=team, user=data["id"])
+        team_user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["get"])
     def all(self, request):
