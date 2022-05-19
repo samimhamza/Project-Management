@@ -31,10 +31,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
             created_by=project_data["created_by"],
             updated_by=project_data["updated_by"],
         )
-        users = User.objects.filter(pk__in=project_data["users"])
-        new_project.users.set(users)
-        teams = Team.objects.filter(pk__in=project_data["teams"])
-        new_project.teams.set(teams)
+        if request.data.get("share"):
+            if project_data["share"] != "justMe":
+                users = User.objects.filter(pk__in=project_data["users"])
+                new_project.users.set(users)
+                teams = Team.objects.filter(pk__in=project_data["teams"])
+                new_project.teams.set(teams)
+            if project_data["share"] == "everyone":
+                users = User.objects.all()
+                new_project.users.set(users)
+        else:
+            users = User.objects.filter(pk__in=project_data["users"])
+            new_project.users.set(users)
+            teams = Team.objects.filter(pk__in=project_data["teams"])
+            new_project.teams.set(teams)
+
         new_project.save()
         serializer = ProjectListSerializer(new_project)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -69,6 +80,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("teams"):
             teams = Team.objects.filter(pk__in=request.data.get("teams"))
             project.teams.set(teams)
+        if request.data.get("company_location"):
+            project.company_location.set(request.data.get("company_location"))
         project.updated_by = request.user
         project.save()
         serializer = ProjectListSerializer(project)

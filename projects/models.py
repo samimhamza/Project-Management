@@ -36,22 +36,6 @@ class Country(models.Model):
         return self.name
 
 
-class Location(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    address_line_one = models.TextField()
-    address_line_two = models.TextField()
-    city = models.CharField(max_length=64)
-    state = models.CharField(max_length=64)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    latitude = models.CharField(max_length=128, null=True, blank=True)
-    longitude = models.CharField(max_length=128, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.city + " " + self.state
-
-
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=30, null=True, blank=True)
@@ -88,9 +72,6 @@ class Project(models.Model):
     project_details = models.JSONField(null=True, blank=True)
     company_name = models.CharField(max_length=100, null=True, blank=True)
     company_email = models.EmailField(null=True, blank=True)
-    company_location = models.ForeignKey(
-        Location, on_delete=models.SET_NULL, null=True, blank=True
-    )
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -119,6 +100,29 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Location(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    address_line_one = models.TextField()
+    address_line_two = models.TextField()
+    city = models.CharField(max_length=64)
+    state = models.CharField(max_length=64)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    latitude = models.CharField(max_length=128, null=True, blank=True)
+    longitude = models.CharField(max_length=128, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="company_location",
+    )
+
+    def __str__(self):
+        return self.city + " " + self.state
 
 
 class Income(models.Model):
