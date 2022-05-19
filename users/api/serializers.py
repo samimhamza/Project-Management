@@ -1,4 +1,3 @@
-import re
 from rest_framework import serializers
 from users.models import User, Team, UserNote, Reminder, Holiday, Notification, TeamUser
 
@@ -7,6 +6,12 @@ class LessFieldsUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "first_name", "last_name", "email"]
+
+
+class FirstAndLastNameUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name"]
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):

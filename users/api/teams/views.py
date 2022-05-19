@@ -6,6 +6,7 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
+    UserTeamUserSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -25,6 +26,15 @@ class TeamViewSet(viewsets.ModelViewSet):
         "trashed": Team.objects.all(),
         "restore": Team.objects.all(),
     }
+
+    def list(self, request):
+        queryset = Team.objects.filter(deleted_at__isnull=True)
+        serializer = TeamListSerializer(queryset, many=True)
+        for team in serializer.data:
+            # leader = TeamUser.objects.filter(team=team)
+            team["total_users"] = len(team["team_users"])
+            # team["leader"] = leader
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
         data = request.data
