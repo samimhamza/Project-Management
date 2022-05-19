@@ -11,6 +11,24 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 import datetime
 
+# Sharing to Teams and Users
+def shareTo(request, project_data, new_project):
+    if request.data.get("share"):
+        if project_data["share"] != "justMe":
+            users = User.objects.filter(pk__in=project_data["users"])
+            new_project.users.set(users)
+            teams = Team.objects.filter(pk__in=project_data["teams"])
+            new_project.teams.set(teams)
+        if project_data["share"] == "everyone":
+            users = User.objects.all()
+            new_project.users.set(users)
+    else:
+        users = User.objects.filter(pk__in=project_data["users"])
+        new_project.users.set(users)
+        teams = Team.objects.filter(pk__in=project_data["teams"])
+        new_project.teams.set(teams)
+    return new_project
+
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(deleted_at__isnull=True)
@@ -31,21 +49,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             created_by=project_data["created_by"],
             updated_by=project_data["updated_by"],
         )
-        if request.data.get("share"):
-            if project_data["share"] != "justMe":
-                users = User.objects.filter(pk__in=project_data["users"])
-                new_project.users.set(users)
-                teams = Team.objects.filter(pk__in=project_data["teams"])
-                new_project.teams.set(teams)
-            if project_data["share"] == "everyone":
-                users = User.objects.all()
-                new_project.users.set(users)
-        else:
-            users = User.objects.filter(pk__in=project_data["users"])
-            new_project.users.set(users)
-            teams = Team.objects.filter(pk__in=project_data["teams"])
-            new_project.teams.set(teams)
-
+        new_project = shareTo(request, project_data, new_project)
         new_project.save()
         serializer = ProjectListSerializer(new_project)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
