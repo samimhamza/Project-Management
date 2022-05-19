@@ -104,6 +104,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "company_location",
             "users",
             "teams",
+            "status",
             "created_by",
             "updated_by",
         ]
