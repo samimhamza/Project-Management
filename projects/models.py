@@ -30,7 +30,7 @@ class Reason(models.Model):
 
 class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -104,10 +104,10 @@ class Project(models.Model):
 
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    address_line_one = models.TextField()
-    address_line_two = models.TextField()
-    city = models.CharField(max_length=64)
-    state = models.CharField(max_length=64)
+    address_line_one = models.TextField(blank=True, null=True)
+    address_line_two = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=64, blank=True, null=True)
+    state = models.CharField(max_length=64, blank=True, null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     latitude = models.CharField(max_length=128, null=True, blank=True)
     longitude = models.CharField(max_length=128, null=True, blank=True)
