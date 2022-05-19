@@ -1,9 +1,11 @@
 from rest_framework import viewsets, status
+from projects.models import Project
 from users.models import User, Team, TeamUser
 from users.api.teams.serializers import (
     TeamListSerializer,
     TeamCreateSerializer,
     TeamUserSerializer,
+    TeamUpdateSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -16,6 +18,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamListSerializer
     serializer_action_classes = {
         "create": TeamCreateSerializer,
+        "update": TeamUpdateSerializer,
     }
     queryset_actions = {}
 
@@ -37,6 +40,20 @@ class TeamViewSet(viewsets.ModelViewSet):
         new_team.save()
         serializer = TeamListSerializer(new_team)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        team = self.get_object()
+        if request.data.get("name"):
+            team.name = request.data.get("name")
+        if request.data.get("description"):
+            team.description = request.data.get("description")
+        if request.data.get("team_projects"):
+            teams = Project.objects.filter(pk__in=request.data.get("team_projects"))
+            team.team_projects.set(teams)
+        # team.updated_by = request.user
+        team.save()
+        serializer = TeamListSerializer(team)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=["get"])
     def team_users(self, request, pk=None):
