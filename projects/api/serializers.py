@@ -66,40 +66,6 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
         ]
 
 
-<<<<<<< HEAD
-class ProjectTasksSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True)
-
-    class Meta:
-        model = Project
-        fields = ["tasks"]
-
-
-class ProjectSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(read_only=True)
-    users = LessFieldsUserSerializer(many=True, read_only=True)
-    teams = LessFieldsTeamSerializer(many=True, read_only=True)
-    created_by = LessFieldsUserSerializer(read_only=True)
-    updated_by = LessFieldsUserSerializer(read_only=True)
-    tasks = TaskSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
-            "tasks",
-            "company_location",
-            "users",
-            "teams",
-            "status",
-            "created_by",
-            "updated_by",
-        ]
-
-
-=======
->>>>>>> 79facaa960cb24524fc943b6dc1029d839856683
 class FocalPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = FocalPoint
