@@ -38,6 +38,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         "create": ProjectCreateSerializer,
         "update": ProjectUpdateSerializer,
     }
+    queryset_actions = {"destroy": Project.objects.all()}
 
     def create(self, request):
         project_data = request.data
@@ -124,3 +125,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return super().get_serializer_class()
+
+    def get_queryset(self):
+        try:
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()
