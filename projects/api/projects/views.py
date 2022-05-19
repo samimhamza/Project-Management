@@ -84,8 +84,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("teams"):
             teams = Team.objects.filter(pk__in=request.data.get("teams"))
             project.teams.set(teams)
-        if request.data.get("company_location"):
-            project.company_location.set(request.data.get("company_location"))
         project.updated_by = request.user
         project.save()
         serializer = ProjectListSerializer(project)
