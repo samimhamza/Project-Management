@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions, status
+from rest_framework import viewsets, generics, permissions, status
 from users.api.serializers import (
     UserSerializer,
     TeamSerializer,
@@ -12,6 +12,11 @@ from users.models import User, Team, TeamUser, UserNote, Reminder, Holiday, Noti
 import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class RegisterView(APIView):

@@ -1,4 +1,3 @@
-from unicodedata import name
 from rest_framework import viewsets, status
 from projects.models import Project, Location, Country
 from users.models import User, Team

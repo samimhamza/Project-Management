@@ -20,5 +20,6 @@ projects/api/projects/__pycache__
 tasks/api/__pycache__ 
 expenses/api/__pycache__  
 users/api/__pycache__ 
+users/api/teams/__pycache__ 
 
 
