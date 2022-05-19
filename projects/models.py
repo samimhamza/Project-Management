@@ -30,7 +30,7 @@ class Reason(models.Model):
 
 class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64, blank=True, null=True)
+    name = models.CharField(max_length=64, blank=True, null=True, unique=True)
 
     def __str__(self):
         return self.name
