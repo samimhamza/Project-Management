@@ -1,11 +1,40 @@
 from rest_framework import serializers
-from projects.models import Project, Country, Location, FocalPoint, Income, Payment
+from projects.models import (
+    Country,
+    Location,
+    FocalPoint,
+    Income,
+    Payment,
+    Project,
+    Attachment,
+)
+from projects.api.projects import serializers as api_serializers
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class AttachmentObjectRelatedField(serializers.RelatedField):
+    """
+    A custom field to use for the `Attachment_object` generic relationship.
+    """
+
+    def to_representation(self, value):
+        """
+        Serialize bookmark instances using a bookmark serializer,
+        and note instances using a note serializer.
+        """
+        if isinstance(value, Project):
+            serializer = api_serializers.ProjectListSerializer(value)
+        else:
+            raise Exception("Unexpected type of Attachment object")
+
+        return serializer.data
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    project = AttachmentObjectRelatedField(read_only=True)
+
     class Meta:
-        model = Project
-        fields = "__all__"
+        model = Attachment
+        fields = ["name", "path", "object_id", "project"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -15,9 +44,26 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+
     class Meta:
         model = Location
         fields = "__all__"
+
+
+class LessFieldsLocationSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+
+    class Meta:
+        model = Location
+        fields = [
+            "id",
+            "address_line_one",
+            "address_line_two",
+            "city",
+            "state",
+            "country",
+        ]
 
 
 class FocalPointSerializer(serializers.ModelSerializer):

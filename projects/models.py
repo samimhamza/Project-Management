@@ -12,8 +12,8 @@ class Attachment(models.Model):
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey()
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
         return self.name
@@ -24,7 +24,7 @@ class Reason(models.Model):
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.UUIDField()
     content_object = GenericForeignKey()
 
 
@@ -54,15 +54,26 @@ class Location(models.Model):
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=30)
-    description = models.TextField()
-    p_start_date = models.DateTimeField()
-    p_end_date = models.DateTimeField()
-    a_start_date = models.DateTimeField()
-    a_end_date = models.DateTimeField()
-    banner = models.CharField(max_length=120)
-    status = models.IntegerField()
-    progress = models.IntegerField()
+    name = models.CharField(max_length=30, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    p_start_date = models.DateTimeField(null=True, blank=True)
+    p_end_date = models.DateTimeField(null=True, blank=True)
+    a_start_date = models.DateTimeField(null=True, blank=True)
+    a_end_date = models.DateTimeField(null=True, blank=True)
+    banner = models.CharField(max_length=120, null=True, blank=True)
+
+    class StatusChoices(models.TextChoices):
+        pending = "pending"
+        in_progress = "in_progress"
+        completed = "completed"
+        very_important = "issue_faced"
+        failed = "failed"
+        cancelled = "cancelled"
+
+    status = models.CharField(
+        max_length=24, choices=StatusChoices.choices, default="pending"
+    )
+    progress = models.IntegerField(default=0)
 
     class Priority(models.TextChoices):
         critical = "critical"
@@ -74,9 +85,12 @@ class Project(models.Model):
     priority = models.CharField(
         max_length=24, choices=Priority.choices, default="normal"
     )
-    project_details = models.JSONField(blank=True, null=True)
-    company_name = models.CharField(max_length=100)
-    company_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    project_details = models.JSONField(null=True, blank=True)
+    company_name = models.CharField(max_length=100, null=True, blank=True)
+    company_email = models.EmailField(null=True, blank=True)
+    company_location = models.ForeignKey(
+        Location, on_delete=models.SET_NULL, null=True, blank=True
+    )
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -89,12 +103,19 @@ class Project(models.Model):
         null=True,
         related_name="project_updated_by",
     )
-    attachments = GenericRelation(Attachment)
-    reasons = GenericRelation(Reason)
+    attachments = GenericRelation(
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+    )
+    reasons = GenericRelation(
+        Reason, content_type_field="content_type", object_id_field="object_id"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
+    teams = models.ManyToManyField("users.Team", related_name="project_team")
 
     def __str__(self):
         return self.name
@@ -123,9 +144,9 @@ class Income(models.Model):
     )
     updated_by = models.ForeignKey(
         "users.User",
-        on_delete=models.SET_NULL,
         null=True,
         related_name="income_updated_by",
+        on_delete=models.SET_NULL,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

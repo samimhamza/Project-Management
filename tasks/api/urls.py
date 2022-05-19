@@ -1,7 +1,5 @@
 from django.urls import path
 from tasks.api.views import (
-    CommentListCreateAPIView,
-    CommentDetailAPIView,
     TaskListCreateAPIView,
     TaskDetailAPIView,
     UserTaskDetailAPIView,
@@ -17,6 +15,4 @@ urlpatterns = [
         UserTaskDetailAPIView.as_view(),
         name="user-tasks-detail",
     ),
-    path("comments/", CommentListCreateAPIView.as_view(), name="comments-list"),
-    path("comments/<uuid:pk>", CommentDetailAPIView.as_view(), name="comments-detail"),
 ]
