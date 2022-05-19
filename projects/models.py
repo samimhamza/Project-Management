@@ -33,7 +33,10 @@ class Country(models.Model):
     name = models.CharField(max_length=64, blank=True, null=True, unique=True)
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
 
 
 class Project(models.Model):
@@ -99,7 +102,10 @@ class Project(models.Model):
     teams = models.ManyToManyField("users.Team", related_name="project_team")
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
 
 
 class Location(models.Model):
@@ -122,7 +128,10 @@ class Location(models.Model):
     )
 
     def __str__(self):
-        return self.city + " " + self.state
+        if self.city and self.state:
+            return self.city + " " + self.state
+        else:
+            return "No City Added"
 
 
 class Income(models.Model):
