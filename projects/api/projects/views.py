@@ -38,7 +38,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         "create": ProjectCreateSerializer,
         "update": ProjectUpdateSerializer,
     }
-    queryset_actions = {"destroy": Project.objects.all()}
+    queryset_actions = {
+        "destroy": Project.objects.all(),
+        "trashed": Project.objects.all(),
+    }
 
     def create(self, request):
         project_data = request.data
@@ -118,6 +121,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def trashed(self, request):
         queryset = Project.objects.filter(deleted_at__isnull=False)
         serializer = ProjectListSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def trashed(self, request, pk=None):
+        project = self.get_object()
+        serializer = ProjectListSerializer(project)
         return Response(serializer.data)
 
     def get_serializer_class(self):
