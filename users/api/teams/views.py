@@ -10,13 +10,15 @@ from users.api.teams.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
-import datetime
 from rest_framework.generics import get_object_or_404
+from taskmanager.custom_classes.custom import CustomPageNumberPagination
+import datetime
 
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.filter(deleted_at__isnull=True)
     serializer_class = TeamListSerializer
+    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "create": TeamCreateSerializer,
         "update": TeamUpdateSerializer,
@@ -28,13 +30,17 @@ class TeamViewSet(viewsets.ModelViewSet):
     }
 
     def list(self, request):
-        queryset = Team.objects.filter(deleted_at__isnull=True)
-        serializer = TeamListSerializer(queryset, many=True)
+        queryset = self.filter_queryset(
+            Team.objects.filter(deleted_at__isnull=True).order_by("created_at")
+        )
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
-            # leader = TeamUser.objects.filter(team=team)
+            # leader = TeamUser.objects.filter(team=team, is_leader=True)
             team["total_users"] = len(team["team_users"])
-            # team["leader"] = leader
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            # team["leader"] = UserTeamUserSerializer(leader, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def create(self, request):
         data = request.data
