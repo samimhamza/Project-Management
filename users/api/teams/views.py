@@ -15,7 +15,7 @@ from common.custom_classes.custom import CustomPageNumberPagination
 from django.db import transaction
 import datetime
 
-
+# return leader of team of unserialized team parameter
 def get_leader(team):
     try:
         team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
@@ -27,6 +27,7 @@ def get_leader(team):
         return {}
 
 
+# return leader of team of serialized team_id parameter
 def get_leader_by_id(id):
     try:
         team = Team.objects.get(pk=id)
@@ -39,6 +40,7 @@ def get_leader_by_id(id):
         return {}
 
 
+# return total users of team of unserialized team parameter
 def get_total(team):
     try:
         return TeamUser.objects.filter(team=team).count()
@@ -46,6 +48,7 @@ def get_total(team):
         return 0
 
 
+# return total_users of team of serialized team_id parameter
 def get_total_users(id):
     try:
         team = Team.objects.get(pk=id)
