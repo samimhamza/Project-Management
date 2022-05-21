@@ -2,15 +2,14 @@ from rest_framework import viewsets, status
 from users.api.serializers import (
     UserSerializer,
     NotificationSerializer,
-    UserNoteSerializer,
     ReminderSerializer,
     HolidaySerializer,
 )
-from users.models import User, UserNote, Reminder, Holiday, Notification
+from users.models import User, Reminder, Holiday, Notification
 from common.custom_classes.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
+from django.db import transaction
 import datetime
 
 
@@ -18,18 +17,25 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
-
     serializer_action_classes = {}
 
     def destroy(self, request, pk=None):
         data = request.data
-        teams = User.objects.filter(pk__in=data["ids"])
-        for team in teams:
-            if team.deleted_at:
-                team.delete()
+        if data:
+            users = User.objects.filter(pk__in=data["ids"])
+            for user in users:
+                if user.deleted_at:
+                    user.delete()
+                else:
+                    user.deleted_at = datetime.datetime.now()
+                    user.save()
+        else:
+            user = self.get_object()
+            if user.deleted_at:
+                user.delete()
             else:
-                team.deleted_at = datetime.datetime.now()
-                team.save()
+                user.deleted_at = datetime.datetime.now()
+                user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["get"])
@@ -51,14 +57,20 @@ class UserViewSet(viewsets.ModelViewSet):
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        data = request.data
-        teams = User.objects.filter(pk__in=data["ids"])
-        for team in teams:
-            team.deleted_at = None
-            team.save()
-        page = self.paginate_queryset(teams)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        try:
+            with transaction.atomic():
+                data = request.data
+                users = User.objects.filter(pk__in=data["ids"])
+                for user in users:
+                    user.deleted_at = None
+                    user.save()
+                page = self.paginate_queryset(users)
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def get_serializer_class(self):
         try:
@@ -69,8 +81,31 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class HolidayViewSet(viewsets.ModelViewSet):
     queryset = Holiday.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = HolidaySerializer
     pagination_class = CustomPageNumberPagination
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    pagination_class = CustomPageNumberPagination
+
+
+class ReminderViewSet(viewsets.ModelViewSet):
+    queryset = Reminder.objects.all().order_by("-created_at")
+    serializer_class = ReminderSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def destroy(self, request, pk=None):
+        data = request.data
+        if data:
+            users = User.objects.filter(pk__in=data["ids"])
+            for user in users:
+                user.delete()
+        else:
+            user = self.get_object()
+            user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # class RegisterView(APIView):
@@ -131,259 +166,3 @@ class HolidayViewSet(viewsets.ModelViewSet):
 #                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
 #             )
 
-
-# # User CRUD
-# class UserListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = User.objects.filter(deleted_at__isnull=True)
-#     serializer_class = UserSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(created_by=request.user.id)
-#                 request.data.update(updated_by=request.user.id)
-#         except:
-#             request.data.update(created_by=request.user.id)
-#             request.data.update(updated_by=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class UserDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = User.objects.filter(deleted_at__isnull=True)
-#     serializer_class = UserSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_by=request.user.id)
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_by=request.user.id)
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of User CRUD
-
-# # Team CRUD
-# class TeamListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Team.objects.filter(deleted_at__isnull=True)
-#     serializer_class = TeamSerializer
-#     # paginate_by = 10
-
-#     # def get(self, request, *args, **kwargs):
-#     #     return self.list(request, *args, **kwargs)
-
-#     # def post(self, request, *args, **kwargs):
-#     #     try:
-#     #         if not request.data._mutable:
-#     #             request.data._mutable = True
-#     #             request.data.update(created_by=request.user.id)
-#     #             request.data.update(updated_by=request.user.id)
-#     #     except:
-#     #         request.data.update(created_by=request.user.id)
-#     #         request.data.update(updated_by=request.user.id)
-#     #     return self.create(request, *args, **kwargs)
-
-
-# class TeamDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Team.objects.filter(deleted_at__isnull=True)
-#     serializer_class = TeamSerializer
-
-#     # def get(self, request, *args, **kwargs):
-#     #     return self.retrieve(request, *args, **kwargs)
-
-#     # def delete(self, request, *args, **kwargs):
-#     #     return self.destroy(request, *args, **kwargs)
-
-#     # def put(self, request, *args, **kwargs):
-#     #     try:
-#     #         if not request.data._mutable:
-#     #             request.data._mutable = True
-#     #             request.data.update(updated_by=request.user.id)
-#     #             request.data.update(updated_at=datetime.datetime.now())
-#     #     except:
-#     #         request.data.update(updated_by=request.user.id)
-#     #         request.data.update(updated_at=datetime.datetime.now())
-#     #     return self.update(request, *args, **kwargs)
-
-
-# # end of Team CRUD
-
-# # TeamUser CRUD
-# class TeamUserListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = TeamUser.objects.all()
-#     serializer_class = TeamUserSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
-
-
-# class TeamUserDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = TeamUser.objects.all()
-#     serializer_class = TeamUserSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of TeamUser CRUD
-
-# # UserNote CRUD
-# class UserNoteListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = UserNote.objects.all()
-#     serializer_class = UserNoteSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(user=request.user.id)
-#         except:
-#             request.data.update(user=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class UserNoteDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = UserNote.objects.all()
-#     serializer_class = UserNoteSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of UserNote CRUD
-# # Reminder CRUD
-# class ReminderListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Reminder.objects.all()
-#     serializer_class = ReminderSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(user=request.user.id)
-#         except:
-#             request.data.update(user=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class ReminderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Reminder.objects.all()
-#     serializer_class = ReminderSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of Reminder CRUD
-# # Notification CRUD
-# class NotificationListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Notification.objects.all()
-#     serializer_class = NotificationSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
-
-
-# class NotificationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Notification.objects.all()
-#     serializer_class = NotificationSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of Notification CRUD
-# # Holiday CRUD
-# class HolidayListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Holiday.objects.all()
-#     serializer_class = HolidaySerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
-
-
-# class HolidayDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Holiday.objects.all()
-#     serializer_class = HolidaySerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of Holiday CRUD

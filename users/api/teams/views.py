@@ -37,6 +37,13 @@ class TeamViewSet(viewsets.ModelViewSet):
             team["total_users"] = len(team["users"])
         return self.get_paginated_response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        team = self.get_object()
+        serializer = self.get_serializer(team)
+        data = serializer.data
+        data["total_users"] = len(serializer.data["users"])
+        return Response(data)
+
     def create(self, request):
         data = request.data
         # data["created_by"] = request.user
@@ -148,16 +155,20 @@ class TeamViewSet(viewsets.ModelViewSet):
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        # try:
-            data = request.data
-            teams = Team.objects.filter(pk__in=data["ids"])
-            for team in teams:
-                team.deleted_at = None
-                team.save()
-            page = self.paginate_queryset(teams)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        # except Exception
+        try:
+            with transaction.atomic():
+                data = request.data
+                teams = Team.objects.filter(pk__in=data["ids"])
+                for team in teams:
+                    team.deleted_at = None
+                    team.save()
+                page = self.paginate_queryset(teams)
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def get_serializer_class(self):
         try:

@@ -1,12 +1,18 @@
 from users.api.teams.views import TeamViewSet
 from users.api.views import (
     UserViewSet,
+    HolidayViewSet,
+    NotificationViewSet,
+    ReminderViewSet,
 )
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r"teams", TeamViewSet, basename="teams")
 router.register(r"users", UserViewSet, basename="users")
+router.register(r"holidays", HolidayViewSet, basename="holidays")
+router.register(r"reminders", ReminderViewSet, basename="reminders")
+router.register(r"notifications", NotificationViewSet, basename="notifications")
 urlpatterns = router.urls
 
 
@@ -18,8 +24,6 @@ urlpatterns = router.urls
 #     UserDetailAPIView,
 #     TeamUserListCreateAPIView,
 #     TeamUserDetailAPIView,
-#     UserNoteListCreateAPIView,
-#     UserNoteDetailAPIView,
 #     ReminderListCreateAPIView,
 #     ReminderDetailAPIView,
 #     HolidayListCreateAPIView,
@@ -36,10 +40,6 @@ urlpatterns = router.urls
 #     path("team-users/", TeamUserListCreateAPIView.as_view(), name="team-users-list"),
 #     path(
 #         "team-users/<int:pk>", TeamUserDetailAPIView.as_view(), name="team-users-detail"
-#     ),
-#     path("user-notes/", UserNoteListCreateAPIView.as_view(), name="user-notes-list"),
-#     path(
-#         "user-notes/<int:pk>", UserNoteDetailAPIView.as_view(), name="user-notes-detail"
 #     ),
 #     path("reminders/", ReminderListCreateAPIView.as_view(), name="reminders-list"),
 #     path(
