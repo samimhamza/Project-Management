@@ -184,6 +184,9 @@ class TeamViewSet(viewsets.ModelViewSet):
         queryset = Team.objects.all().order_by("-created_at")
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
+        for team in serializer.data:
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
