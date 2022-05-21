@@ -99,12 +99,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        project = self.get_object()
-        if project.deleted_at:
-            project.delete()
+        data = request.data
+        if data:
+            projects = Project.objects.filter(pk__in=data["ids"])
+            for project in projects:
+                if project.deleted_at:
+                    project.delete()
+                else:
+                    project.deleted_at = datetime.datetime.now()
+                    project.save()
         else:
-            project.deleted_at = datetime.datetime.now()
-            project.save()
+            project = self.get_object()
+            if project.deleted_at:
+                project.delete()
+            else:
+                project.deleted_at = datetime.datetime.now()
+                project.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["get"])
