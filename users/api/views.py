@@ -10,7 +10,7 @@ from users.models import User, UserNote, Reminder, Holiday, Notification
 from common.custom_classes.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
+from django.db import transaction
 import datetime
 
 
@@ -18,18 +18,25 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
-
     serializer_action_classes = {}
 
     def destroy(self, request, pk=None):
         data = request.data
-        teams = User.objects.filter(pk__in=data["ids"])
-        for team in teams:
-            if team.deleted_at:
-                team.delete()
+        if data:
+            users = User.objects.filter(pk__in=data["ids"])
+            for user in users:
+                if user.deleted_at:
+                    user.delete()
+                else:
+                    user.deleted_at = datetime.datetime.now()
+                    user.save()
+        else:
+            user = self.get_object()
+            if user.deleted_at:
+                user.delete()
             else:
-                team.deleted_at = datetime.datetime.now()
-                team.save()
+                user.deleted_at = datetime.datetime.now()
+                user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["get"])
@@ -51,14 +58,20 @@ class UserViewSet(viewsets.ModelViewSet):
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        data = request.data
-        teams = User.objects.filter(pk__in=data["ids"])
-        for team in teams:
-            team.deleted_at = None
-            team.save()
-        page = self.paginate_queryset(teams)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        try:
+            with transaction.atomic():
+                data = request.data
+                users = User.objects.filter(pk__in=data["ids"])
+                for user in users:
+                    user.deleted_at = None
+                    user.save()
+                page = self.paginate_queryset(users)
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def get_serializer_class(self):
         try:
@@ -180,7 +193,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
 # # Team CRUD
 # class TeamListCreateAPIView(generics.ListCreateAPIView):
 #     queryset = Team.objects.filter(deleted_at__isnull=True)
-#     serializer_class = TeamSerializer
+#     serializer_class = userserializer
 #     # paginate_by = 10
 
 #     # def get(self, request, *args, **kwargs):
@@ -200,7 +213,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
 
 # class TeamDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = Team.objects.filter(deleted_at__isnull=True)
-#     serializer_class = TeamSerializer
+#     serializer_class = userserializer
 
 #     # def get(self, request, *args, **kwargs):
 #     #     return self.retrieve(request, *args, **kwargs)

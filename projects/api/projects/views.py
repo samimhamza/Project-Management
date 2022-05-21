@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status
-from projects.models import Project, Location, Country
+from projects.models import Project
 from users.models import User, Team
 from projects.api.projects.serializers import (
     ProjectListSerializer,
@@ -11,6 +11,7 @@ from projects.api.projects.serializers import (
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom_classes.custom import CustomPageNumberPagination
+from django.db import transaction
 import datetime
 
 # Sharing to Teams and Users
@@ -115,25 +116,36 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def all(self, request):
         queryset = Project.objects.all()
-        serializer = ProjectListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        queryset = Project.objects.filter(deleted_at__isnull=False)
-        serializer = ProjectListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        queryset = self.filter_queryset(
+            Project.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        data = request.data
-        projects = Project.objects.filter(pk__in=data["ids"])
-        for project in projects:
-            project.deleted_at = None
-            project.save()
-        serializer = ProjectListSerializer(projects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            with transaction.atomic():
+                data = request.data
+                projects = Project.objects.filter(pk__in=data["ids"])
+                for project in projects:
+                    project.deleted_at = None
+                    project.save()
+                page = self.paginate_queryset(projects)
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def get_serializer_class(self):
         try:
