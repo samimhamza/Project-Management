@@ -37,6 +37,13 @@ class TeamViewSet(viewsets.ModelViewSet):
             team["total_users"] = len(team["users"])
         return self.get_paginated_response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        team = self.get_object()
+        serializer = self.get_serializer(team)
+        data = serializer.data
+        data["total_users"] = len(serializer.data["users"])
+        return Response(data)
+
     def create(self, request):
         data = request.data
         # data["created_by"] = request.user
