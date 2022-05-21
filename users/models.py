@@ -46,7 +46,7 @@ class Team(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    team_users = models.ManyToManyField(User, through="TeamUser")
+    users = models.ManyToManyField(User, through="TeamUser", related_name="users")
     deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):

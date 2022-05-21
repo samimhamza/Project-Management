@@ -1,32 +1,20 @@
 from rest_framework import serializers
 from users.models import Team, User, TeamUser
-from users.api.serializers import (
-    LessFieldsUserSerializer,
-    FirstAndLastNameUserSerializer,
-)
+from users.api.serializers import LessFieldsUserSerializer, LessFieldsTeamSerializer
 from projects.api.projects.serializers import ProjectLessListSerializer
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
-    user = LessFieldsUserSerializer(read_only=True)
-
     class Meta:
         model = TeamUser
-        fields = ["id", "position", "user"]
-
-
-class UserTeamUserSerializer(serializers.ModelSerializer):
-    user = FirstAndLastNameUserSerializer(read_only=True)
-
-    class Meta:
-        model = TeamUser
-        fields = ["user"]
+        fields = "__all__"
 
 
 class TeamListSerializer(serializers.ModelSerializer):
     created_by = LessFieldsUserSerializer(read_only=True)
     updated_by = LessFieldsUserSerializer(read_only=True)
     team_projects = ProjectLessListSerializer(many=True, read_only=True)
+    users = TeamUserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
@@ -34,7 +22,7 @@ class TeamListSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
-            "team_users",
+            "users",
             "created_by",
             "updated_by",
             "created_at",
