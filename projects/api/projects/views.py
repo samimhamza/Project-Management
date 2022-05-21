@@ -9,7 +9,7 @@ from projects.api.projects.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from taskmanager.custom_classes.custom import CustomPageNumberPagination
+from common.custom_classes.custom import CustomPageNumberPagination
 import datetime
 
 # Sharing to Teams and Users

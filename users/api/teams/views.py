@@ -10,7 +10,7 @@ from users.api.teams.serializers import (
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from taskmanager.custom_classes.custom import CustomPageNumberPagination
+from common.custom_classes.custom import CustomPageNumberPagination
 import datetime
 
 
