@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status
-from projects.models import Project
+from projects.models import Project, Location, Country
 from users.models import User, Team
 from projects.api.projects.serializers import (
     ProjectListSerializer,
@@ -11,6 +11,24 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 import datetime
 
+# Sharing to Teams and Users
+def shareTo(request, project_data, new_project):
+    if request.data.get("share"):
+        if project_data["share"] != "justMe":
+            users = User.objects.filter(pk__in=project_data["users"])
+            new_project.users.set(users)
+            teams = Team.objects.filter(pk__in=project_data["teams"])
+            new_project.teams.set(teams)
+        if project_data["share"] == "everyone":
+            users = User.objects.all()
+            new_project.users.set(users)
+    else:
+        users = User.objects.filter(pk__in=project_data["users"])
+        new_project.users.set(users)
+        teams = Team.objects.filter(pk__in=project_data["teams"])
+        new_project.teams.set(teams)
+    return new_project
+
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(deleted_at__isnull=True)
@@ -19,23 +37,27 @@ class ProjectViewSet(viewsets.ModelViewSet):
         "create": ProjectCreateSerializer,
         "update": ProjectUpdateSerializer,
     }
+    queryset_actions = {
+        "destroy": Project.objects.all(),
+        "trashed": Project.objects.all(),
+        "restore": Project.objects.all(),
+    }
 
     def create(self, request):
         project_data = request.data
-        project_data["created_by"] = request.user
-        project_data["updated_by"] = request.user
+        # project_data["created_by"] = request.user
+        # project_data["updated_by"] = request.user
         new_project = Project.objects.create(
             name=project_data["name"],
             p_start_date=project_data["p_start_date"],
             p_end_date=project_data["p_end_date"],
-            created_by=project_data["created_by"],
-            updated_by=project_data["updated_by"],
+            # created_by=project_data["created_by"],
+            # updated_by=project_data["updated_by"],
         )
-        users = User.objects.filter(pk__in=project_data["users"])
-        new_project.users.set(users)
-        teams = Team.objects.filter(pk__in=project_data["teams"])
-        new_project.teams.set(teams)
+        new_project = shareTo(request, project_data, new_project)
         new_project.save()
+        new_country = Country.objects.create(name="")
+        Location.objects.create(project=new_project, country=new_country)
         serializer = ProjectListSerializer(new_project)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -69,7 +91,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("teams"):
             teams = Team.objects.filter(pk__in=request.data.get("teams"))
             project.teams.set(teams)
-        project.updated_by = request.user
+        # project.updated_by = request.user
         project.save()
         serializer = ProjectListSerializer(project)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -87,22 +109,39 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def tasks(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectTasksSerializer(project)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def all(self, request):
         queryset = Project.objects.all()
         serializer = ProjectListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
         queryset = Project.objects.filter(deleted_at__isnull=False)
         serializer = ProjectListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        data = request.data
+        projects = Project.objects.filter(pk__in=data["ids"])
+        for project in projects:
+            project.deleted_at = None
+            project.save()
+        serializer = ProjectListSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         try:
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return super().get_serializer_class()
+
+    def get_queryset(self):
+        try:
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()

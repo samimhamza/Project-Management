@@ -30,26 +30,13 @@ class Reason(models.Model):
 
 class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, blank=True, null=True, unique=True)
 
     def __str__(self):
-        return self.name
-
-
-class Location(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    address_line_one = models.TextField()
-    address_line_two = models.TextField()
-    city = models.CharField(max_length=64)
-    state = models.CharField(max_length=64)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    latitude = models.CharField(max_length=128, null=True, blank=True)
-    longitude = models.CharField(max_length=128, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.city + " " + self.state
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
 
 
 class Project(models.Model):
@@ -88,9 +75,6 @@ class Project(models.Model):
     project_details = models.JSONField(null=True, blank=True)
     company_name = models.CharField(max_length=100, null=True, blank=True)
     company_email = models.EmailField(null=True, blank=True)
-    company_location = models.ForeignKey(
-        Location, on_delete=models.SET_NULL, null=True, blank=True
-    )
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -115,10 +99,39 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField("users.User", related_name="project_user")
-    teams = models.ManyToManyField("users.Team", related_name="project_team")
+    teams = models.ManyToManyField("users.Team", related_name="team_projects")
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
+
+
+class Location(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    address_line_one = models.TextField(blank=True, null=True)
+    address_line_two = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=64, blank=True, null=True)
+    state = models.CharField(max_length=64, blank=True, null=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    latitude = models.CharField(max_length=128, null=True, blank=True)
+    longitude = models.CharField(max_length=128, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="company_location",
+    )
+
+    def __str__(self):
+        if self.city and self.state:
+            return self.city + " " + self.state
+        else:
+            return "No City Added"
 
 
 class Income(models.Model):

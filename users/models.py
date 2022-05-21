@@ -46,11 +46,7 @@ class Team(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    team_users = models.ManyToManyField(
-        User,
-        through="TeamUser",
-        through_fields=("team", "user"),
-    )
+    team_users = models.ManyToManyField(User, through="TeamUser")
     deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
@@ -60,10 +56,14 @@ class Team(models.Model):
 class TeamUser(models.Model):
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    type = models.CharField(max_length=64)
+    position = models.CharField(max_length=64, blank=True, null=True)
+    is_leader = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.type
+        if self.position:
+            return self.position
+        else:
+            return "No Position"
 
 
 class UserNote(models.Model):

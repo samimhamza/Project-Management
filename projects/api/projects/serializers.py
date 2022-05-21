@@ -17,7 +17,7 @@ class ProjectTasksSerializer(serializers.ModelSerializer):
 
 
 class ProjectListSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(read_only=True)
+    company_location = LessFieldsLocationSerializer(many=True, read_only=True)
     users = LessFieldsUserSerializer(many=True, read_only=True)
     teams = LessFieldsTeamSerializer(many=True, read_only=True)
     created_by = LessFieldsUserSerializer()
@@ -46,6 +46,28 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "created_by",
             "updated_by",
             "deleted_at",
+        ]
+
+
+class ProjectLessListSerializer(serializers.ModelSerializer):
+    company_location = LessFieldsLocationSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
+            "description",
+            "p_start_date",
+            "p_end_date",
+            "a_start_date",
+            "a_end_date",
+            "status",
+            "progress",
+            "priority",
+            "company_name",
+            "company_email",
+            "company_location",
         ]
 
 
@@ -80,9 +102,3 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
             "users",
             "teams",
         ]
-
-
-class DescriptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = ["description"]

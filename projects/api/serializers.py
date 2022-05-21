@@ -52,7 +52,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class LessFieldsLocationSerializer(serializers.ModelSerializer):
-    country = CountrySerializer(read_only=True)
+    country = CountrySerializer()
 
     class Meta:
         model = Location
