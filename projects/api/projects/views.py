@@ -32,7 +32,7 @@ def shareTo(request, project_data, new_project):
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.filter(deleted_at__isnull=True)
+    queryset = Project.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProjectListSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {

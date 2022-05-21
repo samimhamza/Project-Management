@@ -15,7 +15,7 @@ import datetime
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.filter(deleted_at__isnull=True)
+    queryset = Team.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TeamListSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -24,15 +24,13 @@ class TeamViewSet(viewsets.ModelViewSet):
     }
     queryset_actions = {
         "destroy": Team.objects.all(),
-        "trashed": Team.objects.all(),
         "restore": Team.objects.all(),
     }
 
     def list(self, request):
         queryset = self.filter_queryset(
-            Team.objects.filter(deleted_at__isnull=True).order_by("created_at")
+            Team.objects.filter(deleted_at__isnull=True).order_by("-created_at")
         )
-
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
@@ -73,19 +71,22 @@ class TeamViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        team = self.get_object()
-        if team.deleted_at:
-            team.delete()
-        else:
-            team.deleted_at = datetime.datetime.now()
-            team.save()
+        data = request.data
+        teams = Team.objects.filter(pk__in=data["ids"])
+        for team in teams:
+            if team.deleted_at:
+                team.delete()
+            else:
+                team.deleted_at = datetime.datetime.now()
+                team.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         team = self.get_object()
         users = TeamUser.objects.filter(team=team)
-        serializer = TeamUserSerializer(users, many=True)
+        page = self.paginate_queryset(users)
+        serializer = TeamUserSerializer(page, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
@@ -110,14 +111,18 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def all(self, request):
         queryset = Team.objects.all()
-        serializer = TeamListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        queryset = Team.objects.filter(deleted_at__isnull=False)
-        serializer = TeamListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        queryset = self.filter_queryset(
+            Team.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     # for multi restore
     @action(detail=False, methods=["get"])
@@ -127,8 +132,9 @@ class TeamViewSet(viewsets.ModelViewSet):
         for team in teams:
             team.deleted_at = None
             team.save()
-        serializer = TeamListSerializer(teams, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        page = self.paginate_queryset(teams)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def get_serializer_class(self):
         try:
