@@ -1,7 +1,5 @@
 from rest_framework import serializers
-from projects.models import (
-    Project,
-)
+from projects.models import Project
 from users.api.serializers import LessFieldsUserSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import LessFieldsLocationSerializer
@@ -89,13 +87,4 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
             "company_email",
             "users",
             "teams",
-        ]
-
-
-class ProjectNameListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
         ]

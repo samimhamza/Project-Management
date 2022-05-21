@@ -1,14 +1,14 @@
 from rest_framework import viewsets, status
 from projects.models import Project
 from users.models import User, Team
-from projects.api.project.serializers import (
+from projects.api.project_views.serializers import (
     ProjectListSerializer,
     ProjectCreateSerializer,
     ProjectTasksSerializer,
     ProjectUpdateSerializer,
     ProjectExpensesSerializer,
 )
-from projects.api.project.serializers import ProjectNameListSerializer
+from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom_classes.custom import CustomPageNumberPagination

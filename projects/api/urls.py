@@ -1,4 +1,4 @@
-from projects.api.project.views import ProjectViewSet
+from projects.api.project_views.views import ProjectViewSet
 from projects.api.views import (
     CountryViewSet,
     IncomeViewSet,

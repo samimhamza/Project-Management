@@ -7,6 +7,7 @@ from users.api.teams.serializers import (
     TeamUserSerializer,
     TeamUpdateSerializer,
     TeamNamesSerializer,
+    TeamRetieveSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -64,6 +65,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     serializer_action_classes = {
         "create": TeamCreateSerializer,
         "update": TeamUpdateSerializer,
+        "retrieve": TeamRetieveSerializer,
     }
     queryset_actions = {
         "delete_user": Team.objects.all(),
