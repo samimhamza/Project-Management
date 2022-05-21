@@ -6,7 +6,7 @@ from projects.api.projects.serializers import (
     ProjectCreateSerializer,
     ProjectTasksSerializer,
     ProjectUpdateSerializer,
-    ProjectExpensesSerializer
+    ProjectExpensesSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -149,10 +149,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except (KeyError, AttributeError):
             return super().get_queryset()
 
-    #testing APIS
+    # testing APIS
     @action(detail=True, methods=["get"])
-    def expenses(self,request, pk=None):
+    def expenses(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectExpensesSerializer(project)
 
-        return Response(serializer.data, status=status.HTTP_200_OK);
+        return Response(serializer.data, status=status.HTTP_200_OK)
