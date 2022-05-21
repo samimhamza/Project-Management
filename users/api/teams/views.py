@@ -6,6 +6,7 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
+    TeamNamesSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -13,6 +14,47 @@ from rest_framework.generics import get_object_or_404
 from common.custom_classes.custom import CustomPageNumberPagination
 from django.db import transaction
 import datetime
+
+# return leader of team of unserialized team parameter
+def get_leader(team):
+    try:
+        team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
+        leader = User.objects.values("id", "first_name", "last_name").get(
+            pk=team_leader["user"]
+        )
+        return leader
+    except:
+        return {}
+
+
+# return leader of team of serialized team_id parameter
+def get_leader_by_id(id):
+    try:
+        team = Team.objects.get(pk=id)
+        team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
+        leader = User.objects.values("id", "first_name", "last_name").get(
+            pk=team_leader["user"]
+        )
+        return leader
+    except:
+        return {}
+
+
+# return total users of team of unserialized team parameter
+def get_total(team):
+    try:
+        return TeamUser.objects.filter(team=team).count()
+    except:
+        return 0
+
+
+# return total_users of team of serialized team_id parameter
+def get_total_users(id):
+    try:
+        team = Team.objects.get(pk=id)
+        return TeamUser.objects.filter(team=team).count()
+    except:
+        return 0
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -31,17 +73,22 @@ class TeamViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(
             Team.objects.filter(deleted_at__isnull=True).order_by("-created_at")
         )
+        if request.GET.get("items_per_page") == "-1":
+            serializer = TeamNamesSerializer(queryset, many=True)
+            return Response(serializer.data, status=200)
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
-            team["total_users"] = len(team["users"])
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         team = self.get_object()
         serializer = self.get_serializer(team)
         data = serializer.data
-        data["total_users"] = len(serializer.data["users"])
+        data["total_users"] = get_total(team)
+        data["leader"] = get_leader(team)
         return Response(data)
 
     def create(self, request):
@@ -105,7 +152,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    def user(self, request, pk=None):
+    def add_user(self, request, pk=None):
         data = request.data
         team = self.get_object()
         user = get_object_or_404(User, pk=data["id"])
@@ -138,9 +185,12 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = Team.objects.all()
+        queryset = Team.objects.all().order_by("-created_at")
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
+        for team in serializer.data:
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])

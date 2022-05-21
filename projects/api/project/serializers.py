@@ -2,10 +2,12 @@ from rest_framework import serializers
 from projects.models import (
     Project,
 )
-from users.api.serializers import LessFieldsUserSerializer, LessFieldsTeamSerializer
+from users.api.serializers import LessFieldsUserSerializer
+from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import LessFieldsLocationSerializer
 from tasks.api.serializers import TaskSerializer
 from expenses.api.serializers import ExpenseSerializer
+
 
 class ProjectTasksSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)
@@ -15,13 +17,14 @@ class ProjectTasksSerializer(serializers.ModelSerializer):
         fields = ["tasks"]
         depth = 1
 
+
 class ProjectExpensesSerializer(serializers.ModelSerializer):
     expenses = ExpenseSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields= ["expenses"]
-    
+        fields = ["expenses"]
+
 
 class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(many=True, read_only=True)
@@ -56,28 +59,6 @@ class ProjectListSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProjectLessListSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
-            "description",
-            "p_start_date",
-            "p_end_date",
-            "a_start_date",
-            "a_end_date",
-            "status",
-            "progress",
-            "priority",
-            "company_name",
-            "company_email",
-            "company_location",
-        ]
-
-
 class ProjectCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
@@ -108,4 +89,13 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
             "company_email",
             "users",
             "teams",
+        ]
+
+
+class ProjectNameListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
         ]

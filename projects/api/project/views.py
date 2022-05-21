@@ -1,13 +1,14 @@
 from rest_framework import viewsets, status
 from projects.models import Project
 from users.models import User, Team
-from projects.api.projects.serializers import (
+from projects.api.project.serializers import (
     ProjectListSerializer,
     ProjectCreateSerializer,
     ProjectTasksSerializer,
     ProjectUpdateSerializer,
     ProjectExpensesSerializer,
 )
+from projects.api.project.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom_classes.custom import CustomPageNumberPagination
@@ -46,6 +47,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
         "trashed": Project.objects.all(),
         "restore": Project.objects.all(),
     }
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("items_per_page") == "-1":
+            serializer = ProjectNameListSerializer(queryset, many=True)
+            return Response(serializer.data, status=200)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def create(self, request):
         project_data = request.data
@@ -125,7 +135,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = Project.objects.all()
+        queryset = Project.objects.all().order_by("-created_at")
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
