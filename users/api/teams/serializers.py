@@ -47,7 +47,7 @@ class TeamUpdateSerializer(serializers.ModelSerializer):
         fields = ["name", "description", "team_projects"]
 
 
-class FirtNameLastNameSerializer(serializers.ModelSerializer):
+class TeamNamesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TeamUser
-        fields = ["user"]
+        model = Team
+        fields = ["id", "name"]

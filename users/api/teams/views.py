@@ -6,6 +6,7 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
+    TeamNamesSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -68,10 +69,14 @@ class TeamViewSet(viewsets.ModelViewSet):
         "delete_user": Team.objects.all(),
     }
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             Team.objects.filter(deleted_at__isnull=True).order_by("-created_at")
         )
+        if request.GET.get("item_per_page") == "-1":
+            serializer = TeamNamesSerializer(queryset, many=True)
+            return Response(serializer.data, status=200)
+
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
