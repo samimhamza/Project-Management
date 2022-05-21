@@ -6,7 +6,6 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
-    UserTeamUserSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action

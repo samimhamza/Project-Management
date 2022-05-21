@@ -7,7 +7,7 @@ from projects.api.projects.serializers import ProjectLessListSerializer
 class TeamUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeamUser
-        fields = ("position",)
+        fields = "__all__"
 
 
 class TeamListSerializer(serializers.ModelSerializer):
