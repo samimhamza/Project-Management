@@ -60,6 +60,14 @@ class TeamRetieveSerializer(serializers.ModelSerializer):
         ]
 
 
+class ProjectTeamSerializer(serializers.ModelSerializer):
+    team_projects = ProjectNameListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Team
+        fields = ["team_projects"]
+
+
 class TeamCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
