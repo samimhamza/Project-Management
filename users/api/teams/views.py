@@ -6,6 +6,7 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
+    FirtNameLastNameSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -13,6 +14,44 @@ from rest_framework.generics import get_object_or_404
 from common.custom_classes.custom import CustomPageNumberPagination
 from django.db import transaction
 import datetime
+
+
+def get_leader(team):
+    try:
+        team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
+        leader = User.objects.values("id", "first_name", "last_name").get(
+            pk=team_leader["user"]
+        )
+        return leader
+    except:
+        return {}
+
+
+def get_leader_by_id(id):
+    try:
+        team = Team.objects.get(pk=id)
+        team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
+        leader = User.objects.values("id", "first_name", "last_name").get(
+            pk=team_leader["user"]
+        )
+        return leader
+    except:
+        return {}
+
+
+def get_total(team):
+    try:
+        return TeamUser.objects.filter(team=team).count()
+    except:
+        return 0
+
+
+def get_total_users(id):
+    try:
+        team = Team.objects.get(pk=id)
+        return TeamUser.objects.filter(team=team).count()
+    except:
+        return 0
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -34,14 +73,16 @@ class TeamViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
-            team["total_users"] = len(team["users"])
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         team = self.get_object()
         serializer = self.get_serializer(team)
         data = serializer.data
-        data["total_users"] = len(serializer.data["users"])
+        data["total_users"] = get_total(team)
+        data["leader"] = get_leader(team)
         return Response(data)
 
     def create(self, request):
