@@ -11,7 +11,7 @@ class TeamUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamUser
-        fields = ["user", "position"]
+        fields = ["user", "position", "is_leader"]
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):
