@@ -30,7 +30,7 @@ class Expense(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=128)
     project = models.ForeignKey(
-        "projects.Project", on_delete=models.SET_NULL, null=True
+        "projects.Project", on_delete=models.SET_NULL, null=True, related_name="expenses"
     )
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     body = models.TextField()
