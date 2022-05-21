@@ -181,7 +181,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = Team.objects.all()
+        queryset = Team.objects.all().order_by("-created_at")
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
