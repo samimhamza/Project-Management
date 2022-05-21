@@ -59,8 +59,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         )
         new_project = shareTo(request, project_data, new_project)
         new_project.save()
-        new_country = Country.objects.create(name="")
-        Location.objects.create(project=new_project, country=new_country)
         serializer = ProjectListSerializer(new_project)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

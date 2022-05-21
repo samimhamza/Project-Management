@@ -14,7 +14,6 @@ class TeamListSerializer(serializers.ModelSerializer):
     created_by = LessFieldsUserSerializer(read_only=True)
     updated_by = LessFieldsUserSerializer(read_only=True)
     team_projects = ProjectLessListSerializer(many=True, read_only=True)
-    users = TeamUserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team

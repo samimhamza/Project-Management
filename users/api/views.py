@@ -1,24 +1,70 @@
-from rest_framework import viewsets, generics, permissions, status
+from rest_framework import viewsets, status
 from users.api.serializers import (
     UserSerializer,
-    TeamSerializer,
-    TeamUserSerializer,
     NotificationSerializer,
     UserNoteSerializer,
     ReminderSerializer,
     HolidaySerializer,
 )
-from users.models import User, Team, TeamUser, UserNote, Reminder, Holiday, Notification
-import datetime
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from users.models import User, UserNote, Reminder, Holiday, Notification
 from common.custom_classes.custom import CustomPageNumberPagination
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+import datetime
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
+
+    serializer_action_classes = {}
+
+    def destroy(self, request, pk=None):
+        data = request.data
+        teams = User.objects.filter(pk__in=data["ids"])
+        for team in teams:
+            if team.deleted_at:
+                team.delete()
+            else:
+                team.deleted_at = datetime.datetime.now()
+                team.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        queryset = User.objects.all()
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        queryset = self.filter_queryset(
+            User.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        data = request.data
+        teams = User.objects.filter(pk__in=data["ids"])
+        for team in teams:
+            team.deleted_at = None
+            team.save()
+        page = self.paginate_queryset(teams)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
 
 class HolidayViewSet(viewsets.ModelViewSet):

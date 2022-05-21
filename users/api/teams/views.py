@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from common.custom_classes.custom import CustomPageNumberPagination
+from django.db import transaction
 import datetime
 
 
@@ -23,8 +24,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         "update": TeamUpdateSerializer,
     }
     queryset_actions = {
-        "destroy": Team.objects.all(),
-        "restore": Team.objects.all(),
+        "delete_user": Team.objects.all(),
     }
 
     def list(self, request):
@@ -72,8 +72,16 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         data = request.data
-        teams = Team.objects.filter(pk__in=data["ids"])
-        for team in teams:
+        if data:
+            teams = Team.objects.filter(pk__in=data["ids"])
+            for team in teams:
+                if team.deleted_at:
+                    team.delete()
+                else:
+                    team.deleted_at = datetime.datetime.now()
+                    team.save()
+        else:
+            team = self.get_object()
             if team.deleted_at:
                 team.delete()
             else:
@@ -102,11 +110,24 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def delete_user(self, request, pk=None):
-        data = request.data
-        team = self.get_object()
-        team_user = TeamUser.objects.get(team=team, user=data["id"])
-        team_user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            with transaction.atomic():
+                team = self.get_object()
+                data = request.data
+                if request.data.get("ids"):
+                    team_users = TeamUser.objects.filter(
+                        team=team, user__in=data["ids"]
+                    )
+                    for team_user in team_users:
+                        team_user.delete()
+                elif request.data.get("id"):
+                    team_user = TeamUser.objects.get(team=team, user=data["id"])
+                    team_user.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=False, methods=["get"])
     def all(self, request):
@@ -127,14 +148,16 @@ class TeamViewSet(viewsets.ModelViewSet):
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        data = request.data
-        teams = Team.objects.filter(pk__in=data["ids"])
-        for team in teams:
-            team.deleted_at = None
-            team.save()
-        page = self.paginate_queryset(teams)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        try:
+            data = request.data
+            teams = Team.objects.filter(pk__in=data["ids"])
+            for team in teams:
+                team.deleted_at = None
+                team.save()
+            page = self.paginate_queryset(teams)
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        except Exception
 
     def get_serializer_class(self):
         try:
