@@ -90,3 +90,12 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
             "users",
             "teams",
         ]
+
+
+class ProjectNameListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
+        ]
