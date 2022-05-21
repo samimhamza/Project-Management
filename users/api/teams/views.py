@@ -6,7 +6,6 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
-    FirtNameLastNameSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -149,7 +148,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    def user(self, request, pk=None):
+    def add_user(self, request, pk=None):
         data = request.data
         team = self.get_object()
         user = get_object_or_404(User, pk=data["id"])

@@ -40,7 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = User.objects.all()
+        queryset = User.objects.all().order_by("-created_at")
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -165,4 +165,3 @@ class ReminderViewSet(viewsets.ModelViewSet):
 #                 {"error": "Something went wrong while trying to register account"},
 #                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
 #             )
-

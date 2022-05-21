@@ -9,10 +9,10 @@ class LessFieldsUserSerializer(serializers.ModelSerializer):
         fields = ["id", "first_name", "last_name", "email"]
 
 
-class FirtNameLastNameSerializer(serializers.ModelSerializer):
+class UserWithProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name"]
+        fields = ["id", "first_name", "last_name", "email", "profile"]
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):

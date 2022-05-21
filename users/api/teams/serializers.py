@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from users.models import Team, User, TeamUser
-from users.api.serializers import LessFieldsUserSerializer, FirtNameLastNameSerializer
+from users.api.serializers import LessFieldsUserSerializer, UserWithProfileSerializer
 from projects.api.projects.serializers import ProjectLessListSerializer
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
+    user = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = TeamUser
         fields = "__all__"
