@@ -15,11 +15,11 @@ class FirstAndLastNameUserSerializer(serializers.ModelSerializer):
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):
-    team_users = LessFieldsUserSerializer(many=True, read_only=True)
+    users = LessFieldsUserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
-        fields = ["id", "name", "description", "team_users"]
+        fields = ["id", "name", "description", "users"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class TeamUserSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    team_users = TeamUserSerializer(many=True, read_only=True)
+    users = TeamUserSerializer(many=True, read_only=True)
     created_by = LessFieldsUserSerializer(read_only=True)
     updated_by = LessFieldsUserSerializer(read_only=True)
 

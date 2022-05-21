@@ -8,11 +8,9 @@ from projects.api.projects.serializers import ProjectLessListSerializer
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
-    user = LessFieldsUserSerializer(read_only=True)
-
     class Meta:
         model = TeamUser
-        fields = ["id", "position", "user"]
+        fields = ("position",)
 
 
 class UserTeamUserSerializer(serializers.ModelSerializer):
@@ -27,6 +25,7 @@ class TeamListSerializer(serializers.ModelSerializer):
     created_by = LessFieldsUserSerializer(read_only=True)
     updated_by = LessFieldsUserSerializer(read_only=True)
     team_projects = ProjectLessListSerializer(many=True, read_only=True)
+    users = TeamUserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
@@ -34,7 +33,7 @@ class TeamListSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
-            "team_users",
+            "users",
             "created_by",
             "updated_by",
             "created_at",
