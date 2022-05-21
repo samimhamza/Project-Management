@@ -12,11 +12,13 @@ from users.models import User, Team, TeamUser, UserNote, Reminder, Holiday, Noti
 import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from common.custom_classes.custom import CustomPageNumberPagination
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    pagination_class = CustomPageNumberPagination
 
 
 class RegisterView(APIView):

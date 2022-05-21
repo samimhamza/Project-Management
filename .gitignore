@@ -16,10 +16,10 @@ projects/migrations/__pycache__
 incomes/migrations/__pycache__ 
 expenses/migrations/__pycache__ 
 projects/api/__pycache__ 
-projects/api/projects/__pycache__ 
 tasks/api/__pycache__ 
 expenses/api/__pycache__  
 users/api/__pycache__ 
 users/api/teams/__pycache__ 
-
-
+common/custom_classes/__pycache__ 
+projects/api/projects/__pycache__ 
+users/api/teams/__pycache__

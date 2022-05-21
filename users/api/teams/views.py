@@ -6,12 +6,11 @@ from users.api.teams.serializers import (
     TeamCreateSerializer,
     TeamUserSerializer,
     TeamUpdateSerializer,
-    UserTeamUserSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from taskmanager.custom_classes.custom import CustomPageNumberPagination
+from common.custom_classes.custom import CustomPageNumberPagination
 import datetime
 
 
@@ -37,9 +36,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
-            # leader = TeamUser.objects.filter(team=team, is_leader=True)
-            team["total_users"] = len(team["team_users"])
-            # team["leader"] = UserTeamUserSerializer(leader, many=True)
+            team["total_users"] = len(team["users"])
         return self.get_paginated_response(serializer.data)
 
     def create(self, request):
@@ -87,8 +84,8 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         team = self.get_object()
-        team_users = TeamUser.objects.filter(team=team)
-        serializer = TeamUserSerializer(team_users, many=True)
+        users = TeamUser.objects.filter(team=team)
+        serializer = TeamUserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])

@@ -10,6 +10,7 @@ from projects.api.projects.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from common.custom_classes.custom import CustomPageNumberPagination
 import datetime
 
 # Sharing to Teams and Users
@@ -34,6 +35,7 @@ def shareTo(request, project_data, new_project):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(deleted_at__isnull=True)
     serializer_class = ProjectListSerializer
+    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "create": ProjectCreateSerializer,
         "update": ProjectUpdateSerializer,
