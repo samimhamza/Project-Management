@@ -66,6 +66,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         "create": TeamCreateSerializer,
         "update": TeamUpdateSerializer,
         "retrieve": TeamRetieveSerializer,
+        "add_project": TeamRetieveSerializer,
     }
     queryset_actions = {
         "delete_user": Team.objects.all(),
@@ -155,14 +156,32 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def add_user(self, request, pk=None):
-        data = request.data
-        team = self.get_object()
-        user = get_object_or_404(User, pk=data["id"])
-        team_user, created = TeamUser.objects.get_or_create(team=team, user=user)
-        team_user.position = data["position"]
-        team_user.save()
-        serializer = TeamUserSerializer(team_user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        try:
+            data = request.data
+            team = self.get_object()
+            user = get_object_or_404(User, pk=data["id"])
+            team_user, created = TeamUser.objects.get_or_create(team=team, user=user)
+            team_user.position = data["position"]
+            team_user.save()
+            serializer = TeamUserSerializer(team_user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=["post"])
+    def add_project(self, request, pk=None):
+        try:
+            data = request.data
+            team = self.get_object()
+            team.team_projects.set(data["ids"])
+            serializer = self.get_serializer(team)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=True, methods=["post"])
     def delete_user(self, request, pk=None):
