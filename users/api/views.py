@@ -4,6 +4,7 @@ from users.api.serializers import (
     NotificationSerializer,
     ReminderSerializer,
     HolidaySerializer,
+    UserWithProfileSerializer,
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom_classes.custom import CustomPageNumberPagination
@@ -18,6 +19,15 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {}
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("items_per_page") == "-1":
+            serializer = UserWithProfileSerializer(queryset, many=True)
+            return Response(serializer.data, status=200)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def destroy(self, request, pk=None):
         data = request.data

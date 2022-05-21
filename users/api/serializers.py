@@ -15,14 +15,6 @@ class UserWithProfileSerializer(serializers.ModelSerializer):
         fields = ["id", "first_name", "last_name", "email", "profile"]
 
 
-class LessFieldsTeamSerializer(serializers.ModelSerializer):
-    users = LessFieldsUserSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Team
-        fields = ["id", "name", "description", "users"]
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

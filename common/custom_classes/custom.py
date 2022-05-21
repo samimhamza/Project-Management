@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 
 class CustomPageNumberPagination(PageNumberPagination):
-    page_size_query_param = "item_per_page"  # items per page
+    page_size_query_param = "items_per_page"  # items per page
 
     def get_paginated_response(self, data):
         return Response(
