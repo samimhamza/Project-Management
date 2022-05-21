@@ -148,7 +148,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        try:
+        # try:
             data = request.data
             teams = Team.objects.filter(pk__in=data["ids"])
             for team in teams:
@@ -157,7 +157,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             page = self.paginate_queryset(teams)
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        except Exception
+        # except Exception
 
     def get_serializer_class(self):
         try:
