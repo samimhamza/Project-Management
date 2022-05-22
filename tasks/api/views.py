@@ -1,17 +1,11 @@
 from rest_framework import viewsets, status
 from projects.models import Project
 from tasks.models import Task
-from tasks.api.serializers import (
-    TaskCreateSerializer,
-    TaskSerializer,
-    TaskNameSerializer,
-)
+from tasks.api.serializers import TaskCreateSerializer, TaskSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
-from django.db import transaction
-import datetime
+from common.actions import withTrashed, trashList, delete, restore
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -54,57 +48,21 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        data = request.data
-        if data:
-            Tasks = Task.objects.filter(pk__in=data["ids"])
-            for Task in Tasks:
-                if Task.deleted_at:
-                    Task.delete()
-                else:
-                    Task.deleted_at = datetime.datetime.now()
-                    Task.save()
-        else:
-            Task = self.get_object()
-            if Task.deleted_at:
-                Task.delete()
-            else:
-                Task.deleted_at = datetime.datetime.now()
-                Task.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return delete(self, request, Task)
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = Task.objects.all().order_by("-created_at")
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = withTrashed(self, Task, order_by="-created_at")
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        queryset = self.filter_queryset(
-            Task.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
-        )
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        return trashList(self, Task)
 
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        try:
-            with transaction.atomic():
-                data = request.data
-                Tasks = Task.objects.filter(pk__in=data["ids"])
-                for Task in Tasks:
-                    Task.deleted_at = None
-                    Task.save()
-                page = self.paginate_queryset(Tasks)
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return restore(self, request, Task)
 
     def get_serializer_class(self):
         try:
