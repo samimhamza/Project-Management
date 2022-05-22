@@ -17,7 +17,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {}
+    serializer_action_classes = {
+        "check_uniqueness": User.objects.all(),
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -44,6 +46,21 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, User)
+
+    @action(detail=False, methods=["post"])
+    def check_uniqueness(self, request):
+        if request.data.get("email"):
+            try:
+                User.objects.get(email=request.data.get("email"))
+                return Response({"error": "email already in use"}, status=400)
+            except User.DoesNotExist:
+                return Response({"success": "email is available"}, status=200)
+        if request.data.get("username"):
+            try:
+                User.objects.get(username=request.data.get("username"))
+                return Response({"error": "username already in use"}, status=400)
+            except User.DoesNotExist:
+                return Response({"success": "username is available"}, status=200)
 
     def get_serializer_class(self):
         try:

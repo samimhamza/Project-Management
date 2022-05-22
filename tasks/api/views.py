@@ -1,5 +1,4 @@
 from rest_framework import viewsets, status
-from projects.models import Project
 from tasks.models import Task
 from tasks.api.serializers import TaskCreateSerializer, TaskSerializer
 from rest_framework.response import Response
@@ -34,16 +33,27 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
-        Task = self.get_object()
+        task = self.get_object()
         if request.data.get("name"):
-            Task.name = request.data.get("name")
+            task.name = request.data.get("name")
         if request.data.get("description"):
-            Task.description = request.data.get("description")
-        if request.data.get("Task_projects"):
-            Tasks = Project.objects.filter(pk__in=request.data.get("Task_projects"))
-            Task.Task_projects.set(Tasks)
+            task.description = request.data.get("description")
+        if request.data.get("p_start_date"):
+            task.p_start_date = request.data.get("p_start_date")
+        if request.data.get("p_end_date"):
+            task.p_end_date = request.data.get("p_end_date")
+        if request.data.get("a_start_date"):
+            task.a_start_date = request.data.get("a_start_date")
+        if request.data.get("a_end_date"):
+            task.a_end_date = request.data.get("a_end_date")
+        if request.data.get("status"):
+            task.status = request.data.get("status")
+        if request.data.get("progress"):
+            task.progress = request.data.get("progress")
+        if request.data.get("priority"):
+            task.priority = request.data.get("priority")
         # Task.updated_by = request.user
-        Task.save()
+        task.save()
         serializer = TaskSerializer(Task)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
