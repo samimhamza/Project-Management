@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
+from common.actions import delete, all
 from django.db import transaction
 import datetime
 
@@ -70,6 +71,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         "add_project": ProjectTeamSerializer,
     }
     queryset_actions = {
+        "destroy": Team.objects.all(),
         "delete_user": Team.objects.all(),
     }
 
@@ -129,23 +131,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        data = request.data
-        if data:
-            teams = Team.objects.filter(pk__in=data["ids"])
-            for team in teams:
-                if team.deleted_at:
-                    team.delete()
-                else:
-                    team.deleted_at = datetime.datetime.now()
-                    team.save()
-        else:
-            team = self.get_object()
-            if team.deleted_at:
-                team.delete()
-            else:
-                team.deleted_at = datetime.datetime.now()
-                team.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return delete(self, request, Team)
 
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
@@ -207,9 +193,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = Team.objects.all().order_by("-created_at")
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = all(self, Team, "-created_at")
         for team in serializer.data:
             team["total_users"] = get_total_users(team["id"])
             team["leader"] = get_leader_by_id(team["id"])
