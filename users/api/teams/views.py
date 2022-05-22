@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
-from common.actions import delete, all
+from common.actions import delete, withTrashed, trashList, restore
 from django.db import transaction
 import datetime
 
@@ -133,6 +133,24 @@ class TeamViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Team)
 
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        serializer = withTrashed(self, Team, order_by="-created_at")
+        for team in serializer.data:
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Team)
+
+    # for multi and single restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Team)
+
+    # Custom Actions
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         team = self.get_object()
@@ -191,47 +209,14 @@ class TeamViewSet(viewsets.ModelViewSet):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        serializer = all(self, Team, "-created_at")
-        for team in serializer.data:
-            team["total_users"] = get_total_users(team["id"])
-            team["leader"] = get_leader_by_id(team["id"])
-        return self.get_paginated_response(serializer.data)
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        queryset = self.filter_queryset(
-            Team.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
-        )
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-    # for multi restore
-    @action(detail=False, methods=["get"])
-    def restore(self, request, pk=None):
-        try:
-            with transaction.atomic():
-                data = request.data
-                teams = Team.objects.filter(pk__in=data["ids"])
-                for team in teams:
-                    team.deleted_at = None
-                    team.save()
-                page = self.paginate_queryset(teams)
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
+    # return different Serializers for different actions
     def get_serializer_class(self):
         try:
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return super().get_serializer_class()
 
+    # return different Querysets from different actions
     def get_queryset(self):
         try:
             return self.queryset_actions[self.action]

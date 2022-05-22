@@ -12,6 +12,7 @@ from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
+from common.actions import restore, delete, withTrashed, trashList
 from django.db import transaction
 import datetime
 
@@ -109,63 +110,27 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        data = request.data
-        if data:
-            projects = Project.objects.filter(pk__in=data["ids"])
-            for project in projects:
-                if project.deleted_at:
-                    project.delete()
-                else:
-                    project.deleted_at = datetime.datetime.now()
-                    project.save()
-        else:
-            project = self.get_object()
-            if project.deleted_at:
-                project.delete()
-            else:
-                project.deleted_at = datetime.datetime.now()
-                project.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return delete(self, request, Project)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        serializer = withTrashed(self, Project, order_by="-created_at")
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Project)
+
+    # for multi and single restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Project)
 
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectTasksSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        queryset = Project.objects.all().order_by("-created_at")
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        queryset = self.filter_queryset(
-            Project.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
-        )
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-    # for multi restore
-    @action(detail=False, methods=["get"])
-    def restore(self, request, pk=None):
-        try:
-            with transaction.atomic():
-                data = request.data
-                projects = Project.objects.filter(pk__in=data["ids"])
-                for project in projects:
-                    project.deleted_at = None
-                    project.save()
-                page = self.paginate_queryset(projects)
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
 
     def get_serializer_class(self):
         try:
