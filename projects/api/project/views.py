@@ -5,6 +5,7 @@ from projects.api.project.serializers import (
     ProjectListSerializer,
     ProjectCreateSerializer,
     ProjectTasksSerializer,
+    ProjectTasksListSerializer,
     ProjectUpdateSerializer,
     ProjectExpensesSerializer,
 )
@@ -128,6 +129,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def tasks(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectTasksSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    def tasks_list(self, request, pk=None):
+        project = self.get_object()
+        serializer = ProjectTasksListSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
