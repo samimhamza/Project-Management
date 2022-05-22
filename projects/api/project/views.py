@@ -11,7 +11,7 @@ from projects.api.project.serializers import (
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from common.custom_classes.custom import CustomPageNumberPagination
+from common.custom import CustomPageNumberPagination
 from django.db import transaction
 import datetime
 

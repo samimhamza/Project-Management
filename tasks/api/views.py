@@ -1,138 +1,119 @@
-from rest_framework import generics
-from tasks.api.serializers import TaskSerializer, UserTaskSerializer
-from tasks.models import Task, UserTask
+from rest_framework import viewsets, status
+from projects.models import Project
+from tasks.models import Task
+from tasks.api.serializers import (
+    TaskCreateSerializer,
+    TaskSerializer,
+    TaskNameSerializer,
+)
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from common.custom import CustomPageNumberPagination
+from django.db import transaction
 import datetime
 
-# # Task CRUD
-# class TaskListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Task.objects.filter(deleted_at__isnull=True)
-#     serializer_class = TaskSerializer
-#     paginate_by = 10
 
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+    serializer_class = TaskSerializer
+    pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+        "create": TaskCreateSerializer,
+    }
+    queryset_actions = {
+        "delete_user": Task.objects.all(),
+    }
 
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(created_by=request.user.id)
-#                 request.data.update(updated_by=request.user.id)
-#         except:
-#             request.data.update(created_by=request.user.id)
-#             request.data.update(updated_by=request.user.id)
-#         return self.create(request, *args, **kwargs)
+    def create(self, request):
+        data = request.data
+        # data["created_by"] = request.user
+        # data["updated_by"] = request.user
+        new_Task = Task.objects.create(
+            name=data["name"],
+            description=data["description"],
+            # created_by=data["created_by"],
+            # updated_by=data["updated_by"],
+        )
+        new_Task.save()
+        serializer = TaskSerializer(new_Task)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def update(self, request, pk=None):
+        Task = self.get_object()
+        if request.data.get("name"):
+            Task.name = request.data.get("name")
+        if request.data.get("description"):
+            Task.description = request.data.get("description")
+        if request.data.get("Task_projects"):
+            Tasks = Project.objects.filter(pk__in=request.data.get("Task_projects"))
+            Task.Task_projects.set(Tasks)
+        # Task.updated_by = request.user
+        Task.save()
+        serializer = TaskSerializer(Task)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-# class TaskDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Task.objects.filter(deleted_at__isnull=True)
-#     serializer_class = TaskSerializer
+    def destroy(self, request, pk=None):
+        data = request.data
+        if data:
+            Tasks = Task.objects.filter(pk__in=data["ids"])
+            for Task in Tasks:
+                if Task.deleted_at:
+                    Task.delete()
+                else:
+                    Task.deleted_at = datetime.datetime.now()
+                    Task.save()
+        else:
+            Task = self.get_object()
+            if Task.deleted_at:
+                Task.delete()
+            else:
+                Task.deleted_at = datetime.datetime.now()
+                Task.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        queryset = Task.objects.all().order_by("-created_at")
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        queryset = self.filter_queryset(
+            Task.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_by=request.user.id)
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_by=request.user.id)
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        try:
+            with transaction.atomic():
+                data = request.data
+                Tasks = Task.objects.filter(pk__in=data["ids"])
+                for Task in Tasks:
+                    Task.deleted_at = None
+                    Task.save()
+                page = self.paginate_queryset(Tasks)
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
-# # end of Task CRUD
-
-# # UserTask CRUD
-# class UserTaskListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = UserTask.objects.filter(deleted_at__isnull=True)
-#     serializer_class = UserTaskSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(created_by=request.user.id)
-#                 request.data.update(updated_by=request.user.id)
-#         except:
-#             request.data.update(created_by=request.user.id)
-#             request.data.update(updated_by=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class UserTaskDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = UserTask.objects.filter(deleted_at__isnull=True)
-#     serializer_class = UserTaskSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_by=request.user.id)
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_by=request.user.id)
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-# end of UserTask CRUD
-
-
-# Comment CRUD
-# class CommentListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(created_by=request.user.id)
-#                 request.data.update(updated_by=request.user.id)
-#         except:
-#             request.data.update(created_by=request.user.id)
-#             request.data.update(updated_by=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class CommentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_by=request.user.id)
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_by=request.user.id)
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# end of Comment CRUD
+    def get_queryset(self):
+        try:
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()

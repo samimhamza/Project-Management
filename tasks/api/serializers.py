@@ -41,6 +41,28 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
 
+class TaskCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "name",
+            "description",
+            "p_start_date",
+            "p_end_date",
+            "parent",
+            "priority",
+            "status",
+            "task_users",
+        ]
+
+
+class TaskNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ["id", "name"]
+
+
 # class CommentSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Comment

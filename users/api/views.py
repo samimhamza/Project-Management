@@ -7,7 +7,7 @@ from users.api.serializers import (
     UserWithProfileSerializer,
 )
 from users.models import User, Reminder, Holiday, Notification
-from common.custom_classes.custom import CustomPageNumberPagination
+from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db import transaction
