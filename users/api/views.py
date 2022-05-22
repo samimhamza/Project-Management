@@ -8,10 +8,9 @@ from users.api.serializers import (
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
+from common.actions import withTrashed, trashList, restore, delete
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.db import transaction
-import datetime
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -30,57 +29,21 @@ class UserViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
     def destroy(self, request, pk=None):
-        data = request.data
-        if data:
-            users = User.objects.filter(pk__in=data["ids"])
-            for user in users:
-                if user.deleted_at:
-                    user.delete()
-                else:
-                    user.deleted_at = datetime.datetime.now()
-                    user.save()
-        else:
-            user = self.get_object()
-            if user.deleted_at:
-                user.delete()
-            else:
-                user.deleted_at = datetime.datetime.now()
-                user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return delete(self, request, User)
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        queryset = User.objects.all().order_by("-created_at")
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = withTrashed(self, User, order_by="-created_at")
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        queryset = self.filter_queryset(
-            User.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
-        )
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        return trashList(self, User)
 
     # for multi restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        try:
-            with transaction.atomic():
-                data = request.data
-                users = User.objects.filter(pk__in=data["ids"])
-                for user in users:
-                    user.deleted_at = None
-                    user.save()
-                page = self.paginate_queryset(users)
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return restore(self, request, User)
 
     def get_serializer_class(self):
         try:

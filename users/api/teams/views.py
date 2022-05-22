@@ -16,7 +16,6 @@ from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
 from common.actions import delete, withTrashed, trashList, restore
 from django.db import transaction
-import datetime
 
 # return leader of team of unserialized team parameter
 def get_leader(team):

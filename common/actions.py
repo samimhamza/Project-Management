@@ -60,17 +60,3 @@ def restore(self, request, table):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
-
-
-# def get_serializer_class(self, s):
-#     try:
-#         return self.serializer_action_classes[self.action]
-#     except (KeyError, AttributeError):
-#         return super().get_serializer_class()
-
-
-# def get_queryset(self):
-#     try:
-#         return self.queryset_actions[self.action]
-#     except (KeyError, AttributeError):
-#         return super().get_queryset()

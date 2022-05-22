@@ -13,8 +13,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
 from common.actions import restore, delete, withTrashed, trashList
-from django.db import transaction
-import datetime
 
 # Sharing to Teams and Users
 def shareTo(request, project_data, new_project):
