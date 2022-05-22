@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from tasks.models import Task, UserTask
-from users.models import User
+from users.api.serializers import UserWithProfileSerializer
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
@@ -9,14 +9,18 @@ class UserTaskSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class LessFieldsUserSerializer(serializers.ModelSerializer):
+class LessFieldsTaskSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ["id", "first_name", "last_name", "email"]
+        model = Task
+        fields = [
+            "id",
+            "name",
+        ]
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    task_users = LessFieldsUserSerializer(many=True, read_only=True)
+    task_users = UserWithProfileSerializer(many=True, read_only=True)
+    parent = LessFieldsTaskSerializer()
 
     class Meta:
         model = Task
@@ -35,7 +39,6 @@ class TaskSerializer(serializers.ModelSerializer):
             "dependencies",
             "task_users",
         ]
-        depth = 1
 
 
 # class CommentSerializer(serializers.ModelSerializer):

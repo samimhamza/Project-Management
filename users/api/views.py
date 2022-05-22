@@ -109,12 +109,12 @@ class ReminderViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         data = request.data
         if data:
-            users = User.objects.filter(pk__in=data["ids"])
-            for user in users:
-                user.delete()
+            reminders = Reminder.objects.filter(pk__in=data["ids"])
+            for reminder in reminders:
+                reminder.delete()
         else:
-            user = self.get_object()
-            user.delete()
+            reminder = self.get_object()
+            reminder.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

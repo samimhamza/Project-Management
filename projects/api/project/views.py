@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from projects.models import Project
 from users.models import User, Team
-from projects.api.project_views.serializers import (
+from projects.api.project.serializers import (
     ProjectListSerializer,
     ProjectCreateSerializer,
     ProjectTasksSerializer,
