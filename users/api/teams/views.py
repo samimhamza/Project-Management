@@ -18,9 +18,12 @@ from common.actions import delete, withTrashed, trashList, restore
 from django.db import transaction
 
 # return leader of team of unserialized team parameter
+
+
 def get_leader(team):
     try:
-        team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
+        team_leader = TeamUser.objects.values(
+            "user").get(team=team, is_leader=True)
         leader = User.objects.values("id", "first_name", "last_name").get(
             pk=team_leader["user"]
         )
@@ -33,7 +36,8 @@ def get_leader(team):
 def get_leader_by_id(id):
     try:
         team = Team.objects.get(pk=id)
-        team_leader = TeamUser.objects.values("user").get(team=team, is_leader=True)
+        team_leader = TeamUser.objects.values(
+            "user").get(team=team, is_leader=True)
         leader = User.objects.values("id", "first_name", "last_name").get(
             pk=team_leader["user"]
         )
@@ -60,7 +64,8 @@ def get_total_users(id):
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+    queryset = Team.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TeamListSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -76,7 +81,8 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.filter_queryset(
-            Team.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+            Team.objects.filter(
+                deleted_at__isnull=True).order_by("-created_at")
         )
         if request.GET.get("items_per_page") == "-1":
             serializer = TeamNamesSerializer(queryset, many=True)
@@ -94,7 +100,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         data = serializer.data
         data["total_users"] = get_total(team)
         data["leader"] = get_leader(team)
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
 
     def create(self, request):
         data = request.data
@@ -113,7 +119,10 @@ class TeamViewSet(viewsets.ModelViewSet):
             )
         new_team.save()
         serializer = TeamListSerializer(new_team)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        data = serializer.data
+        data["total_users"] = get_total(new_team)
+        data["leader"] = get_leader(new_team)
+        return Response(data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
         team = self.get_object()
@@ -122,7 +131,8 @@ class TeamViewSet(viewsets.ModelViewSet):
         if request.data.get("description"):
             team.description = request.data.get("description")
         if request.data.get("team_projects"):
-            teams = Project.objects.filter(pk__in=request.data.get("team_projects"))
+            teams = Project.objects.filter(
+                pk__in=request.data.get("team_projects"))
             team.team_projects.set(teams)
         # team.updated_by = request.user
         team.save()
@@ -164,7 +174,8 @@ class TeamViewSet(viewsets.ModelViewSet):
             data = request.data
             team = self.get_object()
             user = get_object_or_404(User, pk=data["id"])
-            team_user, created = TeamUser.objects.get_or_create(team=team, user=user)
+            team_user, created = TeamUser.objects.get_or_create(
+                team=team, user=user)
             team_user.position = data["position"]
             team_user.save()
             serializer = TeamUserSerializer(team_user)
@@ -200,7 +211,8 @@ class TeamViewSet(viewsets.ModelViewSet):
                     for team_user in team_users:
                         team_user.delete()
                 elif request.data.get("id"):
-                    team_user = TeamUser.objects.get(team=team, user=data["id"])
+                    team_user = TeamUser.objects.get(
+                        team=team, user=data["id"])
                     team_user.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
         except:

@@ -16,6 +16,8 @@ from common.custom import CustomPageNumberPagination
 from common.actions import restore, delete, withTrashed, trashList
 
 # Sharing to Teams and Users
+
+
 def shareTo(request, project_data, new_project):
     if request.data.get("share"):
         if project_data["share"] != "justMe":
@@ -35,7 +37,8 @@ def shareTo(request, project_data, new_project):
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+    queryset = Project.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProjectListSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -129,7 +132,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def tasks(self, request, pk=None):
         project = self.get_object()
         serializer = ProjectTasksSerializer(project)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def tasks_list(self, request, pk=None):

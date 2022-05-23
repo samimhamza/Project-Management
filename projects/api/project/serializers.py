@@ -13,7 +13,6 @@ class ProjectTasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ["tasks"]
-        depth = 1
 
 
 class ProjectTasksListSerializer(serializers.ModelSerializer):
