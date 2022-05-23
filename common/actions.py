@@ -40,9 +40,7 @@ def delete(self, request, table):
         else:
             team.deleted_at = datetime.datetime.now()
             team.save()
-    return Response(
-        {"message": "successfully deleted"}, status=status.HTTP_204_NO_CONTENT
-    )
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 def restore(self, request, table):
