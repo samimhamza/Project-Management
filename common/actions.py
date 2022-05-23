@@ -21,7 +21,7 @@ def get_leader(team):
 # return leader of team of serialized team_id parameter
 def get_leader_by_id(id):
     try:
-        team = Team.objects.get(pk=id)
+        team = Team.objects.only('id').get(pk=id)
         team_leader = TeamUser.objects.values(
             "user").get(team=team, is_leader=True)
         leader = User.objects.values("id", "first_name", "last_name").get(
@@ -43,7 +43,7 @@ def get_total(team):
 # return total_users of team of serialized team_id parameter
 def get_total_users(id):
     try:
-        team = Team.objects.get(pk=id)
+        team = Team.objects.only('id').get(pk=id)
         return TeamUser.objects.filter(team=team).count()
     except:
         return 0
