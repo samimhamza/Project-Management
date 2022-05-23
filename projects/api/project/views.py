@@ -11,7 +11,7 @@ from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import restore, delete, withTrashed, trashList
+from common.actions import restore, delete, withTrashed, trashList, allItems
 
 # Sharing to Teams and Users
 
@@ -51,9 +51,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
+
         if request.GET.get("items_per_page") == "-1":
-            serializer = ProjectNameListSerializer(queryset, many=True)
-            return Response(serializer.data, status=200)
+            return allItems(ProjectNameListSerializer, queryset)
+
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -114,8 +115,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        serializer = withTrashed(self, Project, order_by="-created_at")
-        return self.get_paginated_response(serializer.data)
+        return withTrashed(self, Project, order_by="-created_at")
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):

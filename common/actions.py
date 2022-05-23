@@ -54,9 +54,14 @@ def withTrashed(self, table, *args, **kwargs):
         queryset = table.objects.all().order_by(kwargs.get("order_by"))
     else:
         queryset = table.objects.all()
+
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
-    return serializer
+    if table == Team:
+        for team in serializer.data:
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
+    return self.get_paginated_response(serializer.data)
 
 
 def trashList(self, table, *args, **kwargs):

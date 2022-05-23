@@ -90,8 +90,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        serializer = withTrashed(self, Task, order_by="-created_at")
-        return self.get_paginated_response(serializer.data)
+        return withTrashed(self, Task, order_by="-created_at")
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):

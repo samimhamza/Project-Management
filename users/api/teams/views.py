@@ -15,7 +15,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
 from common.actions import (delete, withTrashed, trashList, restore,
-                            get_total_users, get_total, get_leader_by_id, get_leader)
+                            get_total_users, get_total, get_leader_by_id, get_leader, allItems)
 from django.db import transaction
 
 
@@ -41,8 +41,8 @@ class TeamViewSet(viewsets.ModelViewSet):
                 deleted_at__isnull=True).order_by("-created_at")
         )
         if request.GET.get("items_per_page") == "-1":
-            serializer = TeamNamesSerializer(queryset, many=True)
-            return Response(serializer.data, status=200)
+            return allItems(TeamNamesSerializer, queryset)
+
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
@@ -103,20 +103,16 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        serializer = withTrashed(self, Team, order_by="-created_at")
-        for team in serializer.data:
-            team["total_users"] = get_total_users(team["id"])
-            team["leader"] = get_leader_by_id(team["id"])
-        return self.get_paginated_response(serializer.data)
+        return withTrashed(self, Team, order_by="-created_at")
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        return trashList(self, Team)
+        return trashList(self, request, Team)
 
     # for multi and single restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        return restore(self, request, Team)
+        return restore(self, Team)
 
     # Custom Actions
     @action(detail=True, methods=["get"])
