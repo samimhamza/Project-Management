@@ -147,7 +147,6 @@ class TeamViewSet(viewsets.ModelViewSet):
 
         users = User.objects.filter(
             deleted_at__isnull=True).exclude(users__id=pk).order_by("-created_at")
-
         serializer = LessFieldsUserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
