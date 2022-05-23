@@ -3,7 +3,7 @@ from projects.models import Project
 from users.api.serializers import LessFieldsUserSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import LessFieldsLocationSerializer
-from tasks.api.serializers import TaskSerializer
+from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
 from expenses.api.serializers import ExpenseSerializer
 
 
@@ -14,6 +14,14 @@ class ProjectTasksSerializer(serializers.ModelSerializer):
         model = Project
         fields = ["tasks"]
         depth = 1
+
+
+class ProjectTasksListSerializer(serializers.ModelSerializer):
+    tasks = LessFieldsTaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = ["tasks"]
 
 
 class ProjectExpensesSerializer(serializers.ModelSerializer):

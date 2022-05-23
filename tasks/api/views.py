@@ -23,7 +23,10 @@ class TaskViewSet(viewsets.ModelViewSet):
         # data["created_by"] = request.user
         # data["updated_by"] = request.user
         new_Task = Task.objects.create(
+            parent=data["parent"],
             name=data["name"],
+            p_start_date=data["p_start_date"],
+            p_end_date=data["p_end_date"],
             description=data["description"],
             # created_by=data["created_by"],
             # updated_by=data["updated_by"],
