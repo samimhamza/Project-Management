@@ -18,7 +18,7 @@ class ProjectExpensesSerializer(serializers.ModelSerializer):
 class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(many=True, read_only=True)
     users = LessFieldsUserSerializer(many=True, read_only=True)
-    teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    projects = LessFieldsTeamSerializer(many=True, read_only=True)
     created_by = LessFieldsUserSerializer()
     updated_by = LessFieldsUserSerializer()
 
@@ -39,7 +39,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "company_email",
             "company_location",
             "users",
-            "teams",
+            "projects",
             "created_at",
             "updated_at",
             "created_by",
@@ -57,7 +57,7 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
             "p_start_date",
             "p_end_date",
             "users",
-            "teams",
+            "projects",
         ]
 
 
@@ -77,5 +77,5 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
             "company_name",
             "company_email",
             "users",
-            "teams",
+            "projects",
         ]

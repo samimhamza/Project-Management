@@ -21,8 +21,8 @@ def shareTo(request, project_data, new_project):
         if project_data["share"] != "justMe":
             users = User.objects.filter(pk__in=project_data["users"])
             new_project.users.set(users)
-            teams = Team.objects.filter(pk__in=project_data["teams"])
-            new_project.teams.set(teams)
+            teams = Team.objects.filter(pk__in=project_data["projects"])
+            new_project.projects.set(teams)
         if project_data["share"] == "everyone":
             users = User.objects.all()
             new_project.users.set(users)
@@ -102,9 +102,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("users"):
             users = User.objects.filter(pk__in=request.data.get("users"))
             project.users.set(users)
-        if request.data.get("teams"):
-            teams = Team.objects.filter(pk__in=request.data.get("teams"))
-            project.teams.set(teams)
+        if request.data.get("projects"):
+            teams = Team.objects.filter(pk__in=request.data.get("projects"))
+            project.projects.set(teams)
         # project.updated_by = request.user
         project.save()
         serializer = ProjectListSerializer(project)

@@ -88,10 +88,10 @@ class TeamViewSet(viewsets.ModelViewSet):
             team.name = request.data.get("name")
         if request.data.get("description"):
             team.description = request.data.get("description")
-        if request.data.get("teams"):
+        if request.data.get("projects"):
             teams = Project.objects.filter(
-                pk__in=request.data.get("teams"))
-            team.teams.set(teams)
+                pk__in=request.data.get("projects"))
+            team.projects.set(teams)
         # team.updated_by = request.user
         team.save()
         serializer = TeamListSerializer(team)
@@ -155,7 +155,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     def excluded_projects(self, request, pk=None):
 
         projects = Project.objects.filter(deleted_at__isnull=True).exclude(
-            teams__id=pk).order_by("-created_at")
+            projects__id=pk).order_by("-created_at")
 
         serializer = ProjectNameListSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -165,7 +165,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         try:
             data = request.data
             team = self.get_object()
-            team.teams.set(data["ids"])
+            team.projects.set(data["ids"])
             serializer = self.get_serializer(team)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
