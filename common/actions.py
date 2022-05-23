@@ -107,3 +107,8 @@ def restore(self, request, table):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+def allItems(serializerName, queryset):
+    serializer = serializerName(queryset, many=True)
+    return Response(serializer.data, status=200)

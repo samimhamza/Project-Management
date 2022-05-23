@@ -38,7 +38,8 @@ class TaskSerializer(serializers.ModelSerializer):
             "type",
             "dependencies",
             "task_users",
-            "deleted_at"
+            "deleted_at",
+            "project"
         ]
 
 

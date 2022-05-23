@@ -1,10 +1,21 @@
 from rest_framework import viewsets, status
 from tasks.models import Task
-from tasks.api.serializers import TaskCreateSerializer, TaskSerializer
+from tasks.api.serializers import TaskCreateSerializer, TaskSerializer, LessFieldsTaskSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, delete, restore
+from common.actions import withTrashed, trashList, delete, restore, allItems
+from projects.models import Project
+
+
+def tasksOfProject(self, request):
+    queryset = Task.objects.filter(
+        project=request.GET.get("project_id"))
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(LessFieldsTaskSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -18,6 +29,19 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset_actions = {
         "destroy": Task.objects.all(),
     }
+
+    def list(self, request):
+        queryset = self.get_queryset()
+
+        if request.GET.get("project_id"):
+            return tasksOfProject(self, request)
+
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(LessFieldsTaskSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def create(self, request):
         data = request.data

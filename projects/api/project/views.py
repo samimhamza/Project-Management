@@ -4,8 +4,6 @@ from users.models import User, Team
 from projects.api.project.serializers import (
     ProjectListSerializer,
     ProjectCreateSerializer,
-    ProjectTasksSerializer,
-    ProjectTasksListSerializer,
     ProjectUpdateSerializer,
     ProjectExpensesSerializer,
 )
@@ -127,19 +125,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Project)
-
-    @action(detail=True, methods=["get"])
-    def tasks(self, request, pk=None):
-        project = self.get_object()
-        serializer = ProjectTasksSerializer(project)
-        return self.get_paginated_response(serializer.data)
-        # return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=["get"])
-    def tasks_list(self, request, pk=None):
-        project = self.get_object()
-        serializer = ProjectTasksListSerializer(project)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         try:
