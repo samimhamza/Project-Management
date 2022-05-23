@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, delete, restore, allItems
+from projects.models import Project
 
 
 def tasksOfProject(self, request):
@@ -46,12 +47,21 @@ class TaskViewSet(viewsets.ModelViewSet):
         data = request.data
         # data["created_by"] = request.user
         # data["updated_by"] = request.user
+        if data['parent']:
+            parent = Task.objects.only('id').get(pk=data['parent'])
+        else:
+            parent = None
+        if data['project']:
+            project = Project.objects.only('id').get(pk=data['project'])
+        else:
+            project = None
         new_Task = Task.objects.create(
-            parent=data["parent"],
+            parent=parent,
             name=data["name"],
             p_start_date=data["p_start_date"],
             p_end_date=data["p_end_date"],
             description=data["description"],
+            project=project,
             # created_by=data["created_by"],
             # updated_by=data["updated_by"],
         )

@@ -161,16 +161,16 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def add_project(self, request, pk=None):
-        try:
-            data = request.data
-            team = self.get_object()
-            team.projects.set(data["ids"])
-            serializer = self.get_serializer(team)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        # try:
+        data = request.data
+        team = self.get_object()
+        team.projects.set(data["ids"])
+        serializer = self.get_serializer(team)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # except:
+        #     return Response(
+        #         {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        #     )
 
     @action(detail=True, methods=["post"])
     def delete_user(self, request, pk=None):

@@ -52,6 +52,7 @@ class TaskCreateSerializer(serializers.ModelSerializer):
             "p_start_date",
             "p_end_date",
             "parent",
+            "project"
         ]
 
 
