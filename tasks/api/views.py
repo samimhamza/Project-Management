@@ -8,14 +8,15 @@ from common.actions import withTrashed, trashList, delete, restore
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+    queryset = Task.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TaskSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "create": TaskCreateSerializer,
     }
     queryset_actions = {
-        "delete_user": Task.objects.all(),
+        "destroy": Task.objects.all(),
     }
 
     def create(self, request):
