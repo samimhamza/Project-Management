@@ -14,53 +14,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
-from common.actions import delete, withTrashed, trashList, restore
+from common.actions import (delete, withTrashed, trashList, restore,
+                            get_total_users, get_total, get_leader_by_id, get_leader)
 from django.db import transaction
-
-# return leader of team of unserialized team parameter
-
-
-def get_leader(team):
-    try:
-        team_leader = TeamUser.objects.values(
-            "user").get(team=team, is_leader=True)
-        leader = User.objects.values("id", "first_name", "last_name").get(
-            pk=team_leader["user"]
-        )
-        return leader
-    except:
-        return {}
-
-
-# return leader of team of serialized team_id parameter
-def get_leader_by_id(id):
-    try:
-        team = Team.objects.get(pk=id)
-        team_leader = TeamUser.objects.values(
-            "user").get(team=team, is_leader=True)
-        leader = User.objects.values("id", "first_name", "last_name").get(
-            pk=team_leader["user"]
-        )
-        return leader
-    except:
-        return {}
-
-
-# return total users of team of unserialized team parameter
-def get_total(team):
-    try:
-        return TeamUser.objects.filter(team=team).count()
-    except:
-        return 0
-
-
-# return total_users of team of serialized team_id parameter
-def get_total_users(id):
-    try:
-        team = Team.objects.get(pk=id)
-        return TeamUser.objects.filter(team=team).count()
-    except:
-        return 0
 
 
 class TeamViewSet(viewsets.ModelViewSet):
