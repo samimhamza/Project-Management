@@ -5,12 +5,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, delete, restore, allItems
-from projects.models import Project
 
 
 def tasksOfProject(self, request):
     queryset = Task.objects.filter(
-        project=request.GET.get("project_id"))
+        deleted_at__isnull=True, project=request.GET.get("project_id"))
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
     page = self.paginate_queryset(queryset)
