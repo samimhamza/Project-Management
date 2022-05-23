@@ -10,7 +10,7 @@ from projects.models import Project
 
 def tasksOfProject(self, request):
     queryset = Task.objects.filter(
-        deleted_at__isnull=True, project=request.GET.get("project_id"))
+        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
     page = self.paginate_queryset(queryset)
