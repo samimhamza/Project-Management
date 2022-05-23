@@ -17,6 +17,8 @@ from common.custom import CustomPageNumberPagination
 from common.actions import (delete, withTrashed, trashList, restore,
                             get_total_users, get_total, get_leader_by_id, get_leader, allItems)
 from django.db import transaction
+from users.api.serializers import LessFieldsUserSerializer
+from projects.api.serializers import ProjectNameListSerializer
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -86,10 +88,10 @@ class TeamViewSet(viewsets.ModelViewSet):
             team.name = request.data.get("name")
         if request.data.get("description"):
             team.description = request.data.get("description")
-        if request.data.get("team_projects"):
+        if request.data.get("teams"):
             teams = Project.objects.filter(
-                pk__in=request.data.get("team_projects"))
-            team.team_projects.set(teams)
+                pk__in=request.data.get("teams"))
+            team.teams.set(teams)
         # team.updated_by = request.user
         team.save()
         serializer = TeamListSerializer(team)
@@ -140,12 +142,26 @@ class TeamViewSet(viewsets.ModelViewSet):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
+    @action(detail=True, methods=["get"])
+    def excluded_users(self, request, pk=None):
+        users = User.objects.filter(
+            deleted_at__isnull=True).exclude(users__id=pk).order_by("-created_at")
+        serializer = LessFieldsUserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    def excluded_projects(self, request, pk=None):
+        projects = Project.objects.filter(deleted_at__isnull=True).exclude(
+            teams__id=pk).order_by("-created_at")
+        serializer = ProjectNameListSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=["post"])
     def add_project(self, request, pk=None):
         try:
             data = request.data
             team = self.get_object()
-            team.team_projects.set(data["ids"])
+            team.teams.set(data["ids"])
             serializer = self.get_serializer(team)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
