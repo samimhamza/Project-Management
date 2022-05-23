@@ -137,7 +137,10 @@ class TeamViewSet(viewsets.ModelViewSet):
         # team.updated_by = request.user
         team.save()
         serializer = TeamListSerializer(team)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        data = serializer.data
+        data["total_users"] = get_total(team)
+        data["leader"] = get_leader(team)
+        return Response(data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
         return delete(self, request, Team)
