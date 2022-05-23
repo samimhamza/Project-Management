@@ -107,12 +107,12 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        return trashList(self, request, Team)
+        return trashList(self, Team)
 
     # for multi and single restore
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
-        return restore(self, Team)
+        return restore(self, request, Team)
 
     # Custom Actions
     @action(detail=True, methods=["get"])
