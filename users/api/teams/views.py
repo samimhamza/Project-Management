@@ -146,7 +146,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     def excluded_users(self, request, pk=None):
 
         users = User.objects.filter(
-            deleted_at__isnull=True).exclude(users__id=pk).order_by("-created_at")
+            deleted_at__isnull=True).exclude(teams__id=pk).order_by("-created_at")
         serializer = LessFieldsUserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -154,7 +154,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     def excluded_projects(self, request, pk=None):
 
         projects = Project.objects.filter(deleted_at__isnull=True).exclude(
-            projects__id=pk).order_by("-created_at")
+            teams__id=pk).order_by("-created_at")
 
         serializer = ProjectNameListSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
