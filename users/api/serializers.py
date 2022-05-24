@@ -15,6 +15,17 @@ class UserWithProfileSerializer(serializers.ModelSerializer):
         fields = ["id", "first_name", "last_name", "email", "profile"]
 
 
+class CustoUserModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "password"]
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'], email=validated_data['email'], password=validated_data['password'])
+        return user
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -25,11 +36,28 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "profile",
+            "phone",
+            "whatsapp",
             "created_by",
             "updated_by",
             "created_at",
             "updated_at",
             "deleted_at",
+        ]
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "profile",
+            "phone",
+            "whatsapp",
+            "password",
         ]
 
 

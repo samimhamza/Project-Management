@@ -121,9 +121,11 @@ class TeamViewSet(viewsets.ModelViewSet):
     def users(self, request, pk=None):
         team = self.get_object()
         users = TeamUser.objects.filter(team=team)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(TeamUserSerializer, users)
         page = self.paginate_queryset(users)
         serializer = TeamUserSerializer(page, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=["post"])
     def add_user(self, request, pk=None):
