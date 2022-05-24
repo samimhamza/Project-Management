@@ -14,6 +14,9 @@ from pathlib import Path
 from datetime import timedelta
 import environ
 import os
+# from rest_framework import routers
+
+# router = routers.SimpleRouter(trailing_slash=False)
 
 # Initialise environment variables
 env = environ.Env()
