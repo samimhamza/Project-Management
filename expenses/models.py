@@ -32,15 +32,18 @@ class Expense(models.Model):
     project = models.ForeignKey(
         "projects.Project", on_delete=models.SET_NULL, null=True, related_name="expenses"
     )
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    body = models.TextField()
-    cost = models.DecimalField(max_digits=19, decimal_places=2)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True)
+    body = models.TextField(null=True, blank=True)
+    date = models.DateField()
+    # cost = models.DecimalField(max_digits=19, decimal_places=2)
 
     class Types(models.TextChoices):
         estimate = "estimate"
         actual = "actual"
 
-    type = models.CharField(max_length=24, choices=Types.choices, default="actual")
+    type = models.CharField(
+        max_length=24, choices=Types.choices, default="estimate")
     expense_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
