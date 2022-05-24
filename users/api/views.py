@@ -5,6 +5,7 @@ from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
     UserWithProfileSerializer,
+    CreateUserSerializer
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
@@ -18,7 +19,11 @@ class UserViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
+
     serializer_action_classes = {
+        "create": CreateUserSerializer,
+    }
+    queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }
 
@@ -31,6 +36,27 @@ class UserViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def create(self, request):
+        data = request.data
+        # data["created_by"] = request.user
+        # data["updated_by"] = request.user
+        new_user = User.objects.create(
+            username=data["username"],
+            email=data["email"],
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            phone=data["phone"],
+            whatsapp=data["whatsapp"],
+            profile=data["profile"],
+            is_active=True,
+            # created_by=data["created_by"],
+            # updated_by=data["updated_by"],
+        )
+        new_user.set_password(data["password"])
+        new_user.save()
+        serializer = UserSerializer(new_user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         return delete(self, request, User)
