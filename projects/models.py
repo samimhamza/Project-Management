@@ -98,8 +98,9 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
-    users = models.ManyToManyField("users.User", related_name="project_user")
-    teams = models.ManyToManyField("users.Team", related_name="team_projects")
+    users = models.ManyToManyField("users.User", related_name="project_users")
+    teams = models.ManyToManyField(
+        "users.Team", related_name="%(class)ss")
 
     def __str__(self):
         if self.name:

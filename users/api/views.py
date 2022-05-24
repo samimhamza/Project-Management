@@ -8,13 +8,14 @@ from users.api.serializers import (
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, restore, delete
+from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+    queryset = User.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -23,9 +24,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
+
         if request.GET.get("items_per_page") == "-1":
-            serializer = UserWithProfileSerializer(queryset, many=True)
-            return Response(serializer.data, status=200)
+            return allItems(UserWithProfileSerializer, queryset)
+
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -35,8 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        serializer = withTrashed(self, User, order_by="-created_at")
-        return self.get_paginated_response(serializer.data)
+        return withTrashed(self, User, order_by="-created_at")
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):

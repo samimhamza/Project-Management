@@ -7,23 +7,6 @@ from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
 from expenses.api.serializers import ExpenseSerializer
 
 
-class ProjectTasksSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = ["tasks"]
-        depth = 1
-
-
-class ProjectTasksListSerializer(serializers.ModelSerializer):
-    tasks = LessFieldsTaskSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = ["tasks"]
-
-
 class ProjectExpensesSerializer(serializers.ModelSerializer):
     expenses = ExpenseSerializer(many=True, read_only=True)
 

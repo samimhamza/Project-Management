@@ -5,7 +5,8 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    profile = models.ImageField(upload_to="user_profiles", blank=True, null=True)
+    profile = models.ImageField(
+        upload_to="user_profiles", blank=True, null=True)
     phone = models.CharField(max_length=32, blank=True, null=True)
     whatsapp = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,7 +49,8 @@ class Team(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    users = models.ManyToManyField(User, through="TeamUser", related_name="users")
+    users = models.ManyToManyField(
+        User, through="TeamUser", related_name="%(class)ss")
     deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
@@ -96,4 +98,5 @@ class Notification(models.Model):
         success = "success"
         warning = "warning"
 
-    type = models.CharField(max_length=24, choices=Types.choices, default="notify")
+    type = models.CharField(
+        max_length=24, choices=Types.choices, default="notify")

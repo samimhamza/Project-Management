@@ -1,133 +1,269 @@
-from rest_framework import generics
+import datetime
+from expenses.models import Expense, ExpenseItem, Category
 from expenses.api.serializers import (
     ExpenseSerializer,
+    CreateExpenseSerializer,
     ExpenseItemSerializer,
     CategorySerializer,
+    LessFieldExpenseSerializer
 )
-from expenses.models import Expense, ExpenseItem, Category
-import datetime
+from rest_framework import generics
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from common.custom import CustomPageNumberPagination
+from common.actions import withTrashed, trashList, delete, restore, allItems
+from projects.models import Project
 
-# Category CRUD
-class CategoryListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Category.objects.filter(deleted_at__isnull=True)
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = CategorySerializer
-    paginate_by = 10
+    pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {}
+    queryset_actions = {
+        "destroy": Category.objects.all(),
+    }
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def destroy(self, request, pk=None):
+        return delete(self, request, Category)
 
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, Category, order_by="-created_at")
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Category)
+
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Category)
+
+    def get_serializer_class(self):
         try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(created_by=request.user.id)
-                request.data.update(updated_by=request.user.id)
-        except:
-            request.data.update(created_by=request.user.id)
-            request.data.update(updated_by=request.user.id)
-        return self.create(request, *args, **kwargs)
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
-
-class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.filter(deleted_at__isnull=True)
-    serializer_class = CategorySerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
+    def get_queryset(self):
         try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(updated_by=request.user.id)
-                request.data.update(updated_at=datetime.datetime.now())
-        except:
-            request.data.update(updated_by=request.user.id)
-            request.data.update(updated_at=datetime.datetime.now())
-        return self.update(request, *args, **kwargs)
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()
 
 
-# end of Category CRUD
+def tasksOfProject(self, request):
+    queryset = Expense.objects.filter(
+        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(LessFieldExpenseSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
 
-# Expense CRUD
-class ExpenseListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Expense.objects.filter(deleted_at__isnull=True)
+
+class ExpenseViewSet(viewsets.ModelViewSet):
+    queryset = Expense.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseSerializer
-    paginate_by = 10
+    pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+        "create": CreateExpenseSerializer,
+    }
+    queryset_actions = {
+        "destroy": Expense.objects.all(),
+    }
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def list(self, request):
+        queryset = self.get_queryset()
 
-    def post(self, request, *args, **kwargs):
+        if request.GET.get("project_id"):
+            return tasksOfProject(self, request)
+
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(LessFieldExpenseSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    def create(self, request):
+        data = request.data
+        # data["created_by"] = request.user
+        # data["updated_by"] = request.user
+        if data['category']:
+            category = Category.objects.only('id').get(pk=data['category'])
+        else:
+            category = None
+        if data['project']:
+            project = Project.objects.only('id').get(pk=data['project'])
+        else:
+            project = None
+        new_Task = Expense.objects.create(
+            category=category,
+            title=data["title"],
+            date=data["date"],
+            project=project,
+            # created_by=data["created_by"],
+            # updated_by=data["updated_by"],
+        )
+        new_Task.save()
+        serializer = ExpenseSerializer(new_Task)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Expense)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, Expense, order_by="-created_at")
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Expense)
+
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Expense)
+
+    def get_serializer_class(self):
         try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(created_by=request.user.id)
-                request.data.update(updated_by=request.user.id)
-        except:
-            request.data.update(created_by=request.user.id)
-            request.data.update(updated_by=request.user.id)
-        return self.create(request, *args, **kwargs)
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
-
-class ExpenseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Expense.objects.filter(deleted_at__isnull=True)
-    serializer_class = ExpenseSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
+    def get_queryset(self):
         try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(updated_by=request.user.id)
-                request.data.update(updated_at=datetime.datetime.now())
-        except:
-            request.data.update(updated_by=request.user.id)
-            request.data.update(updated_at=datetime.datetime.now())
-        return self.update(request, *args, **kwargs)
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()
 
 
-# end of Expense CRUD
+# # Category CRUD
+# class CategoryListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Category.objects.filter(deleted_at__isnull=True)
+#     serializer_class = CategorySerializer
+#     paginate_by = 10
 
-# ExpenseItem CRUD
-class ExpenseItemListCreateAPIView(generics.ListCreateAPIView):
-    queryset = ExpenseItem.objects.all()
-    serializer_class = ExpenseItemSerializer
-    paginate_by = 10
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-
-class ExpenseItemDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ExpenseItem.objects.all()
-    serializer_class = ExpenseItemSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            if not request.data._mutable:
-                request.data._mutable = True
-                request.data.update(updated_at=datetime.datetime.now())
-        except:
-            request.data.update(updated_at=datetime.datetime.now())
-        return self.update(request, *args, **kwargs)
+#     def post(self, request, *args, **kwargs):
+#         try:
+#             if not request.data._mutable:
+#                 request.data._mutable = True
+#                 request.data.update(created_by=request.user.id)
+#                 request.data.update(updated_by=request.user.id)
+#         except:
+#             request.data.update(created_by=request.user.id)
+#             request.data.update(updated_by=request.user.id)
+#         return self.create(request, *args, **kwargs)
 
 
-# end of ExpenseItem CRUD
+# class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Category.objects.filter(deleted_at__isnull=True)
+#     serializer_class = CategorySerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
+
+#     def put(self, request, *args, **kwargs):
+#         try:
+#             if not request.data._mutable:
+#                 request.data._mutable = True
+#                 request.data.update(updated_by=request.user.id)
+#                 request.data.update(updated_at=datetime.datetime.now())
+#         except:
+#             request.data.update(updated_by=request.user.id)
+#             request.data.update(updated_at=datetime.datetime.now())
+#         return self.update(request, *args, **kwargs)
+
+
+# # end of Category CRUD
+
+# # Expense CRUD
+# class ExpenseListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Expense.objects.filter(deleted_at__isnull=True)
+#     serializer_class = ExpenseSerializer
+#     paginate_by = 10
+
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+#     def post(self, request, *args, **kwargs):
+#         try:
+#             if not request.data._mutable:
+#                 request.data._mutable = True
+#                 request.data.update(created_by=request.user.id)
+#                 request.data.update(updated_by=request.user.id)
+#         except:
+#             request.data.update(created_by=request.user.id)
+#             request.data.update(updated_by=request.user.id)
+#         return self.create(request, *args, **kwargs)
+
+
+# class ExpenseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Expense.objects.filter(deleted_at__isnull=True)
+#     serializer_class = ExpenseSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
+
+#     def put(self, request, *args, **kwargs):
+#         try:
+#             if not request.data._mutable:
+#                 request.data._mutable = True
+#                 request.data.update(updated_by=request.user.id)
+#                 request.data.update(updated_at=datetime.datetime.now())
+#         except:
+#             request.data.update(updated_by=request.user.id)
+#             request.data.update(updated_at=datetime.datetime.now())
+#         return self.update(request, *args, **kwargs)
+
+
+# # end of Expense CRUD
+
+# # ExpenseItem CRUD
+# class ExpenseItemListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = ExpenseItem.objects.all()
+#     serializer_class = ExpenseItemSerializer
+#     paginate_by = 10
+
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
+
+
+# class ExpenseItemDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = ExpenseItem.objects.all()
+#     serializer_class = ExpenseItemSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
+
+#     def put(self, request, *args, **kwargs):
+#         try:
+#             if not request.data._mutable:
+#                 request.data._mutable = True
+#                 request.data.update(updated_at=datetime.datetime.now())
+#         except:
+#             request.data.update(updated_at=datetime.datetime.now())
+#         return self.update(request, *args, **kwargs)
+
+
+# # end of ExpenseItem CRUD

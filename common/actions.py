@@ -2,6 +2,51 @@ import datetime
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
+from users.models import Team, TeamUser, User
+
+
+# return leader of team of unserialized team parameter
+def get_leader(team):
+    try:
+        team_leader = TeamUser.objects.values(
+            "user").get(team=team, is_leader=True)
+        leader = User.objects.values("id", "first_name", "last_name").get(
+            pk=team_leader["user"]
+        )
+        return leader
+    except:
+        return {}
+
+
+# return leader of team of serialized team_id parameter
+def get_leader_by_id(id):
+    try:
+        team = Team.objects.only('id').get(pk=id)
+        team_leader = TeamUser.objects.values(
+            "user").get(team=team, is_leader=True)
+        leader = User.objects.values("id", "first_name", "last_name").get(
+            pk=team_leader["user"]
+        )
+        return leader
+    except:
+        return {}
+
+
+# return total users of team of unserialized team parameter
+def get_total(team):
+    try:
+        return TeamUser.objects.filter(team=team).count()
+    except:
+        return 0
+
+
+# return total_users of team of serialized team_id parameter
+def get_total_users(id):
+    try:
+        team = Team.objects.only('id').get(pk=id)
+        return TeamUser.objects.filter(team=team).count()
+    except:
+        return 0
 
 
 def withTrashed(self, table, *args, **kwargs):
@@ -9,9 +54,14 @@ def withTrashed(self, table, *args, **kwargs):
         queryset = table.objects.all().order_by(kwargs.get("order_by"))
     else:
         queryset = table.objects.all()
+
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
-    return serializer
+    if table == Team:
+        for team in serializer.data:
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
+    return self.get_paginated_response(serializer.data)
 
 
 def trashList(self, table, *args, **kwargs):
@@ -20,6 +70,10 @@ def trashList(self, table, *args, **kwargs):
     )
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
+    if table == Team:
+        for team in serializer.data:
+            team["total_users"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"])
     return self.get_paginated_response(serializer.data)
 
 
@@ -40,9 +94,7 @@ def delete(self, request, table):
         else:
             team.deleted_at = datetime.datetime.now()
             team.save()
-    return Response(
-        {"message": "successfully deleted"}, status=status.HTTP_204_NO_CONTENT
-    )
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 def restore(self, request, table):
@@ -60,3 +112,8 @@ def restore(self, request, table):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+def allItems(serializerName, queryset):
+    serializer = serializerName(queryset, many=True)
+    return Response(serializer.data, status=200)

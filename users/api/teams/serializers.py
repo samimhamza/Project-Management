@@ -43,7 +43,7 @@ class TeamListSerializer(serializers.ModelSerializer):
 class TeamRetieveSerializer(serializers.ModelSerializer):
     created_by = LessFieldsUserSerializer(read_only=True)
     updated_by = LessFieldsUserSerializer(read_only=True)
-    team_projects = ProjectNameListSerializer(many=True, read_only=True)
+    projects = ProjectNameListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
@@ -56,16 +56,16 @@ class TeamRetieveSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "deleted_at",
-            "team_projects",
+            "projects",
         ]
 
 
 class ProjectTeamSerializer(serializers.ModelSerializer):
-    team_projects = ProjectNameListSerializer(many=True, read_only=True)
+    projects = ProjectNameListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
-        fields = ["team_projects"]
+        fields = ["projects"]
 
 
 class TeamCreateSerializer(serializers.ModelSerializer):
@@ -80,7 +80,7 @@ class TeamCreateSerializer(serializers.ModelSerializer):
 class TeamUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ["name", "description", "team_projects"]
+        fields = ["name", "description", "projects"]
 
 
 class TeamNamesSerializer(serializers.ModelSerializer):
