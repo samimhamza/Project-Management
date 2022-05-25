@@ -72,13 +72,13 @@ class Expense(models.Model):
 
 class ExpenseItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    expense = models.ForeignKey(Expense, on_delete=models.SET_NULL, null=True)
-    item = models.CharField(max_length=255)
+    expense = models.ForeignKey(Expense, on_delete=models.SET_NULL, null=True, related_name="items")
+    name = models.CharField(max_length=255)
     quantity = models.IntegerField()
-    cpp = models.DecimalField(max_digits=19, decimal_places=2)
+    cost = models.DecimalField(max_digits=19, decimal_places=2)
     unit = models.CharField(max_length=64)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.item
+        return self.name
