@@ -8,10 +8,18 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ExpenseItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpenseItem
+        fields = "__all__"
+
+
 class ExpenseSerializer(serializers.ModelSerializer):
+    items = ExpenseItemSerializer(many=True)
+
     class Meta:
         model = Expense
-        fields = "__all__"
+        fields = ["id", "title", "data" "items"]
 
 
 class LessFieldExpenseSerializer(serializers.ModelSerializer):
@@ -24,9 +32,3 @@ class CreateExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = ["title", "category", "date", "project"]
-
-
-class ExpenseItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ExpenseItem
-        fields = "__all__"
