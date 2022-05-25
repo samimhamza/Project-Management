@@ -143,6 +143,75 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             return super().get_queryset()
 
 
+class ExpenseItemViewSet(viewsets.ModelViewSet):
+    queryset = ExpenseItem.objects.order_by("-created_at")
+    serializer_class = ExpenseItemSerializer
+    pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+    }
+    queryset_actions = {
+        "destroy": Expense.objects.all(),
+    }
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(ExpenseItemSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    def create(self, request):
+        data = request.data
+        # data["created_by"] = request.user
+        # data["updated_by"] = request.user
+        if data['expense']:
+            expense = Expense.objects.only('id').get(pk=data['expense'])
+        else:
+            expense = None
+        new_Task = ExpenseItem.objects.create(
+            expense=expense,
+            name=data["name"],
+            cost=data["cost"],
+            unit=data["unit"],
+            quantity=data['quantity']
+            # created_by=data["created_by"],
+            # updated_by=data["updated_by"],
+        )
+        new_Task.save()
+        serializer = ExpenseItemSerializer(new_Task)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, ExpenseItem)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, ExpenseItem, order_by="-created_at")
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, ExpenseItem)
+
+    # for multi restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, ExpenseItem)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
+
+    def get_queryset(self):
+        try:
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()
+
+
 # # Category CRUD
 # class CategoryListCreateAPIView(generics.ListCreateAPIView):
 #     queryset = Category.objects.filter(deleted_at__isnull=True)
