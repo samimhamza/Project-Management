@@ -72,7 +72,8 @@ class Expense(models.Model):
 
 class ExpenseItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    expense = models.ForeignKey(Expense, on_delete=models.SET_NULL, null=True, related_name="items")
+    expense = models.ForeignKey(
+        Expense, on_delete=models.SET_NULL, null=True, related_name="items")
     name = models.CharField(max_length=255)
     quantity = models.IntegerField()
     cost = models.DecimalField(max_digits=19, decimal_places=2)

@@ -12,8 +12,11 @@ class ExpenseItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseItem
         fields = "__all__"
+
+
 class ExpenseSerializer(serializers.ModelSerializer):
     items = ExpenseItemSerializer(many=True)
+
     class Meta:
         model = Expense
         fields = "__all__"
@@ -29,6 +32,3 @@ class CreateExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = ["title", "category", "date", "project"]
-
-
-
