@@ -58,6 +58,22 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(new_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    # def update(self, request, pk=None):
+    #     user = self.get_object()
+    #     if request.data.get("name"):
+    #         user.name = request.data.get("name")
+    #     if request.data.get("description"):
+    #         user.description = request.data.get("description")
+    #     if request.data.get("projects"):
+    #         users = Project.objects.filter(
+    #             pk__in=request.data.get("projects"))
+    #         user.projects.set(users)
+    #     # user.updated_by = request.user
+    #     user.save()
+    #     serializer = UserSerializer(user)
+    #     data = serializer.data
+    #     return Response(data, status=status.HTTP_202_ACCEPTED)
+
     def destroy(self, request, pk=None):
         return delete(self, request, User)
 
