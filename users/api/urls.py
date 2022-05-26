@@ -1,22 +1,28 @@
+from django.urls import path
 from users.api.teams.views import TeamViewSet
 from users.api.views import (
     UserViewSet,
     HolidayViewSet,
     NotificationViewSet,
     ReminderViewSet,
+    LoadUserView
 )
 from rest_framework.routers import DefaultRouter
+
+# urlpatterns = [
+#     path("s/", LoadUserView.as_view()),
+# ]
 
 router = DefaultRouter()
 router.register(r"teams", TeamViewSet, basename="teams")
 router.register(r"users", UserViewSet, basename="users")
 router.register(r"holidays", HolidayViewSet, basename="holidays")
 router.register(r"reminders", ReminderViewSet, basename="reminders")
-router.register(r"notifications", NotificationViewSet, basename="notifications")
+router.register(r"notifications", NotificationViewSet,
+                basename="notifications")
 urlpatterns = router.urls
 
 
-# from django.urls import path
 # from users.api.views import (
 #     TeamListCreateAPIView,
 #     TeamDetailAPIView,

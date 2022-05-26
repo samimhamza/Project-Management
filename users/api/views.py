@@ -12,6 +12,7 @@ from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -90,6 +91,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def restore(self, request, pk=None):
         return restore(self, request, User)
 
+    @action(detail=False, methods=["get"])
+    def auth_user(self, request, pk=None):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=["post"])
     def check_uniqueness(self, request):
         if request.data.get("email"):
@@ -141,60 +148,16 @@ class ReminderViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# class RegisterView(APIView):
-#     permission_classes = (permissions.AllowAny,)
-
-#     def post(self, request):
-#         try:
-#             data = request.data
-#             first_name = data["first_name"]
-#             last_name = data["last_name"]
-#             username = data["username"]
-#             email = data["email"]
-#             password = data["password"]
-#             re_password = data["re_password"]
-#             if password == re_password:
-#                 if len(password) >= 8:
-#                     if not User.objects.filter(username=username, email=email).exists():
-#                         user = User.objects.create_user(
-#                             first_name=first_name,
-#                             last_name=last_name,
-#                             username=username,
-#                             email=email,
-#                             password=password,
-#                             created_by=request.user.id,
-#                             updated_by=request.user.id,
-#                         )
-#                         user.save()
-#                         if User.objects.filter(username=username).exists():
-#                             return Response(
-#                                 {"success": "Account Successfully Created"},
-#                                 status=status.HTTP_201_CREATED,
-#                             )
-#                         else:
-#                             return Response(
-#                                 {
-#                                     "error": "Something went wrong when registering account"
-#                                 },
-#                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#                             )
-#                     else:
-#                         return Response(
-#                             {"error": "User Already Exists"},
-#                             status=status.HTTP_400_BAD_REQUEST,
-#                         )
-#                 else:
-#                     return Response(
-#                         {"error": "Password must be at least 8 characters in length"},
-#                         status=status.HTTP_400_BAD_REQUEST,
-#                     )
-#             else:
-#                 return Response(
-#                     {"error": "Passwords do not match"},
-#                     status=status.HTTP_400_BAD_REQUEST,
-#                 )
-#         except:
-#             return Response(
-#                 {"error": "Something went wrong while trying to register account"},
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             )
+class LoadUserView(APIView):
+    def get(self, request, format=None):
+        try:
+            user = request.user
+            user = UserSerializer(user)
+            return Response({
+                'user': user.data
+            }, status=status.HTTP_200_OK)
+        except:
+            return Response({
+                'error': 'Something went wrong when trying to load user'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
