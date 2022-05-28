@@ -12,7 +12,6 @@ from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.views import APIView
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -58,22 +57,6 @@ class UserViewSet(viewsets.ModelViewSet):
         new_user.save()
         serializer = UserSerializer(new_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    # def update(self, request, pk=None):
-    #     user = self.get_object()
-    #     if request.data.get("name"):
-    #         user.name = request.data.get("name")
-    #     if request.data.get("description"):
-    #         user.description = request.data.get("description")
-    #     if request.data.get("projects"):
-    #         users = Project.objects.filter(
-    #             pk__in=request.data.get("projects"))
-    #         user.projects.set(users)
-    #     # user.updated_by = request.user
-    #     user.save()
-    #     serializer = UserSerializer(user)
-    #     data = serializer.data
-    #     return Response(data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
         return delete(self, request, User)
@@ -146,18 +129,3 @@ class ReminderViewSet(viewsets.ModelViewSet):
             reminder = self.get_object()
             reminder.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class LoadUserView(APIView):
-    def get(self, request, format=None):
-        try:
-            user = request.user
-            user = UserSerializer(user)
-            return Response({
-                'user': user.data
-            }, status=status.HTTP_200_OK)
-        except:
-            return Response({
-                'error': 'Something went wrong when trying to load user'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )

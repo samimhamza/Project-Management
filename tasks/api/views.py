@@ -4,11 +4,21 @@ from tasks.api.serializers import TaskCreateSerializer, TaskSerializer, LessFiel
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, delete, restore, allItems
+from common.actions import withTrashed, trashList, delete, restore, allItems, countStatuses
 from projects.models import Project
 
 
+def tasksAccordingToStatus(self, request):
+    queryset = Task.objects.filter(
+        deleted_at__isnull=True, project=request.GET.get("project_id"), status=request.GET.get('status')).order_by("-created_at")
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
+
+
 def tasksOfProject(self, request):
+    if request.GET.get('status'):
+        return tasksAccordingToStatus(self, request)
     queryset = Task.objects.filter(
         deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
@@ -41,6 +51,16 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
+        countables = [
+            'pendingTotal', 'status', 'pending',
+            'inProgressTotal', 'status', 'in_progress',
+            'completedTotal', 'status', 'completed',
+            'issuFacedTotal', 'status', 'issue_faced',
+            'failedTotal', 'status', 'failed',
+            'cancelledTotal', "status", "cancelled"
+        ]
+        # statusTotals = countStatuses(Task, countables)
+        # return Response(statusTotals)
         return self.get_paginated_response(serializer.data)
 
     def create(self, request):

@@ -3,6 +3,7 @@ from rest_framework import exceptions
 from users.models import User
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from users.api.serializers import AuthUserSerializer
 
 
 def validateEmail(email):
@@ -44,4 +45,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
                     'No such user with provided credentials'.title())
 
         data = super().validate(attrs)
+        auth_user = User.objects.filter(pk=self.user.id).first()
+        data['user'] = AuthUserSerializer(auth_user).data
         return data
