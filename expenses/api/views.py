@@ -144,13 +144,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 
 class ExpenseItemViewSet(viewsets.ModelViewSet):
-    queryset = ExpenseItem.objects.order_by("-created_at")
+    queryset = ExpenseItem.objects.filter(deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseItemSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
     }
     queryset_actions = {
-        "destroy": Expense.objects.all(),
+        "destroy": ExpenseItem.objects.all(),
     }
 
     def list(self, request):
