@@ -21,8 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taskmanager/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/project/team/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/project/team/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projects/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +49,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_backend&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/store&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
@@ -59,11 +58,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\store" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\customComponents" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\focalPoint" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\test" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
@@ -107,6 +106,11 @@
       <workItem from="1652155253728" duration="5263000" />
       <workItem from="1652846090064" duration="2172000" />
       <workItem from="1653104239245" duration="957000" />
+      <workItem from="1653296783119" duration="12027000" />
+      <workItem from="1653363199447" duration="14492000" />
+      <workItem from="1653383572353" duration="11410000" />
+      <workItem from="1653450251810" duration="27118000" />
+      <workItem from="1653537837151" duration="592000" />
     </task>
     <servers />
   </component>
