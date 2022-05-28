@@ -1,12 +1,12 @@
-from rest_framework import viewsets, status
-from tasks.models import Task
-from projects.models import Project
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from common.custom import CustomPageNumberPagination
 from tasks.api.serializers import TaskCreateSerializer, TaskSerializer, LessFieldsTaskSerializer
 from common.actions import withTrashed, trashList, delete, restore, allItems
 from common.tasks_actions import tasksOfProject, tasksResponse
+from common.custom import CustomPageNumberPagination
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from tasks.models import Task
+from projects.models import Project
 
 
 class TaskViewSet(viewsets.ModelViewSet):
