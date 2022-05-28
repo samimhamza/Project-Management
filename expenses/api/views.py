@@ -150,7 +150,7 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
     serializer_action_classes = {
     }
     queryset_actions = {
-        "destroy": Expense.objects.all(),
+        "destroy": ExpenseItem.objects.all(),
     }
 
     def list(self, request):
