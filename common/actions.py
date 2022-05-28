@@ -8,10 +8,10 @@ from .team_actions import get_leader_by_id, get_total_users
 
 
 def countStatuses(table, countables):
-    totals = []
-    for x in (0, len(countables), 3):
-        q = Q(**{"%s__contains" % countables[x+1]: countables[x+2]})
-        itemTotal = table.objects.filter(q).count()
+    totals = {}
+    for x in range(0, len(countables), 3):
+        itemTotal = table.objects.filter(
+            **{countables[x+1]: countables[x+2]}).count()
         totals[countables[x]] = itemTotal
     return totals
 
