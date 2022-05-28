@@ -14,8 +14,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
-from common.actions import (delete, withTrashed, trashList, restore,
-                            get_total_users, get_total, get_leader_by_id, get_leader, allItems)
+from common.actions import delete, withTrashed, trashList, restore, allItems
+from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from django.db import transaction
 from users.api.serializers import LessFieldsUserSerializer
 from projects.api.serializers import ProjectNameListSerializer
