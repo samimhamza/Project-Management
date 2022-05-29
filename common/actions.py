@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 from users.models import Team
-from django.db.models import Q
 from .team_actions import get_leader_by_id, get_total_users
 
 
@@ -53,9 +52,8 @@ def delete(self, request, table):
                 if item.deleted_at:
                     item.delete()
                 else:
-                    if item.deleted_at:
-                        item.deleted_at = datetime.datetime.now()
-                        item.save()
+                    item.deleted_at = datetime.datetime.now()
+                    item.save()
             else:
                 item.delete()
 

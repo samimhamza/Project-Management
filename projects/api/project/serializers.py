@@ -5,6 +5,7 @@ from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import LessFieldsLocationSerializer
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
 from expenses.api.serializers import ExpenseSerializer
+from users.models import User, Team
 
 
 class ProjectExpensesSerializer(serializers.ModelSerializer):
@@ -17,10 +18,24 @@ class ProjectExpensesSerializer(serializers.ModelSerializer):
 
 class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(many=True, read_only=True)
-    users = LessFieldsUserSerializer(many=True, read_only=True)
-    teams = LessFieldsTeamSerializer(many=True, read_only=True)
+    users = serializers.SerializerMethodField()
+    # teams = serializers.SerializerMethodField()
     created_by = LessFieldsUserSerializer()
     updated_by = LessFieldsUserSerializer()
+
+    def get_users(self, project):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, project_users=project)
+        serializer = LessFieldsUserSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
+    # def get_teams(self, team):
+    #     qs = Team.objects.filter(
+    #         deleted_at__isnull=True, team=team)
+    #     serializer = LessFieldsTeamSerializer(
+    #         instance=qs, many=True, read_only=True)
+    #     return serializer.data
 
     class Meta:
         model = Project
@@ -45,37 +60,4 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "created_by",
             "updated_by",
             "deleted_at",
-        ]
-
-
-class ProjectCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
-            "p_start_date",
-            "p_end_date",
-            "users",
-            "teams",
-        ]
-
-
-class ProjectUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = [
-            "name",
-            "description",
-            "p_start_date",
-            "p_end_date",
-            "a_start_date",
-            "a_end_date",
-            "status",
-            "priority",
-            "progress",
-            "company_name",
-            "company_email",
-            "users",
-            "teams",
         ]
