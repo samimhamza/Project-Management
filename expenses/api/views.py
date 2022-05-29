@@ -92,8 +92,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        # data["created_by"] = request.user
-        # data["updated_by"] = request.user
+        data["created_by"] = request.user
+        data["updated_by"] = request.user
         if data['category']:
             category = Category.objects.only('id').get(pk=data['category'])
         else:
@@ -107,8 +107,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             title=data["title"],
             date=data["date"],
             project=project,
-            # created_by=data["created_by"],
-            # updated_by=data["updated_by"],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         new_Task.save()
         serializer = ExpenseSerializer(new_Task)
@@ -144,7 +144,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 
 class ExpenseItemViewSet(viewsets.ModelViewSet):
-    queryset = ExpenseItem.objects.filter(deleted_at__isnull=True).order_by("-created_at")
+    queryset = ExpenseItem.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseItemSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -164,8 +165,8 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        # data["created_by"] = request.user
-        # data["updated_by"] = request.user
+        data["created_by"] = request.user
+        data["updated_by"] = request.user
         if data['expense']:
             expense = Expense.objects.only('id').get(pk=data['expense'])
         else:
@@ -175,9 +176,9 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
             name=data["name"],
             cost=data["cost"],
             unit=data["unit"],
-            quantity=data['quantity']
-            # created_by=data["created_by"],
-            # updated_by=data["updated_by"],
+            quantity=data['quantity'],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         new_Task.save()
         serializer = ExpenseItemSerializer(new_Task)

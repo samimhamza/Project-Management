@@ -39,8 +39,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        # data["created_by"] = request.user
-        # data["updated_by"] = request.user
+        data["created_by"] = request.user
+        data["updated_by"] = request.user
         new_user = User.objects.create(
             username=data["username"],
             email=data["email"],
@@ -50,8 +50,8 @@ class UserViewSet(viewsets.ModelViewSet):
             whatsapp=data["whatsapp"],
             profile=data["profile"],
             is_active=True,
-            # created_by=data["created_by"],
-            # updated_by=data["updated_by"],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         new_user.set_password(data["password"])
         new_user.save()

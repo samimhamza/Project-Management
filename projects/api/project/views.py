@@ -61,14 +61,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         project_data = request.data
-        # project_data["created_by"] = request.user
-        # project_data["updated_by"] = request.user
+        project_data["created_by"] = request.user
+        project_data["updated_by"] = request.user
         new_project = Project.objects.create(
             name=project_data["name"],
             p_start_date=project_data["p_start_date"],
             p_end_date=project_data["p_end_date"],
-            # created_by=project_data["created_by"],
-            # updated_by=project_data["updated_by"],
+            created_by=project_data["created_by"],
+            updated_by=project_data["updated_by"],
         )
         new_project = shareTo(request, project_data, new_project)
         new_project.save()
@@ -105,7 +105,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("teams"):
             teams = Team.objects.filter(pk__in=request.data.get("teams"))
             project.teams.set(teams)
-        # project.updated_by = request.user
+        project.updated_by = request.user
         project.save()
         serializer = ProjectListSerializer(project)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

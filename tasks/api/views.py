@@ -36,8 +36,8 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        # data["created_by"] = request.user
-        # data["updated_by"] = request.user
+        data["created_by"] = request.user
+        data["updated_by"] = request.user
         if data['parent']:
             parent = Task.objects.only('id').get(pk=data['parent'])
         else:
@@ -53,8 +53,8 @@ class TaskViewSet(viewsets.ModelViewSet):
             p_end_date=data["p_end_date"],
             description=data["description"],
             project=project,
-            # created_by=data["created_by"],
-            # updated_by=data["updated_by"],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         new_Task.save()
         serializer = TaskSerializer(new_Task)
@@ -80,7 +80,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.progress = request.data.get("progress")
         if request.data.get("priority"):
             task.priority = request.data.get("priority")
-        # Task.updated_by = request.user
+        Task.updated_by = request.user
         task.save()
         serializer = TaskSerializer(Task)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
