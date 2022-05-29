@@ -2,51 +2,18 @@ import datetime
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from users.models import Team, TeamUser, User
+from users.models import Team
+from django.db.models import Q
+from .team_actions import get_leader_by_id, get_total_users
 
 
-# return leader of team of unserialized team parameter
-def get_leader(team):
-    try:
-        team_leader = TeamUser.objects.values(
-            "user").get(team=team, is_leader=True)
-        leader = User.objects.values("id", "first_name", "last_name").get(
-            pk=team_leader["user"]
-        )
-        return leader
-    except:
-        return {}
-
-
-# return leader of team of serialized team_id parameter
-def get_leader_by_id(id):
-    try:
-        team = Team.objects.only('id').get(pk=id)
-        team_leader = TeamUser.objects.values(
-            "user").get(team=team, is_leader=True)
-        leader = User.objects.values("id", "first_name", "last_name").get(
-            pk=team_leader["user"]
-        )
-        return leader
-    except:
-        return {}
-
-
-# return total users of team of unserialized team parameter
-def get_total(team):
-    try:
-        return TeamUser.objects.filter(team=team).count()
-    except:
-        return 0
-
-
-# return total_users of team of serialized team_id parameter
-def get_total_users(id):
-    try:
-        team = Team.objects.only('id').get(pk=id)
-        return TeamUser.objects.filter(team=team).count()
-    except:
-        return 0
+def countStatuses(table, countables):
+    totals = {}
+    for x in range(0, len(countables), 3):
+        itemTotal = table.objects.filter(
+            **{countables[x+1]: countables[x+2]}).count()
+        totals[countables[x]] = itemTotal
+    return totals
 
 
 def withTrashed(self, table, *args, **kwargs):
@@ -80,20 +47,28 @@ def trashList(self, table, *args, **kwargs):
 def delete(self, request, table):
     data = request.data
     if data:
-        teams = table.objects.filter(pk__in=data["ids"])
-        for team in teams:
-            if team.deleted_at:
-                team.delete()
+        items = table.objects.filter(pk__in=data["ids"])
+        for item in items:
+            if getattr(table, 'deleted_at', False):
+                if item.deleted_at:
+                    item.delete()
+                else:
+                    if item.deleted_at:
+                        item.deleted_at = datetime.datetime.now()
+                        item.save()
             else:
-                team.deleted_at = datetime.datetime.now()
-                team.save()
+                item.delete()
+
     else:
-        team = self.get_object()
-        if team.deleted_at:
-            team.delete()
+        item = self.get_object()
+        if getattr(table, 'deleted_at', False):
+            if item.deleted_at:
+                item.delete()
+            else:
+                item.deleted_at = datetime.datetime.now()
+                item.save()
         else:
-            team.deleted_at = datetime.datetime.now()
-            team.save()
+            item.delete()
     return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -101,11 +76,11 @@ def restore(self, request, table):
     try:
         with transaction.atomic():
             data = request.data
-            teams = table.objects.filter(pk__in=data["ids"])
-            for team in teams:
-                team.deleted_at = None
-                team.save()
-            page = self.paginate_queryset(teams)
+            items = table.objects.filter(pk__in=data["ids"])
+            for item in items:
+                item.deleted_at = None
+                item.save()
+            page = self.paginate_queryset(items)
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
     except:

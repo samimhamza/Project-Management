@@ -6,9 +6,12 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 # Start of Task Table
+
+
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True)
+    parent = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True)
     project = models.ForeignKey(
         Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
     )
@@ -34,7 +37,7 @@ class Task(models.Model):
         pending = "pending"
         in_progress = "in_progress"
         completed = "completed"
-        very_important = "issue_faced"
+        issue_faced = "issue_faced"
         failed = "failed"
         cancelled = "cancelled"
 
@@ -46,7 +49,8 @@ class Task(models.Model):
         dependent = "dependent"
         independent = "independent"
 
-    type = models.CharField(max_length=24, choices=Types.choices, default="independent")
+    type = models.CharField(
+        max_length=24, choices=Types.choices, default="independent")
     dependencies = models.JSONField(blank=True, null=True)
     created_by = models.ForeignKey(
         "users.User",
