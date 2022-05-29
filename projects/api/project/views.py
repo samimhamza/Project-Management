@@ -3,7 +3,6 @@ from projects.models import Project
 from users.models import User, Team
 from projects.api.project.serializers import (
     ProjectListSerializer,
-    ProjectExpensesSerializer,
 )
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
@@ -135,11 +134,3 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return self.queryset_actions[self.action]
         except (KeyError, AttributeError):
             return super().get_queryset()
-
-    # testing APIS
-    @action(detail=True, methods=["get"])
-    def expenses(self, request, pk=None):
-        project = self.get_object()
-        serializer = ProjectExpensesSerializer(project)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)

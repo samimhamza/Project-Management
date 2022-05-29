@@ -1,6 +1,8 @@
+from os import read
 from rest_framework import serializers
 from tasks.models import Task, UserTask
 from users.api.serializers import UserWithProfileSerializer
+from users.models import User
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
@@ -19,8 +21,15 @@ class LessFieldsTaskSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    task_users = UserWithProfileSerializer(many=True, read_only=True)
+    users = serializers.SerializerMethodField()
     parent = LessFieldsTaskSerializer()
+
+    def get_users(self, user):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, users=user)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
 
     class Meta:
         model = Task
@@ -37,21 +46,8 @@ class TaskSerializer(serializers.ModelSerializer):
             "status",
             "type",
             "dependencies",
-            "task_users",
+            "users",
             "deleted_at",
-            "project"
-        ]
-
-
-class TaskCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = [
-            "name",
-            "description",
-            "p_start_date",
-            "p_end_date",
-            "parent",
             "project"
         ]
 

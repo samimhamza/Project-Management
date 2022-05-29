@@ -73,6 +73,7 @@ class Task(models.Model):
         "users.User",
         through="UserTask",
         through_fields=("task", "user"),
+        related_name="users"
     )
 
     def __str__(self):
@@ -115,7 +116,6 @@ class UserTask(models.Model):
     reasons = GenericRelation(Reason)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.description

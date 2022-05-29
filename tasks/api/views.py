@@ -1,4 +1,4 @@
-from tasks.api.serializers import TaskCreateSerializer, TaskSerializer, LessFieldsTaskSerializer
+from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
 from common.actions import withTrashed, trashList, delete, restore, allItems
 from common.tasks_actions import tasksOfProject, tasksResponse
 from common.custom import CustomPageNumberPagination
@@ -14,9 +14,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TaskSerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {
-        "create": TaskCreateSerializer,
-    }
+
     queryset_actions = {
         "destroy": Task.objects.all(),
     }
@@ -100,12 +98,6 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Task)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

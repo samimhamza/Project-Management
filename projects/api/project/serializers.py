@@ -3,23 +3,13 @@ from projects.models import Project
 from users.api.serializers import LessFieldsUserSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import LessFieldsLocationSerializer
-from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
-from expenses.api.serializers import ExpenseSerializer
 from users.models import User, Team
-
-
-class ProjectExpensesSerializer(serializers.ModelSerializer):
-    expenses = ExpenseSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = ["expenses"]
 
 
 class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(many=True, read_only=True)
     users = serializers.SerializerMethodField()
-    # teams = serializers.SerializerMethodField()
+    teams = serializers.SerializerMethodField()
     created_by = LessFieldsUserSerializer()
     updated_by = LessFieldsUserSerializer()
 
@@ -30,12 +20,12 @@ class ProjectListSerializer(serializers.ModelSerializer):
             instance=qs, many=True, read_only=True)
         return serializer.data
 
-    # def get_teams(self, team):
-    #     qs = Team.objects.filter(
-    #         deleted_at__isnull=True, team=team)
-    #     serializer = LessFieldsTeamSerializer(
-    #         instance=qs, many=True, read_only=True)
-    #     return serializer.data
+    def get_teams(self, team):
+        qs = Team.objects.filter(
+            deleted_at__isnull=True, projects=team)
+        serializer = LessFieldsTeamSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
 
     class Meta:
         model = Project
