@@ -117,6 +117,14 @@ class TeamViewSet(viewsets.ModelViewSet):
     def users(self, request, pk=None):
         team = self.get_object()
         users = TeamUser.objects.filter(team=team)
+
+        # excluding users that are softdeted
+        for team_user in users:
+            user = User.objects.get(pk=team_user.user.id)
+            if user.deleted_at:
+                users = users.exclude(user=team_user.user)
+        # end of excluding users that are softdeted
+
         if request.GET.get("items_per_page") == "-1":
             return allItems(TeamUserSerializer, users)
         page = self.paginate_queryset(users)
