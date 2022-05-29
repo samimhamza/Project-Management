@@ -96,10 +96,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.data.get("company_email"):
             project.company_email = request.data.get("company_email")
         if request.data.get("users"):
-            users = User.objects.filter(pk__in=request.data.get("users"))
+            users = User.objects.only('id').filter(
+                pk__in=request.data.get("users"))
             project.users.set(users)
         if request.data.get("teams"):
-            teams = Team.objects.filter(pk__in=request.data.get("teams"))
+            teams = Team.objects.only('id').filter(
+                pk__in=request.data.get("teams"))
             project.teams.set(teams)
         project.updated_by = request.user
         project.save()

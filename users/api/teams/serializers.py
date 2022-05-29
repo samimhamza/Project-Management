@@ -68,21 +68,6 @@ class ProjectTeamSerializer(serializers.ModelSerializer):
         fields = ["projects"]
 
 
-class TeamCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Team
-        fields = [
-            "name",
-            "description",
-        ]
-
-
-class TeamUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Team
-        fields = ["name", "description", "projects"]
-
-
 class TeamNamesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team

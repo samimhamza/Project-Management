@@ -1,7 +1,6 @@
 from expenses.models import Expense, ExpenseItem, Category
 from expenses.api.serializers import (
     ExpenseSerializer,
-    CreateExpenseSerializer,
     ExpenseItemSerializer,
     CategorySerializer,
     LessFieldExpenseSerializer
@@ -68,9 +67,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseSerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {
-        "create": CreateExpenseSerializer,
-    }
+
     queryset_actions = {
         "destroy": Expense.objects.all(),
     }
@@ -149,12 +146,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def restore(self, request, pk=None):
         return restore(self, request, Expense)
 
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
     def get_queryset(self):
         try:
             return self.queryset_actions[self.action]
@@ -167,8 +158,6 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseItemSerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {
-    }
     queryset_actions = {
         "destroy": ExpenseItem.objects.all(),
     }
@@ -184,8 +173,6 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        data["created_by"] = request.user
-        data["updated_by"] = request.user
         if data['expense']:
             expense = Expense.objects.only('id').get(pk=data['expense'])
         else:
@@ -196,8 +183,6 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
             cost=data["cost"],
             unit=data["unit"],
             quantity=data['quantity'],
-            created_by=data["created_by"],
-            updated_by=data["updated_by"],
         )
         new_Task.save()
         serializer = ExpenseItemSerializer(new_Task)
@@ -218,12 +203,6 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, ExpenseItem)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

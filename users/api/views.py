@@ -5,7 +5,6 @@ from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
     UserWithProfileSerializer,
-    CreateUserSerializer
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
@@ -20,9 +19,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
 
-    serializer_action_classes = {
-        "create": CreateUserSerializer,
-    }
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }
@@ -57,6 +53,27 @@ class UserViewSet(viewsets.ModelViewSet):
         new_user.save()
         serializer = UserSerializer(new_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        project = self.get_object()
+        if request.data.get("username"):
+            project.username = request.data.get("username")
+        if request.data.get("first_name"):
+            project.first_name = request.data.get("first_name")
+        if request.data.get("last_name"):
+            project.last_name = request.data.get("last_name")
+        if request.data.get("phone"):
+            project.phone = request.data.get("phone")
+        if request.data.get("whatsapp"):
+            project.whatsapp = request.data.get("whatsapp")
+        if request.data.get("email"):
+            project.email = request.data.get("email")
+        if request.data.get("profile"):
+            project.profile = request.data.get("profile")
+        project.updated_by = request.user
+        project.save()
+        serializer = UserSerializer(project)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
         return delete(self, request, User)
@@ -95,11 +112,11 @@ class UserViewSet(viewsets.ModelViewSet):
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
 
-    def get_serializer_class(self):
+    def get_queryset(self):
         try:
-            return self.serializer_action_classes[self.action]
+            return self.queryset_actions[self.action]
         except (KeyError, AttributeError):
-            return super().get_serializer_class()
+            return super().get_queryset()
 
 
 class HolidayViewSet(viewsets.ModelViewSet):
@@ -120,12 +137,4 @@ class ReminderViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
 
     def destroy(self, request, pk=None):
-        data = request.data
-        if data:
-            reminders = Reminder.objects.filter(pk__in=data["ids"])
-            for reminder in reminders:
-                reminder.delete()
-        else:
-            reminder = self.get_object()
-            reminder.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return delete(self, request, Reminder)
