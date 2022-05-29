@@ -1,6 +1,7 @@
+from unicodedata import category
 from rest_framework import serializers
 from expenses.models import Category, Expense, ExpenseItem
-
+from users.api.serializers import LessFieldsUserSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,6 +17,8 @@ class ExpenseItemSerializer(serializers.ModelSerializer):
 
 class ExpenseSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
+    category = CategorySerializer()
+    expense_by = LessFieldsUserSerializer()
 
     def get_items(self, expense):
         qs = ExpenseItem.objects.filter(deleted_at__isnull=True, expense=expense)

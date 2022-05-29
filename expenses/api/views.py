@@ -105,12 +105,33 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             title=data["title"],
             date=data["date"],
             project=project,
-            created_by=data["created_by"],
-            updated_by=data["updated_by"],
+            expense_by = request.user,
+            created_by= data["created_by"],
+            updated_by= data["updated_by"],
         )
         new_Task.save()
         serializer = ExpenseSerializer(new_Task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, pk=None):
+        expense = self.get_object()
+        data = request.data
+        if request.data.get("title"):
+            expense.title = request.data.get("title")
+        if request.data.get("body"):
+            expense.body = request.data.get("body")
+        if request.data.get("date"):
+            expense.date = request.data.get("date")
+        if request.data.get("category"):
+            category = Category.objects.only('id').get(pk=data['category'])
+            expense.category = category
+            # category = Category.objects.only('id').get(pk=data['category'])
+            # expense.category.set(category)
+    
+        expense.updated_by = request.user
+        expense.save()
+        serializer = ExpenseSerializer(expense)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
         return delete(self, request, Expense)
