@@ -5,7 +5,6 @@ from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
     UserWithProfileSerializer,
-    CreateUserSerializer
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
@@ -20,9 +19,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
 
-    serializer_action_classes = {
-        "create": CreateUserSerializer,
-    }
+    serializer_action_classes = {}
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }

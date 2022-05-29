@@ -12,9 +12,7 @@ from projects.models import Project
 from django.db import transaction
 from users.api.teams.serializers import (
     TeamListSerializer,
-    TeamCreateSerializer,
     TeamUserSerializer,
-    TeamUpdateSerializer,
     TeamNamesSerializer,
     TeamRetieveSerializer,
     ProjectTeamSerializer,
@@ -27,8 +25,6 @@ class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamListSerializer
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
-        "create": TeamCreateSerializer,
-        "update": TeamUpdateSerializer,
         "retrieve": TeamRetieveSerializer,
         "add_project": ProjectTeamSerializer,
     }
