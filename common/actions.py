@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 from users.models import Team
-from django.db.models import Q
 from .team_actions import get_leader_by_id, get_total_users
 
 
