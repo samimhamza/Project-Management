@@ -1,21 +1,12 @@
-from rest_framework import viewsets, status
-from tasks.models import Task
 from tasks.api.serializers import TaskCreateSerializer, TaskSerializer, LessFieldsTaskSerializer
+from common.actions import withTrashed, trashList, delete, restore, allItems
+from common.tasks_actions import tasksOfProject, tasksResponse
+from common.custom import CustomPageNumberPagination
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, delete, restore, allItems
+from tasks.models import Task
 from projects.models import Project
-
-
-def tasksOfProject(self, request):
-    queryset = Task.objects.filter(
-        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
-    if request.GET.get("items_per_page") == "-1":
-        return allItems(LessFieldsTaskSerializer, queryset)
-    page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
-    return self.get_paginated_response(serializer.data)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -41,12 +32,12 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        return tasksResponse(self, serializer)
 
     def create(self, request):
         data = request.data
-        # data["created_by"] = request.user
-        # data["updated_by"] = request.user
+        data["created_by"] = request.user
+        data["updated_by"] = request.user
         if data['parent']:
             parent = Task.objects.only('id').get(pk=data['parent'])
         else:
@@ -62,8 +53,8 @@ class TaskViewSet(viewsets.ModelViewSet):
             p_end_date=data["p_end_date"],
             description=data["description"],
             project=project,
-            # created_by=data["created_by"],
-            # updated_by=data["updated_by"],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         new_Task.save()
         serializer = TaskSerializer(new_Task)
@@ -89,7 +80,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.progress = request.data.get("progress")
         if request.data.get("priority"):
             task.priority = request.data.get("priority")
-        # Task.updated_by = request.user
+        Task.updated_by = request.user
         task.save()
         serializer = TaskSerializer(Task)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

@@ -1,6 +1,15 @@
+from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
+from common.actions import delete, withTrashed, trashList, restore, allItems
+from users.api.serializers import LessFieldsUserSerializer
+from projects.api.serializers import ProjectNameListSerializer
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from common.custom import CustomPageNumberPagination
+from users.models import User, Team, TeamUser
 from rest_framework import viewsets, status
 from projects.models import Project
-from users.models import User, Team, TeamUser
+from django.db import transaction
 from users.api.teams.serializers import (
     TeamListSerializer,
     TeamCreateSerializer,
@@ -10,15 +19,6 @@ from users.api.teams.serializers import (
     TeamRetieveSerializer,
     ProjectTeamSerializer,
 )
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
-from common.custom import CustomPageNumberPagination
-from common.actions import (delete, withTrashed, trashList, restore,
-                            get_total_users, get_total, get_leader_by_id, get_leader, allItems)
-from django.db import transaction
-from users.api.serializers import LessFieldsUserSerializer
-from projects.api.serializers import ProjectNameListSerializer
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -62,13 +62,13 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        # data["created_by"] = request.user
-        # data["updated_by"] = request.user
+        data["created_by"] = request.user
+        data["updated_by"] = request.user
         new_team = Team.objects.create(
             name=data["name"],
             description=data["description"],
-            # created_by=data["created_by"],
-            # updated_by=data["updated_by"],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         if request.data.get("team_leader"):
             user = get_object_or_404(User, pk=request.data.get("team_leader"))
@@ -92,7 +92,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             teams = Project.objects.filter(
                 pk__in=request.data.get("projects"))
             team.projects.set(teams)
-        # team.updated_by = request.user
+        team.updated_by = request.user
         team.save()
         serializer = TeamListSerializer(team)
         data = serializer.data
@@ -163,16 +163,16 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def add_project(self, request, pk=None):
-        # try:
-        data = request.data
-        team = self.get_object()
-        team.projects.set(data["ids"])
-        serializer = self.get_serializer(team)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # except:
-        #     return Response(
-        #         {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-        #     )
+        try:
+            data = request.data
+            team = self.get_object()
+            team.projects.set(data["ids"])
+            serializer = self.get_serializer(team)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=True, methods=["post"])
     def delete_user(self, request, pk=None):
