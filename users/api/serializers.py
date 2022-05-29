@@ -65,16 +65,6 @@ class TeamUserSerializer(serializers.ModelSerializer):
         fields = "type"
 
 
-class TeamSerializer(serializers.ModelSerializer):
-    users = TeamUserSerializer(many=True, read_only=True)
-    created_by = LessFieldsUserSerializer(read_only=True)
-    updated_by = LessFieldsUserSerializer(read_only=True)
-
-    class Meta:
-        model = Team
-        fields = "__all__"
-
-
 class ReminderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reminder
