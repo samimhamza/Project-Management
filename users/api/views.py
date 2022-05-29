@@ -117,12 +117,4 @@ class ReminderViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
 
     def destroy(self, request, pk=None):
-        data = request.data
-        if data:
-            reminders = Reminder.objects.filter(pk__in=data["ids"])
-            for reminder in reminders:
-                reminder.delete()
-        else:
-            reminder = self.get_object()
-            reminder.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return delete(self, request, Reminder)
