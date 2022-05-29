@@ -20,8 +20,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/store/noteSlice.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expenses/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expenses/migrations/0010_merge_20220526_0810.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expenses/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projects/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taskmanager/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/Note.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/Note.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NoteForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NoteForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NotesDrawer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NotesDrawer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/project/[id]/focalpoints.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/project/[id]/focalpoints.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/store/store.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +121,9 @@
       <workItem from="1653363199447" duration="14492000" />
       <workItem from="1653383572353" duration="11410000" />
       <workItem from="1653450251810" duration="27118000" />
-      <workItem from="1653537837151" duration="592000" />
+      <workItem from="1653537837151" duration="20302000" />
+      <workItem from="1653710069890" duration="28573000" />
+      <workItem from="1653795504609" duration="374000" />
     </task>
     <servers />
   </component>
