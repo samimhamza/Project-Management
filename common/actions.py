@@ -53,9 +53,8 @@ def delete(self, request, table):
                 if item.deleted_at:
                     item.delete()
                 else:
-                    if item.deleted_at:
-                        item.deleted_at = datetime.datetime.now()
-                        item.save()
+                    item.deleted_at = datetime.datetime.now()
+                    item.save()
             else:
                 item.delete()
 

@@ -1,4 +1,3 @@
-import datetime
 from expenses.models import Expense, ExpenseItem, Category
 from expenses.api.serializers import (
     ExpenseSerializer,
@@ -7,7 +6,6 @@ from expenses.api.serializers import (
     CategorySerializer,
     LessFieldExpenseSerializer
 )
-from rest_framework import generics
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action

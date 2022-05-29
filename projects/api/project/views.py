@@ -3,8 +3,6 @@ from projects.models import Project
 from users.models import User, Team
 from projects.api.project.serializers import (
     ProjectListSerializer,
-    ProjectCreateSerializer,
-    ProjectUpdateSerializer,
     ProjectExpensesSerializer,
 )
 from projects.api.serializers import ProjectNameListSerializer
@@ -39,10 +37,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProjectListSerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {
-        "create": ProjectCreateSerializer,
-        "update": ProjectUpdateSerializer,
-    }
+    serializer_action_classes = {}
+
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
