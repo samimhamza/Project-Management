@@ -73,9 +73,9 @@ class TeamUser(models.Model):
 class Reminder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.TextField()
-    remind_at = models.DateTimeField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    remind_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + " " + self.remind_at
