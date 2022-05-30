@@ -1,3 +1,4 @@
+from django.forms import JSONField
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from common.actions import delete, withTrashed, trashList, restore, allItems
 from users.api.serializers import LessFieldsUserSerializer
@@ -34,6 +35,15 @@ class TeamViewSet(viewsets.ModelViewSet):
     }
 
     def list(self, request):
+        # data = request.query_params
+        # x = []
+        # for key, value in data.items():
+        #     if key == 'data':
+        #         x.append(value)
+        #         print("x", value)
+
+        # return Response(x)
+
         queryset = self.filter_queryset(
             Team.objects.filter(
                 deleted_at__isnull=True).order_by("-created_at")

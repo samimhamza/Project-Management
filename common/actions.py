@@ -15,6 +15,14 @@ def countStatuses(table, countables):
     return totals
 
 
+# def filterRecords(queryset, request, columns=[]):
+#     data = request.query_params
+#     for key, value in data.items():
+#         if(value.isnull)
+# {value: value is '', 'like@@': value.startswith('like@@'), 'value': value[6:]}
+# isinstance(value, str)
+
+
 def withTrashed(self, table, *args, **kwargs):
     if kwargs.get("order_by") is not None:
         queryset = table.objects.all().order_by(kwargs.get("order_by"))
