@@ -1,3 +1,5 @@
+from email.mime import base
+import imp
 from rest_framework import viewsets, status
 from users.api.serializers import (
     UserSerializer,
@@ -12,10 +14,7 @@ from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.core.files.base import ContentFile
-import base64
-import uuid
-
+from common.base64_image import convertBase64ToImage
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
@@ -44,10 +43,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         profile = data["profile"]
-        format, imgstr = profile.split(';base64,')
-        ext = format.split('/')[-1]
-        imageField = ContentFile(base64.b64decode(
-            imgstr), name=str(uuid.uuid4())+'.' + ext)
+        imageField = convertBase64ToImage(data["profile"])
 
         data["created_by"] = request.user
         data["updated_by"] = request.user
@@ -83,10 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.data.get("email"):
             project.email = request.data.get("email")
         if request.data.get("profile"):
-              profile = request.data.get("profile")
-              format, imgstr = profile.split(';base64,')
-              ext = format.split('/')[-1]
-              imageField = ContentFile(base64.b64decode(imgstr), name=str(uuid.uuid4())+'.' + ext)
+              imageField=convertBase64ToImage(request.data.get("profile"))
               project.profile = imageField
 
         project.updated_by = request.user
@@ -178,3 +171,7 @@ class ReminderViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         return delete(self, request, Reminder)
+
+        
+
+
