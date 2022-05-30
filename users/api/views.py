@@ -13,13 +13,9 @@ from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
 import base64
-<<<<<<< HEAD
-import uuid
-=======
 from django.core.files.base import ContentFile
 
->>>>>>> c0a0b6678d07b38e76646a18631be2bf4fb05c8d
-
+import uuid
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
@@ -46,26 +42,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-<<<<<<< HEAD
-
-        profile = data["profile"]
-        unique_filename = str(uuid.uuid4())
-        image_path="media/user_profiles/"+unique_filename+".jpg"
-        imgdata = base64.b64decode(profile)
-        with open(image_path, 'wb') as f:
-                f.write(imgdata)
-       
-        # with open(image_path, 'wb') as f:
-        #     f.write(base64.decodebytes(profile))
-                
-        
-=======
         profile = data["profile"]
         format, imgstr = profile.split(';base64,')
         ext = format.split('/')[-1]
         imageField = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
->>>>>>> c0a0b6678d07b38e76646a18631be2bf4fb05c8d
         data["created_by"] = request.user
         data["updated_by"] = request.user
         new_user = User.objects.create(
