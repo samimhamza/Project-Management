@@ -5,15 +5,20 @@ from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
     UserWithProfileSerializer,
+    CreateUserSerializer
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from PIL import Image
 import base64
+<<<<<<< HEAD
 import uuid
+=======
+from django.core.files.base import ContentFile
+
+>>>>>>> c0a0b6678d07b38e76646a18631be2bf4fb05c8d
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
@@ -21,6 +26,10 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
 
+    serializer_action_classes = {
+        "create": CreateUserSerializer,
+        "update": CreateUserSerializer
+    }
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }
@@ -37,6 +46,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
+<<<<<<< HEAD
 
         profile = data["profile"]
         unique_filename = str(uuid.uuid4())
@@ -49,6 +59,13 @@ class UserViewSet(viewsets.ModelViewSet):
         #     f.write(base64.decodebytes(profile))
                 
         
+=======
+        profile = data["profile"]
+        format, imgstr = profile.split(';base64,')
+        ext = format.split('/')[-1]
+        imageField = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+>>>>>>> c0a0b6678d07b38e76646a18631be2bf4fb05c8d
         data["created_by"] = request.user
         data["updated_by"] = request.user
         new_user = User.objects.create(
@@ -58,7 +75,7 @@ class UserViewSet(viewsets.ModelViewSet):
             last_name=data["last_name"],
             phone=data["phone"],
             whatsapp=data["whatsapp"],
-            profile=image_path,
+            profile=imageField,
             is_active=True,
             created_by=data["created_by"],
             updated_by=data["updated_by"],
@@ -125,6 +142,13 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"error": "username already in use"}, status=400)
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
+
+    # return different Serializers for different actions
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:
