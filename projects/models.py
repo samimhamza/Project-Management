@@ -8,8 +8,7 @@ from django.core.validators import RegexValidator
 
 class Attachment(models.Model):
     name = models.CharField(max_length=64)
-    path = models.CharField(max_length=255)
-
+    attachment = models.FileField(upload_to="attachments")
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
@@ -18,6 +17,11 @@ class Attachment(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
 
 class Reason(models.Model):
     description = models.TextField()
@@ -25,7 +29,7 @@ class Reason(models.Model):
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
-    content_object = GenericForeignKey()
+    content_object = GenericForeignKey("content_type", "object_id")
 
 
 class Country(models.Model):
@@ -91,9 +95,17 @@ class Project(models.Model):
         Attachment,
         content_type_field="content_type",
         object_id_field="object_id",
+        related_query_name='projects'
     )
     reasons = GenericRelation(
-        Reason, content_type_field="content_type", object_id_field="object_id"
+        Reason, content_type_field="content_type", object_id_field="object_id",
+        related_query_name='projects'
+    )
+    comments = GenericRelation(
+        'tasks.Comment',
+        content_type_field="content_type",
+        object_id_field="object_id",
+        related_query_name='projects'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -214,8 +226,10 @@ class FocalPoint(models.Model):
         regex=r"^\+?1?\d{9,15}$",
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
     )
-    phone = models.CharField(validators=[phone_regex], max_length=17,blank=True, null=True)
-    whatsapp = models.CharField(validators=[phone_regex], max_length=17, blank=True, null=True)
+    phone = models.CharField(
+        validators=[phone_regex], max_length=17, blank=True, null=True)
+    whatsapp = models.CharField(
+        validators=[phone_regex], max_length=17, blank=True, null=True)
     position = models.CharField(max_length=64, blank=True, null=True)
     created_by = models.ForeignKey(
         "users.User",

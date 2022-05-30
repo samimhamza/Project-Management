@@ -1,18 +1,15 @@
+from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords
 from rest_framework import viewsets, status
-from projects.models import Project
+from projects.models import Project, Attachment
 from users.models import User, Team
-from projects.api.project.serializers import (
-    ProjectListSerializer,
-)
-from projects.api.serializers import ProjectNameListSerializer
+from projects.api.project.serializers import ProjectListSerializer
+from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords
+
 
 # Sharing to Teams and Users
-
-
 def shareTo(request, project_data, new_project):
     if request.data.get("share"):
         if project_data["share"] != "justMe":
@@ -53,6 +50,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        project = self.get_object()
+        data = ProjectListSerializer(project).data
+        attachments = Attachment.objects.filter(
+            object_id=project.id)
+        data["attachments"] = AttachmentSerializer(
+            attachments, many=True).data
+        return Response(data)
 
     def create(self, request):
         project_data = request.data
@@ -110,16 +116,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Project)
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Project, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, Project)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Project)
 

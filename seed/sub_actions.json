@@ -1,0 +1,22 @@
+[
+	{
+		"model": "users.subaction",
+		"pk": "92f0274b-d24e-4865-b93d-23cf66a432c4",
+		"fields": { "code": "c", "name": "Create" }
+	},
+	{
+		"model": "users.subaction",
+		"pk": "ac54f06f-d829-46ef-99a8-6304b52d50ec",
+		"fields": { "code": "d", "name": "Delete" }
+	},
+	{
+		"model": "users.subaction",
+		"pk": "b074a3f7-7729-4103-88c9-c88a9e7f9acf",
+		"fields": { "code": "v", "name": "View" }
+	},
+	{
+		"model": "users.subaction",
+		"pk": "c77bcaa5-93e6-4290-8415-a4fecd58eb61",
+		"fields": { "code": "u", "name": "Update" }
+	}
+]

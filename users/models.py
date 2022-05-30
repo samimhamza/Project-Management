@@ -102,3 +102,32 @@ class Notification(models.Model):
 
     type = models.CharField(
         max_length=24, choices=Types.choices, default="notify")
+
+
+class Role(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64)
+
+
+class SubAction(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    code = models.CharField(max_length=24)
+    name = models.CharField(max_length=64)
+
+
+class Action(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64)
+    codename = models.CharField(max_length=64)
+    subaction = models.ManyToManyField(
+        SubAction, related_name="sub_actions")
+
+
+class Permission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    action = models.ForeignKey(
+        Action, on_delete=models.CASCADE, related_name="permission_action")
+    role = models.ManyToManyField(
+        Role, related_name="permissions_roles")
+    user = models.ManyToManyField(
+        User, related_name="permissions_users")

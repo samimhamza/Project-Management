@@ -107,8 +107,8 @@ class AttachmentObjectRelatedField(serializers.RelatedField):
 
 
 class AttachmentSerializer(serializers.ModelSerializer):
-    project = AttachmentObjectRelatedField(read_only=True)
+    # project = AttachmentObjectRelatedField(read_only=True)
 
     class Meta:
         model = Attachment
-        fields = ["name", "path", "object_id", "project"]
+        fields = ["id", "name", "attachment"]

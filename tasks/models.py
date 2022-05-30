@@ -5,7 +5,21 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
-# Start of Task Table
+
+class Comment(models.Model):
+    # commentable_id = models.CharField(max_length=64)
+    # commentable_type = models.CharField(max_length=32)
+    body = models.TextField()
+    commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    attachments = GenericRelation(Attachment)
+
+    # Below the mandatory fields for generic relation
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    def __str__(self):
+        return self.body
 
 
 class Task(models.Model):
@@ -64,8 +78,21 @@ class Task(models.Model):
         null=True,
         related_name="task_updated_by",
     )
-    attachments = GenericRelation(Attachment)
-    reasons = GenericRelation(Reason)
+    attachments = GenericRelation(
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+    )
+    reasons = GenericRelation(
+        Reason,
+        content_type_field="content_type",
+        object_id_field="object_id",
+    )
+    comments = GenericRelation(
+        Comment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
@@ -122,30 +149,3 @@ class UserTask(models.Model):
 
 
 # End of UserTask Table
-
-# Start of Comments Table
-# class Comment(models.Model):
-#     commentable_id = models.CharField(max_length=64)
-#     commentable_type = models.CharField(max_length=32)
-#     body = models.TextField()
-#     commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
-#     attachments = GenericRelation(Attachment)
-
-#     # Below the mandatory fields for generic relation
-#     # content_type = models.ForeignKey(
-#     #     ContentType, on_delete=models.CASCADE, blank=True, null=True
-#     # )
-#     # object_id = models.PositiveIntegerField(blank=True, null=True)
-#     # content_object = GenericForeignKey()
-
-#     def __str__(self):
-#         return self.body
-
-
-# end of Comments Table
-
-# class Attachment(models.Model):
-#     attachmentable_id = models.CharField(max_length=64)
-#     attachmentable_type = models.CharField(max_length=32)
-#     name = models.CharField(max_length=64)
-#     path = models.CharField(max_length=255)
