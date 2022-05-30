@@ -44,14 +44,16 @@ class UserViewSet(viewsets.ModelViewSet):
         #     f.write(profile)
 
         profile = data["profile"]
+
+        # imgdata = base64.b64decode(profile)
+        # filename = 'media/user_profiles/some_image.jpg'  # I assume you have a way of picking unique filenames
+        # with open(filename, 'wb') as f:
+        #         f.write(imgdata)
+        image_path="media/user_profiles/some_image.jpg"
+        with open(image_path, 'wb') as f:
+            f.write(base64.decodebytes(profile))
+                
         
-    
-        imgdata = base64.b64decode(profile)
-        filename = 'media/user_profiles/some_image.jpg'  # I assume you have a way of picking unique filenames
-        with open(filename, 'wb') as f:
-                f.write(imgdata)
-
-
         data["created_by"] = request.user
         data["updated_by"] = request.user
         new_user = User.objects.create(
@@ -61,7 +63,7 @@ class UserViewSet(viewsets.ModelViewSet):
             last_name=data["last_name"],
             phone=data["phone"],
             whatsapp=data["whatsapp"],
-            profile='s',
+            profile=image_path,
             is_active=True,
             created_by=data["created_by"],
             updated_by=data["updated_by"],
