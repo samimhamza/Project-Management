@@ -11,6 +11,8 @@ from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from PIL import Image
+import base64
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -35,6 +37,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
+        # profile  = base64.b64decode(str(data["profile"]))  
+
+        # filename = 'media/user_profiles/some_image.jpg'  # I assume you have a way of picking unique filenames
+        # with open(filename, 'wb') as f:
+        #     f.write(profile)
+
+        profile = data["profile"]
+
+        # imgdata = base64.b64decode(profile)
+        # filename = 'media/user_profiles/some_image.jpg'  # I assume you have a way of picking unique filenames
+        # with open(filename, 'wb') as f:
+        #         f.write(imgdata)
+        image_path="media/user_profiles/some_image.jpg"
+        with open(image_path, 'wb') as f:
+            f.write(base64.decodebytes(profile))
+                
+        
         data["created_by"] = request.user
         data["updated_by"] = request.user
         new_user = User.objects.create(
@@ -44,7 +63,7 @@ class UserViewSet(viewsets.ModelViewSet):
             last_name=data["last_name"],
             phone=data["phone"],
             whatsapp=data["whatsapp"],
-            profile=data["profile"],
+            profile=image_path,
             is_active=True,
             created_by=data["created_by"],
             updated_by=data["updated_by"],
