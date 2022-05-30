@@ -82,7 +82,12 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.data.get("email"):
             project.email = request.data.get("email")
         if request.data.get("profile"):
-            project.profile = request.data.get("profile")
+              profile = request.data.get("profile")
+              format, imgstr = profile.split(';base64,')
+              ext = format.split('/')[-1]
+              imageField = ContentFile(base64.b64decode(imgstr), name=str(uuid.uuid4())+'.' + ext)
+              project.profile = imageField
+
         project.updated_by = request.user
         project.save()
         serializer = UserSerializer(project)
