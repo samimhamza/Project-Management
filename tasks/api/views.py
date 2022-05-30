@@ -36,20 +36,32 @@ class TaskViewSet(viewsets.ModelViewSet):
         data = request.data
         data["created_by"] = request.user
         data["updated_by"] = request.user
-        if data['parent']:
+        if request.POST.get("parent"):
             parent = Task.objects.only('id').get(pk=data['parent'])
         else:
             parent = None
-        if data['project']:
+        if request.POST.get("project"):
             project = Project.objects.only('id').get(pk=data['project'])
         else:
             project = None
+        if request.POST.get("p_start_date"):
+            start_date = data["p_start_date"]
+        else:
+            start_date = None
+        if request.POST.get("p_end_date"):
+            end_date = data["p_end_date"]
+        else:
+            end_date = None
+        if request.POST.get("description"):
+            description = data["description"]
+        else:
+            description = None
         new_Task = Task.objects.create(
             parent=parent,
             name=data["name"],
-            p_start_date=data["p_start_date"],
-            p_end_date=data["p_end_date"],
-            description=data["description"],
+            p_start_date=start_date,
+            p_end_date=end_date,
+            description=description,
             project=project,
             created_by=data["created_by"],
             updated_by=data["updated_by"],

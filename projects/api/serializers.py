@@ -111,4 +111,5 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
-        fields = ["id", "name", "attachment"]
+        fields = "__all__"
+        depth = 1

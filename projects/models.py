@@ -15,7 +15,7 @@ class Attachment(models.Model):
     content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
-        return self.name
+        return self.content_type.model
 
     class Meta:
         indexes = [
@@ -30,6 +30,14 @@ class Reason(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
     content_object = GenericForeignKey("content_type", "object_id")
+
+    def __str__(self):
+        return self.content_type.app_name
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
 
 
 class Country(models.Model):
