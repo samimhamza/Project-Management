@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from PIL import Image
 import base64
-
+import uuid
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
@@ -37,21 +37,16 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        # profile  = base64.b64decode(str(data["profile"]))  
-
-        # filename = 'media/user_profiles/some_image.jpg'  # I assume you have a way of picking unique filenames
-        # with open(filename, 'wb') as f:
-        #     f.write(profile)
 
         profile = data["profile"]
-
-        # imgdata = base64.b64decode(profile)
-        # filename = 'media/user_profiles/some_image.jpg'  # I assume you have a way of picking unique filenames
-        # with open(filename, 'wb') as f:
-        #         f.write(imgdata)
-        image_path="media/user_profiles/some_image.jpg"
+        unique_filename = str(uuid.uuid4())
+        image_path="media/user_profiles/"+unique_filename+".jpg"
+        imgdata = base64.b64decode(profile)
         with open(image_path, 'wb') as f:
-            f.write(base64.decodebytes(profile))
+                f.write(imgdata)
+       
+        # with open(image_path, 'wb') as f:
+        #     f.write(base64.decodebytes(profile))
                 
         
         data["created_by"] = request.user
