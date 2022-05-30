@@ -103,6 +103,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             date=data["date"],
             project=project,
             expense_by = request.user,
+            type= data["type"],
             created_by= data["created_by"],
             updated_by= data["updated_by"],
         )
