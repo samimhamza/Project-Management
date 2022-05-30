@@ -80,7 +80,7 @@ class Reminder(models.Model):
     remind_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name + " " + self.remind_at
+        return self.user.first_name + " " + self.note
 
 
 class Holiday(models.Model):

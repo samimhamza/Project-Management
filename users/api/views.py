@@ -14,8 +14,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.core.files.base import ContentFile
 import base64
-
 import uuid
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
@@ -154,6 +155,20 @@ class ReminderViewSet(viewsets.ModelViewSet):
     queryset = Reminder.objects.all().order_by("-created_at")
     serializer_class = ReminderSerializer
     pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(ReminderSerializer, queryset)
+
+        if request.GET.get("user_id"):
+            queryset = Reminder.objects.filter(
+                user=request.GET.get("user_id")).order_by("-created_at")
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def destroy(self, request, pk=None):
         return delete(self, request, Reminder)

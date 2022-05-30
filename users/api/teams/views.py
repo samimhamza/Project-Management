@@ -35,14 +35,14 @@ class TeamViewSet(viewsets.ModelViewSet):
     }
 
     def list(self, request):
-        # data = request.query_params
-        # x = []
-        # for key, value in data.items():
-        #     if key == 'data':
-        #         x.append(value)
-        #         print("x", value)
+        data = request.query_params
+        x = []
+        for key, value in data.items():
+            if key == 'data':
+                x.append(value)
+                print("x", value)
 
-        # return Response(x)
+        return Response(x)
 
         queryset = self.filter_queryset(
             Team.objects.filter(
