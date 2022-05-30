@@ -15,7 +15,7 @@ from rest_framework.decorators import action
 from django.core.files.base import ContentFile
 import base64
 
-
+import uuid
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
