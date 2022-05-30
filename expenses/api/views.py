@@ -9,7 +9,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, delete, restore, allItems
+from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from projects.models import Project
 
 
@@ -74,7 +74,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-
+        queryset = filterRecords(queryset, request)
         if request.GET.get("project_id"):
             return tasksOfProject(self, request)
 
@@ -103,13 +103,14 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             date=data["date"],
             project=project,
             expense_by = request.user,
+            type= data["type"],
             created_by= data["created_by"],
             updated_by= data["updated_by"],
         )
         new_Task.save()
         serializer = ExpenseSerializer(new_Task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def update(self, request, pk=None):
         expense = self.get_object()
         data = request.data
@@ -124,7 +125,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             expense.category = category
             # category = Category.objects.only('id').get(pk=data['category'])
             # expense.category.set(category)
-    
+
         expense.updated_by = request.user
         expense.save()
         serializer = ExpenseSerializer(expense)
@@ -164,6 +165,7 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ExpenseItemSerializer, queryset)
 
