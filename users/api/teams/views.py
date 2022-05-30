@@ -1,5 +1,6 @@
+from django.forms import JSONField
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
-from common.actions import delete, withTrashed, trashList, restore, allItems
+from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords
 from users.api.serializers import LessFieldsUserSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
@@ -38,6 +39,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             Team.objects.filter(
                 deleted_at__isnull=True).order_by("-created_at")
         )
+        queryset = filterRecords(queryset, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(TeamNamesSerializer, queryset)
 

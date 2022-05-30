@@ -5,12 +5,16 @@ from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
     UserWithProfileSerializer,
+    CreateUserSerializer
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, restore, delete, allItems
+from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.core.files.base import ContentFile
+import base64
+import uuid
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -19,13 +23,17 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
 
+    serializer_action_classes = {
+        "create": CreateUserSerializer,
+        "update": CreateUserSerializer
+    }
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }
 
     def list(self, request):
         queryset = self.get_queryset()
-
+        queryset = filterRecords(queryset, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(UserWithProfileSerializer, queryset)
 
@@ -35,6 +43,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
+        profile = data["profile"]
+        format, imgstr = profile.split(';base64,')
+        ext = format.split('/')[-1]
+        imageField = ContentFile(base64.b64decode(
+            imgstr), name=str(uuid.uuid4())+'.' + ext)
+
         data["created_by"] = request.user
         data["updated_by"] = request.user
         new_user = User.objects.create(
@@ -44,7 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
             last_name=data["last_name"],
             phone=data["phone"],
             whatsapp=data["whatsapp"],
-            profile=data["profile"],
+            profile=imageField,
             is_active=True,
             created_by=data["created_by"],
             updated_by=data["updated_by"],
@@ -69,7 +83,12 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.data.get("email"):
             project.email = request.data.get("email")
         if request.data.get("profile"):
-            project.profile = request.data.get("profile")
+              profile = request.data.get("profile")
+              format, imgstr = profile.split(';base64,')
+              ext = format.split('/')[-1]
+              imageField = ContentFile(base64.b64decode(imgstr), name=str(uuid.uuid4())+'.' + ext)
+              project.profile = imageField
+
         project.updated_by = request.user
         project.save()
         serializer = UserSerializer(project)
@@ -112,6 +131,13 @@ class UserViewSet(viewsets.ModelViewSet):
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
 
+    # return different Serializers for different actions
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
+
     def get_queryset(self):
         try:
             return self.queryset_actions[self.action]
@@ -135,6 +161,20 @@ class ReminderViewSet(viewsets.ModelViewSet):
     queryset = Reminder.objects.all().order_by("-created_at")
     serializer_class = ReminderSerializer
     pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(ReminderSerializer, queryset)
+
+        if request.GET.get("user_id"):
+            queryset = Reminder.objects.filter(
+                user=request.GET.get("user_id")).order_by("-created_at")
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def destroy(self, request, pk=None):
         return delete(self, request, Reminder)

@@ -15,6 +15,23 @@ def countStatuses(table, countables):
     return totals
 
 
+def filterRecords(queryset, request, columns=[]):
+    data = request.query_params
+    for key, value in data.lists():
+        if len(value) == 1:
+            value = value[0]
+            if value.startswith('like@@'):
+                likeValue = value[6:]
+                queryset = queryset.filter(
+                    **{'%s__icontains' % key: likeValue})
+            elif value.startswith('exact@@'):
+                exactValue = value[7:]
+                queryset = queryset.filter(**{key: exactValue})
+        else:
+            queryset = queryset.filter(**{"%s__in" % key: value})
+    return queryset
+
+
 def withTrashed(self, table, *args, **kwargs):
     if kwargs.get("order_by") is not None:
         queryset = table.objects.all().order_by(kwargs.get("order_by"))

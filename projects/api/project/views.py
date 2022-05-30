@@ -8,7 +8,7 @@ from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import restore, delete, withTrashed, trashList, allItems
+from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords
 
 # Sharing to Teams and Users
 
@@ -46,7 +46,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-
+        queryset = filterRecords(queryset, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ProjectNameListSerializer, queryset)
 

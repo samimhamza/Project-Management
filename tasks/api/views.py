@@ -1,5 +1,5 @@
+from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
-from common.actions import withTrashed, trashList, delete, restore, allItems
 from common.tasks_actions import tasksOfProject, tasksResponse
 from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
@@ -21,7 +21,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-
+        queryset = filterRecords(queryset, request)
         if request.GET.get("project_id"):
             return tasksOfProject(self, request)
 
