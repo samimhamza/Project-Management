@@ -1,6 +1,7 @@
 import re
 from rest_framework import serializers
 from users.models import User, Team, Reminder, Holiday, Notification, TeamUser
+from drf_extra_fields.fields import Base64ImageField
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -43,6 +44,25 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "deleted_at",
+        ]
+
+
+class UploadedBase64ImageSerializer(serializers.Serializer):
+    profile = Base64ImageField(required=False)
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "profile",
+            "phone",
+            "whatsapp",
         ]
 
 
