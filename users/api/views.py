@@ -12,8 +12,8 @@ from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
-import base64
 from django.core.files.base import ContentFile
+import base64
 
 
 class UserViewSet(viewsets.ModelViewSet):
