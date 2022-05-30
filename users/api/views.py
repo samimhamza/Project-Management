@@ -9,7 +9,7 @@ from users.api.serializers import (
 )
 from users.models import User, Reminder, Holiday, Notification
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, restore, delete, allItems
+from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.core.files.base import ContentFile
@@ -33,7 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-
+        queryset = filterRecords(queryset, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(UserWithProfileSerializer, queryset)
 
