@@ -46,7 +46,8 @@ class UserViewSet(viewsets.ModelViewSet):
         profile = data["profile"]
         format, imgstr = profile.split(';base64,')
         ext = format.split('/')[-1]
-        imageField = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+        imageField = ContentFile(base64.b64decode(
+            imgstr), name=str(uuid.uuid4())+'.' + ext)
 
         data["created_by"] = request.user
         data["updated_by"] = request.user
