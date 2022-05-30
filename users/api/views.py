@@ -12,8 +12,9 @@ from common.custom import CustomPageNumberPagination
 from common.actions import withTrashed, trashList, restore, delete, allItems
 from rest_framework.response import Response
 from rest_framework.decorators import action
-import base64
 from django.core.files.base import ContentFile
+import base64
+
 import uuid
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -45,7 +46,7 @@ class UserViewSet(viewsets.ModelViewSet):
         profile = data["profile"]
         format, imgstr = profile.split(';base64,')
         ext = format.split('/')[-1]
-        imageField = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+        imageField = ContentFile(base64.b64decode(imgstr), name=str(uuid.uuid4())+'.' + ext)
 
         data["created_by"] = request.user
         data["updated_by"] = request.user
