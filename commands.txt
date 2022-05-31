@@ -1,1 +1,3 @@
 py manage.py loaddata ./seed/sub_actions.json 
+py manage.py dumpdata users.action > ./seed/actions.json
+py manage.py create_permissions

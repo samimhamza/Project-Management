@@ -1,0 +1,17 @@
+[
+	{
+		"model": "users.role",
+		"pk": "30377046-ec60-4975-8a09-dabb0898f103",
+		"fields": { "name": "Manager" }
+	},
+	{
+		"model": "users.role",
+		"pk": "452185a1-8a18-4d30-8ae8-3888ef2452be",
+		"fields": { "name": "Admin" }
+	},
+	{
+		"model": "users.role",
+		"pk": "f63fce14-7715-4ecf-9c1d-e12718779090",
+		"fields": { "name": "Developer" }
+	}
+]

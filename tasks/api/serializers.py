@@ -1,6 +1,6 @@
 from os import read
 from rest_framework import serializers
-from tasks.models import Task, UserTask
+from tasks.models import Task, UserTask, Comment
 from users.api.serializers import UserWithProfileSerializer
 from users.models import User
 
@@ -58,7 +58,9 @@ class TaskNameSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-# class CommentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Comment
-#         fields = "__all__"
+class CommentSerializer(serializers.ModelSerializer):
+    commented_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ["id", "body", "created_at", "updated_at", "commented_by"]
