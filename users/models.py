@@ -106,27 +106,27 @@ class Notification(models.Model):
 
 class Role(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
 
 
 class SubAction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=24)
-    name = models.CharField(max_length=64)
+    code = models.CharField(max_length=32, unique=True)
+    name = models.CharField(max_length=64, unique=True)
 
 
 class Action(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64)
-    codename = models.CharField(max_length=64)
-    subaction = models.ManyToManyField(
-        SubAction, related_name="sub_actions")
+    name = models.CharField(max_length=64, unique=True)
+    codename = models.CharField(max_length=64, unique=True)
 
 
 class Permission(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     action = models.ForeignKey(
         Action, on_delete=models.CASCADE, related_name="permission_action")
+    sub_action = models.ForeignKey(
+        SubAction, on_delete=models.CASCADE, related_name="permission_sub_action")
     role = models.ManyToManyField(
         Role, related_name="permissions_roles")
     user = models.ManyToManyField(

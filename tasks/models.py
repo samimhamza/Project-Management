@@ -7,11 +7,16 @@ from django.contrib.contenttypes.models import ContentType
 
 
 class Comment(models.Model):
-    # commentable_id = models.CharField(max_length=64)
-    # commentable_type = models.CharField(max_length=32)
     body = models.TextField()
     commented_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
-    attachments = GenericRelation(Attachment)
+    attachments = GenericRelation(
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+        related_query_name='comments'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -19,7 +24,12 @@ class Comment(models.Model):
     content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
-        return self.body
+        return self.content_type.model
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
 
 
 class Task(models.Model):

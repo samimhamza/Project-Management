@@ -96,26 +96,7 @@ class ProjectNameListSerializer(serializers.ModelSerializer):
         ]
 
 
-class AttachmentObjectRelatedField(serializers.RelatedField):
-    """
-    A custom field to use for the `Attachment_object` generic relationship.
-    """
-
-    def to_representation(self, value):
-        """
-        Serialize bookmark instances using a bookmark serializer,
-        and note instances using a note serializer.
-        """
-        if isinstance(value, Project):
-            serializer = ProjectNameListSerializer(value)
-        else:
-            raise Exception("Unexpected type of Attachment object")
-
-        return serializer.data
-
-
 class AttachmentSerializer(serializers.ModelSerializer):
-    # project = AttachmentObjectRelatedField(read_only=True)
 
     class Meta:
         model = Attachment

@@ -1,11 +1,12 @@
 from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
-from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer
+from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer
 from common.tasks_actions import tasksOfProject, tasksResponse
 from common.custom import CustomPageNumberPagination
+from common.comments import commentsOfProject
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from tasks.models import Task
+from tasks.models import Task, Comment
 from projects.models import Project
 
 
@@ -24,7 +25,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = filterRecords(queryset, request)
         if request.GET.get("project_id"):
             return tasksOfProject(self, request)
-
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldsTaskSerializer, queryset)
 
@@ -34,37 +34,37 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        data["created_by"] = request.user
-        data["updated_by"] = request.user
-        if request.POST.get("parent"):
+        creator = request.user
+        updator = request.user
+        if request.data.get("parent"):
             parent = Task.objects.only('id').get(pk=data['parent'])
         else:
             parent = None
-        if request.POST.get("project"):
+        if request.data.get("project"):
             project = Project.objects.only('id').get(pk=data['project'])
         else:
             project = None
-        if request.POST.get("p_start_date"):
+        if request.data.get("p_start_date"):
             start_date = data["p_start_date"]
         else:
             start_date = None
-        if request.POST.get("p_end_date"):
+        if request.data.get("p_end_date"):
             end_date = data["p_end_date"]
         else:
             end_date = None
-        if request.POST.get("description"):
+        if request.data.get("description"):
             description = data["description"]
         else:
             description = None
         new_Task = Task.objects.create(
             parent=parent,
-            name=data["name"],
+            name=data['name'],
             p_start_date=start_date,
             p_end_date=end_date,
             description=description,
             project=project,
-            created_by=data["created_by"],
-            updated_by=data["updated_by"],
+            created_by=creator,
+            updated_by=updator,
         )
         new_Task.save()
         serializer = TaskSerializer(new_Task)
@@ -116,3 +116,19 @@ class TaskViewSet(viewsets.ModelViewSet):
             return self.queryset_actions[self.action]
         except (KeyError, AttributeError):
             return super().get_queryset()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request)
+        if request.GET.get("project_id"):
+            return commentsOfProject(self, request)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)

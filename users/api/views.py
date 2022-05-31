@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.base64_image import convertBase64ToImage
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
@@ -79,8 +80,8 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.data.get("email"):
             project.email = request.data.get("email")
         if request.data.get("profile"):
-              imageField=convertBase64ToImage(request.data.get("profile"))
-              project.profile = imageField
+            imageField = convertBase64ToImage(request.data.get("profile"))
+            project.profile = imageField
 
         project.updated_by = request.user
         project.save()
@@ -151,7 +152,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
 
 class ReminderViewSet(viewsets.ModelViewSet):
-    queryset = Reminder.objects.all().order_by("-created_at")
+    queryset = Reminder.objects.all().order_by("-updated_at")
     serializer_class = ReminderSerializer
     pagination_class = CustomPageNumberPagination
 
@@ -163,7 +164,7 @@ class ReminderViewSet(viewsets.ModelViewSet):
 
         if request.GET.get("user_id"):
             queryset = Reminder.objects.filter(
-                user=request.GET.get("user_id")).order_by("-created_at")
+                user=request.GET.get("user_id")).order_by("-updated_at")
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
@@ -171,7 +172,3 @@ class ReminderViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         return delete(self, request, Reminder)
-
-        
-
-
