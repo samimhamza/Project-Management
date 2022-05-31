@@ -1,7 +1,7 @@
 from users.api.serializers import LessFieldsUserSerializer, UserWithProfileSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework import serializers
-from users.models import Team, TeamUser, User
+from users.models import Team, TeamUser, Permission, Role, Action, SubAction
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
