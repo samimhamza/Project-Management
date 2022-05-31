@@ -131,4 +131,4 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(self, serializer)
+        return self.get_paginated_response(serializer.data)
