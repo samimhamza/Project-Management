@@ -1,4 +1,3 @@
-from json import JSONEncoder
 from django.core.management.base import BaseCommand
 from users.models import Role, User, Permission, UserPermissionList
 from django.db.models import Q
