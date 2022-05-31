@@ -192,7 +192,7 @@ class Income(models.Model):
 
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True)
+    income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True, related_name='payments')
     source = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=19, decimal_places=2)
 
@@ -221,7 +221,7 @@ class Payment(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.amount
+        return self.source
 
 
 class FocalPoint(models.Model):

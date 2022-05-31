@@ -1,3 +1,4 @@
+from urllib import response
 from rest_framework import viewsets
 from projects.models import (
     Country,
@@ -15,6 +16,8 @@ from projects.api.serializers import (
     PaymentSerializer,
     AttachmentSerializer,
 )
+from common.custom import CustomPageNumberPagination
+from rest_framework.response import Response
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -38,8 +41,25 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 
 class IncomeViewSet(viewsets.ModelViewSet):
-    queryset = Income.objects.all()
+    # queryset = Income.objects.all()
+    queryset = Income.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
     serializer_class = IncomeSerializer
+    # pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("project_id"):
+            queryset = Income.objects.filter(
+            deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+            # page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
+        # page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 
 class FocalPointViewSet(viewsets.ModelViewSet):

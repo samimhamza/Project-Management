@@ -52,6 +52,14 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 
 class IncomeSerializer(serializers.ModelSerializer):
+    payments = serializers.SerializerMethodField()
+
+    def get_payments(self, income):
+        qs = Payment.objects.filter(
+        deleted_at__isnull=True, income=income)
+        serializer = PaymentSerializer(instance=qs, many=True)
+        return serializer.data
+
     class Meta:
         model = Income
         fields = "__all__"
