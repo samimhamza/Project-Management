@@ -4,13 +4,19 @@ from rest_framework import status
 from django.db import transaction
 from users.models import Team
 from .team_actions import get_leader_by_id, get_total_users
+from projects.models import Project
 
 
-def countStatuses(table, countables):
+def countStatuses(table, countables, project_id=None):
     totals = {}
     for x in range(0, len(countables), 3):
-        itemTotal = table.objects.filter(
-            **{countables[x+1]: countables[x+2]}).count()
+        if project_id is not None:
+            project = Project.objects.only('id').get(pk=project_id)
+            itemTotal = table.objects.filter(
+                **{countables[x+1]: countables[x+2]}, project=project, deleted_at__isnull=True).count()
+        else:
+            itemTotal = table.objects.filter(
+                **{countables[x+1]: countables[x+2]}, deleted_at__isnull=True).count()
         totals[countables[x]] = itemTotal
     return totals
 

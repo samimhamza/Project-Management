@@ -23,7 +23,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request)
         if request.GET.get("project_id"):
-
             return tasksOfProject(self, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldsTaskSerializer, queryset)
