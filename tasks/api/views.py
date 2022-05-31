@@ -23,8 +23,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request)
         if request.GET.get("project_id"):
-            return tasksOfProject(self, request)
 
+            return tasksOfProject(self, request)
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldsTaskSerializer, queryset)
 
@@ -34,37 +34,37 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        data["created_by"] = request.user
-        data["updated_by"] = request.user
-        if request.POST.get("parent"):
+        creator = request.user
+        updator = request.user
+        if request.data.get("parent"):
             parent = Task.objects.only('id').get(pk=data['parent'])
         else:
             parent = None
-        if request.POST.get("project"):
+        if request.data.get("project"):
             project = Project.objects.only('id').get(pk=data['project'])
         else:
             project = None
-        if request.POST.get("p_start_date"):
+        if request.data.get("p_start_date"):
             start_date = data["p_start_date"]
         else:
             start_date = None
-        if request.POST.get("p_end_date"):
+        if request.data.get("p_end_date"):
             end_date = data["p_end_date"]
         else:
             end_date = None
-        if request.POST.get("description"):
+        if request.data.get("description"):
             description = data["description"]
         else:
             description = None
         new_Task = Task.objects.create(
             parent=parent,
-            name=data["name"],
+            name=data['name'],
             p_start_date=start_date,
             p_end_date=end_date,
             description=description,
             project=project,
-            created_by=data["created_by"],
-            updated_by=data["updated_by"],
+            created_by=creator,
+            updated_by=updator,
         )
         new_Task.save()
         serializer = TaskSerializer(new_Task)
