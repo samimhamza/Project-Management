@@ -57,6 +57,11 @@ class TaskViewSet(viewsets.ModelViewSet):
             description = data["description"]
         else:
             description = None
+        if request.data.get('priority'):
+            priority=data['priority']
+        else:
+            priority="normal"
+
         new_Task = Task.objects.create(
             parent=parent,
             name=data['name'],
@@ -66,6 +71,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             project=project,
             created_by=creator,
             updated_by=updator,
+            priority=priority,
         )
         new_Task.save()
         serializer = TaskSerializer(new_Task)
