@@ -68,12 +68,12 @@ class TeamPermissions(CustomPermissions):
         'restore': 'teams_d',
         'trashed': 'teams_d',
         'all': 'teams_v',
-        'users': 'team_users_v',
-        'add_users': 'team_users_c',
+        'users': 'teams_v',
+        'add_users': 'teams_c',
         'excluded_users': 'users_v',
         'excluded_projects': 'projects_v',
         'add_project': 'team_projects_c',
-        'delete_user': 'team_users_d'
+        'delete_user': 'teams_d'
     }
 
 

@@ -138,9 +138,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = self.get_object()
         users = Project.objects.only('users').filter(pk=project)
         if request.GET.get("items_per_page") == "-1":
-            return allItems(ProjectUsersSerializer, users)
-        page = self.paginate_queryset(users)
-        serializer = ProjectUsersSerializer(page, many=True)
+            return allItems(ProjectUsersSerializer, project)
+        page = self.paginate_queryset(project)
+        serializer = ProjectUsersSerializer(page)
         return self.get_paginated_response(serializer.data)
 
     # @action(detail=True, methods=["post"])
