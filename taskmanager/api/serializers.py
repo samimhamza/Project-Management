@@ -1,9 +1,9 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import exceptions
-from users.models import User
+from users.models import User, UserPermissionList
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from users.api.serializers import AuthUserSerializer
+from users.api.serializers import AuthUserSerializer, UserPermissionListSerializer
 
 
 def validateEmail(email):
@@ -47,4 +47,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         auth_user = User.objects.filter(pk=self.user.id).first()
         data['user'] = AuthUserSerializer(auth_user).data
+        permissions = UserPermissionList.objects.get(user=auth_user)
+        data['permissions'] = UserPermissionListSerializer(permissions).data
         return data

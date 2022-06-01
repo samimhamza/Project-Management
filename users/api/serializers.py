@@ -1,6 +1,7 @@
 import re
 from rest_framework import serializers
-from users.models import User, Team, Reminder, Holiday, Notification, TeamUser, Action, SubAction, Permission
+from users.models import (User,  Reminder, Holiday, Notification,
+                          TeamUser, Action, SubAction, Permission, UserPermissionList)
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -101,7 +102,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ["codename"]
+        fields = ["name"]
 
 
 class SubActionSerializer(serializers.ModelSerializer):
@@ -117,3 +118,9 @@ class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = ["action", "sub_action"]
+
+
+class UserPermissionListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPermissionList
+        fields = ["permissions_list"]
