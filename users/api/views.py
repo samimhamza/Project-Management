@@ -10,8 +10,7 @@ from users.api.serializers import (
     NotificationSerializer,
     ReminderSerializer,
     HolidaySerializer,
-    UserWithProfileSerializer,
-    CreateUserSerializer
+    UserWithProfileSerializer
 )
 from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
 
@@ -22,10 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (UserPermissions,)
-    serializer_action_classes = {
-        "create": CreateUserSerializer,
-        "update": CreateUserSerializer
-    }
+
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }
@@ -80,7 +76,6 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.data.get("profile"):
             imageField = convertBase64ToImage(request.data.get("profile"))
             project.profile = imageField
-
         project.updated_by = request.user
         project.save()
         serializer = UserSerializer(project)
@@ -96,6 +91,16 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, User)
+
+    @action(detail=True, methods=["post"])
+    def change_password(self, request, pk=None):
+        try:
+            user = self.get_object()
+            data = request.data
+            user.set_password(data['password'])
+            user.save()
+        except:
+            return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
     # for multi restore
     @action(detail=False, methods=["get"])
@@ -122,13 +127,6 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"error": "username already in use"}, status=400)
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
-
-    # return different Serializers for different actions
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
 
     def get_queryset(self):
         try:
