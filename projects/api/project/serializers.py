@@ -51,3 +51,18 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "updated_by",
             "deleted_at",
         ]
+
+
+class ProjectUsersSerializer(serializers.ModelSerializer):
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, project):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, project_users=project)
+        serializer = LessFieldsUserSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
+    class Meta:
+        model = Project
+        fields = ["users"]

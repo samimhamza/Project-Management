@@ -2,12 +2,15 @@ from common.actions import restore, delete, withTrashed, trashList, allItems, fi
 from rest_framework import viewsets, status
 from projects.models import Project, Attachment
 from users.models import User, Team
-from projects.api.project.serializers import ProjectListSerializer
+from projects.api.project.serializers import ProjectListSerializer, ProjectUsersSerializer
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
 from common.permissions_scopes import ProjectPermissions
+from users.models import User, Team
+from rest_framework import viewsets, status
+from projects.models import Project
 
 
 # Sharing to Teams and Users
@@ -128,6 +131,86 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Project)
+
+    # Custom Actions
+    @action(detail=True, methods=["get"])
+    def users(self, request, pk=None):
+        project = self.get_object()
+        users = Project.objects.only('users').filter(pk=project)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(ProjectUsersSerializer, users)
+        page = self.paginate_queryset(users)
+        serializer = ProjectUsersSerializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    # @action(detail=True, methods=["post"])
+    # def add_user(self, request, pk=None):
+    #     try:
+    #         data = request.data
+    #         team = self.get_object()
+    #         user = get_object_or_404(User, pk=data["id"])
+    #         team_user, created = TeamUser.objects.get_or_create(
+    #             team=team, user=user)
+    #         team_user.position = data["position"]
+    #         team_user.save()
+    #         serializer = TeamUserSerializer(team_user)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     except:
+    #         return Response(
+    #             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+    #         )
+
+    # @action(detail=True, methods=["get"])
+    # def excluded_users(self, request, pk=None):
+
+    #     users = User.objects.filter(
+    #         deleted_at__isnull=True).exclude(teams__id=pk).order_by("-created_at")
+    #     serializer = LessFieldsUserSerializer(users, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # @action(detail=True, methods=["get"])
+    # def excluded_projects(self, request, pk=None):
+
+    #     projects = Project.objects.filter(deleted_at__isnull=True).exclude(
+    #         teams__id=pk).order_by("-created_at")
+
+    #     serializer = ProjectNameListSerializer(projects, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # @action(detail=True, methods=["post"])
+    # def add_project(self, request, pk=None):
+    #     try:
+    #         data = request.data
+    #         team = self.get_object()
+    #         team.projects.set(data["ids"])
+    #         serializer = self.get_serializer(team)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     except:
+    #         return Response(
+    #             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+    #         )
+
+    # @action(detail=True, methods=["post"])
+    # def delete_user(self, request, pk=None):
+    #     try:
+    #         with transaction.atomic():
+    #             team = self.get_object()
+    #             data = request.data
+    #             if request.data.get("ids"):
+    #                 team_users = TeamUser.objects.filter(
+    #                     team=team, user__in=data["ids"]
+    #                 )
+    #                 for team_user in team_users:
+    #                     team_user.delete()
+    #             elif request.data.get("id"):
+    #                 team_user = TeamUser.objects.get(
+    #                     team=team, user=data["id"])
+    #                 team_user.delete()
+    #             return Response(status=status.HTTP_204_NO_CONTENT)
+    #     except:
+    #         return Response(
+    #             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+    #         )
 
     def get_queryset(self):
         try:
