@@ -61,6 +61,10 @@ class TaskViewSet(viewsets.ModelViewSet):
             priority=data['priority']
         else:
             priority="normal"
+        if request.data.get('status'):
+            task_status=data['status']
+        else:
+            task_status="pending"
 
         new_Task = Task.objects.create(
             parent=parent,
@@ -72,6 +76,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             created_by=creator,
             updated_by=updator,
             priority=priority,
+            status=task_status,
         )
         new_Task.save()
         serializer = TaskSerializer(new_Task)
