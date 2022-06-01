@@ -47,6 +47,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         auth_user = User.objects.filter(pk=self.user.id).first()
         data['user'] = AuthUserSerializer(auth_user).data
-        permissions = UserPermissionList.objects.get(user=auth_user)
-        data['permissions'] = UserPermissionListSerializer(permissions).data
+        try:
+            permissions = UserPermissionList.objects.get(user=auth_user)
+            data['permissions'] = UserPermissionListSerializer(
+                permissions).data
+        except UserPermissionList.DoesNotExist:
+            data['permissions'] = []
         return data
