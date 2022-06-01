@@ -1,3 +1,5 @@
+from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords, expensesOfProject
+from common.permissions_scopes import CategoryPermissions, ExpensePermissions
 from expenses.models import Expense, ExpenseItem, Category
 from expenses.api.serializers import (
     ExpenseSerializer,
@@ -9,7 +11,6 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from projects.models import Project
 
 
@@ -18,7 +19,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = CategorySerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {}
+    permission_classes = (CategoryPermissions,)
     queryset_actions = {
         "destroy": Category.objects.all(),
     }
@@ -39,12 +40,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def restore(self, request, pk=None):
         return restore(self, request, Category)
 
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
     def get_queryset(self):
         try:
             return self.queryset_actions[self.action]
@@ -52,22 +47,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return super().get_queryset()
 
 
-def tasksOfProject(self, request):
-    queryset = Expense.objects.filter(
-        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
-    if request.GET.get("items_per_page") == "-1":
-        return allItems(LessFieldExpenseSerializer, queryset)
-    page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
-    return self.get_paginated_response(serializer.data)
-
-
 class ExpenseViewSet(viewsets.ModelViewSet):
     queryset = Expense.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = (ExpensePermissions,)
     queryset_actions = {
         "destroy": Expense.objects.all(),
     }
@@ -76,7 +61,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request)
         if request.GET.get("project_id"):
-            return tasksOfProject(self, request)
+            return expensesOfProject(self, request)
 
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldExpenseSerializer, queryset)
@@ -102,10 +87,10 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             title=data["title"],
             date=data["date"],
             project=project,
-            expense_by = request.user,
-            type= data["type"],
-            created_by= data["created_by"],
-            updated_by= data["updated_by"],
+            expense_by=request.user,
+            type=data["type"],
+            created_by=data["created_by"],
+            updated_by=data["updated_by"],
         )
         new_Task.save()
         serializer = ExpenseSerializer(new_Task)
@@ -123,9 +108,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         if request.data.get("category"):
             category = Category.objects.only('id').get(pk=data['category'])
             expense.category = category
-            # category = Category.objects.only('id').get(pk=data['category'])
-            # expense.category.set(category)
-
         expense.updated_by = request.user
         expense.save()
         serializer = ExpenseSerializer(expense)
@@ -159,6 +141,7 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseItemSerializer
     pagination_class = CustomPageNumberPagination
+    permission_classes = (ExpensePermissions,)
     queryset_actions = {
         "destroy": ExpenseItem.objects.all(),
     }
@@ -211,129 +194,3 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
             return self.queryset_actions[self.action]
         except (KeyError, AttributeError):
             return super().get_queryset()
-
-
-# # Category CRUD
-# class CategoryListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Category.objects.filter(deleted_at__isnull=True)
-#     serializer_class = CategorySerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(created_by=request.user.id)
-#                 request.data.update(updated_by=request.user.id)
-#         except:
-#             request.data.update(created_by=request.user.id)
-#             request.data.update(updated_by=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Category.objects.filter(deleted_at__isnull=True)
-#     serializer_class = CategorySerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_by=request.user.id)
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_by=request.user.id)
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of Category CRUD
-
-# # Expense CRUD
-# class ExpenseListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Expense.objects.filter(deleted_at__isnull=True)
-#     serializer_class = ExpenseSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(created_by=request.user.id)
-#                 request.data.update(updated_by=request.user.id)
-#         except:
-#             request.data.update(created_by=request.user.id)
-#             request.data.update(updated_by=request.user.id)
-#         return self.create(request, *args, **kwargs)
-
-
-# class ExpenseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Expense.objects.filter(deleted_at__isnull=True)
-#     serializer_class = ExpenseSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_by=request.user.id)
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_by=request.user.id)
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of Expense CRUD
-
-# # ExpenseItem CRUD
-# class ExpenseItemListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = ExpenseItem.objects.all()
-#     serializer_class = ExpenseItemSerializer
-#     paginate_by = 10
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def post(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
-
-
-# class ExpenseItemDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = ExpenseItem.objects.all()
-#     serializer_class = ExpenseItemSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         try:
-#             if not request.data._mutable:
-#                 request.data._mutable = True
-#                 request.data.update(updated_at=datetime.datetime.now())
-#         except:
-#             request.data.update(updated_at=datetime.datetime.now())
-#         return self.update(request, *args, **kwargs)
-
-
-# # end of ExpenseItem CRUD

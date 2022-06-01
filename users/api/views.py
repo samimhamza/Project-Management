@@ -13,6 +13,7 @@ from users.api.serializers import (
     UserWithProfileSerializer,
     CreateUserSerializer
 )
+from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -20,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = (UserPermissions,)
     serializer_action_classes = {
         "create": CreateUserSerializer,
         "update": CreateUserSerializer
@@ -140,6 +141,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
     queryset = Holiday.objects.all()
     serializer_class = HolidaySerializer
     pagination_class = CustomPageNumberPagination
+    permission_classes = (HolidayPermissions,)
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
@@ -152,6 +154,7 @@ class ReminderViewSet(viewsets.ModelViewSet):
     queryset = Reminder.objects.all().order_by("-updated_at")
     serializer_class = ReminderSerializer
     pagination_class = CustomPageNumberPagination
+    permission_classes = (ReminderPermissions,)
 
     def list(self, request):
         queryset = self.get_queryset()

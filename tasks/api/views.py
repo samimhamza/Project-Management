@@ -8,15 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from tasks.models import Task, Comment
 from projects.models import Project
-
-from users.models import UserPermissionList
-
-
-def checkScope(user, scope):
-    permissionScopes = UserPermissionList.objects.only(
-        'permissions_list').get(user=user)
-    if scope in permissionScopes:
-        return True
+from common.permissions_scopes import TaskPermissions, CommentPermissions
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -24,7 +16,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TaskSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = (TaskPermissions,)
     queryset_actions = {
         "destroy": Task.objects.all(),
     }
@@ -131,6 +123,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = CustomPageNumberPagination
+    permission_classes = (CommentPermissions,)
 
     def list(self, request):
         queryset = self.get_queryset()

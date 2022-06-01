@@ -19,6 +19,7 @@ from users.api.teams.serializers import (
     ProjectTeamSerializer,
 
 )
+from common.permissions_scopes import TeamPermissions
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -26,6 +27,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TeamListSerializer
     pagination_class = CustomPageNumberPagination
+    permission_classes = (TeamPermissions,)
     serializer_action_classes = {
         "retrieve": TeamRetieveSerializer,
         "add_project": ProjectTeamSerializer,

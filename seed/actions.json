@@ -11,6 +11,11 @@
 	},
 	{
 		"model": "users.action",
+		"pk": "36439923-fa3f-4c26-b581-20bfccab3ba9",
+		"fields": { "name": "task_comments", "codename": "tc" }
+	},
+	{
+		"model": "users.action",
 		"pk": "555bdc04-6a41-479a-817f-5eaa74a92bc7",
 		"fields": { "name": "teams", "codename": "t" }
 	},
@@ -42,7 +47,12 @@
 	{
 		"model": "users.action",
 		"pk": "b1aebaea-8a18-4c11-94d8-b367323e02ea",
-		"fields": { "name": "project_attachemnets", "codename": "pa" }
+		"fields": { "name": "project_attachments", "codename": "pa" }
+	},
+	{
+		"model": "users.action",
+		"pk": "b684c06e-aa4c-48e0-a6fd-3abc30fa8925",
+		"fields": { "name": "attachments", "codename": "a" }
 	},
 	{
 		"model": "users.action",
@@ -52,7 +62,12 @@
 	{
 		"model": "users.action",
 		"pk": "c16a625c-2129-452d-afb2-0c331a40d77e",
-		"fields": { "name": "comments", "codename": "c" }
+		"fields": { "name": "project_comments", "codename": "pco" }
+	},
+	{
+		"model": "users.action",
+		"pk": "c371e6c2-2a10-4531-8d95-c4974d390d2a",
+		"fields": { "name": "task_attachments", "codename": "tat" }
 	},
 	{
 		"model": "users.action",
@@ -62,12 +77,12 @@
 	{
 		"model": "users.action",
 		"pk": "e07b4ef3-176a-4aa9-aefa-a32b1b8af656",
-		"fields": { "name": "category", "codename": "ca" }
+		"fields": { "name": "categories", "codename": "ca" }
 	},
 	{
 		"model": "users.action",
 		"pk": "eba6feb2-8086-4742-8705-a14c22114308",
-		"fields": { "name": "project_expenses", "codename": "pc" }
+		"fields": { "name": "project_expenses", "codename": "pe" }
 	},
 	{
 		"model": "users.action",

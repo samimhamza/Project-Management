@@ -50,7 +50,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         try:
             permissions = UserPermissionList.objects.get(user=auth_user)
             data['permissions'] = UserPermissionListSerializer(
-                permissions).data
+                permissions).data['permissions_list']
         except UserPermissionList.DoesNotExist:
             data['permissions'] = []
         return data

@@ -7,6 +7,7 @@ from projects.api.serializers import ProjectNameListSerializer, AttachmentSerial
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.custom import CustomPageNumberPagination
+from common.permissions_scopes import ProjectPermissions
 
 
 # Sharing to Teams and Users
@@ -33,8 +34,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProjectListSerializer
     pagination_class = CustomPageNumberPagination
-    serializer_action_classes = {}
-
+    permission_classes = (ProjectPermissions,)
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
@@ -128,12 +128,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Project)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

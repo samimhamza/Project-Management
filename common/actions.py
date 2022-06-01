@@ -5,6 +5,8 @@ from django.db import transaction
 from users.models import Team
 from .team_actions import get_leader_by_id, get_total_users
 from projects.models import Project
+from expenses.models import Expense
+from expenses.api.serializers import LessFieldExpenseSerializer
 
 
 def countStatuses(table, countables, project_id=None):
@@ -113,3 +115,13 @@ def restore(self, request, table):
 def allItems(serializerName, queryset):
     serializer = serializerName(queryset, many=True)
     return Response(serializer.data, status=200)
+
+
+def expensesOfProject(self, request):
+    queryset = Expense.objects.filter(
+        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(LessFieldExpenseSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
