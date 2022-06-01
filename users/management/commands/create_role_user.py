@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from users.models import Role, Permission
+from users.models import Role, User
+from common.permissions import addPermissionList
 
 
 class Command(BaseCommand):
@@ -9,10 +10,14 @@ class Command(BaseCommand):
         parser.add_argument('role', type=str,
                             help='Indicates role')
 
+        parser.add_argument('user', type=str,
+                            help='Define user id', )
+
     def handle(self, *args, **kwargs):
         role = kwargs['role']
+        user = kwargs['user']
+        user_obj = User.objects.get(pk=user)
         role_obj = Role.objects.get(name=role)
-        if role == 'Admin':
-            permissions = Permission.objects.all()
-            role_obj.permissions_roles.set(permissions)
-            role_obj.save()
+        user_obj.roles_users.set([role_obj])
+        user_obj.save()
+        addPermissionList(user_obj)
