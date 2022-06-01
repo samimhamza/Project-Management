@@ -136,12 +136,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         project = self.get_object()
-        users = Project.objects.only('users').filter(pk=project)
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(ProjectUsersSerializer, project)
-        page = self.paginate_queryset(project)
-        serializer = ProjectUsersSerializer(page)
-        return self.get_paginated_response(serializer.data)
+        return Response()
+        # users = Project.objects.only('users').filter(pk=project)
+        # if request.GET.get("items_per_page") == "-1":
+        #     return allItems(ProjectUsersSerializer, project.users)
+        # page = self.paginate_queryset(project.users)
+        # serializer = ProjectUsersSerializer(page, many=True)
+        # return self.get_paginated_response(serializer.data)
 
     # @action(detail=True, methods=["post"])
     # def add_user(self, request, pk=None):

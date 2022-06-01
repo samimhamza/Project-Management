@@ -33,12 +33,12 @@ class ProjectPermissions(CustomPermissions):
 
 class CommentPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'comments_v',
-        'create': 'comments_c',
-        'retrieve': "comments_v",
-        'update': 'comments_u',
-        'partial_update': 'comments_u',
-        'destroy': 'comments_d'
+        'list': 'project_comments_v',
+        'create': 'project_comments_c',
+        'retrieve': "project_comments_v",
+        'update': 'project_comments_u',
+        'partial_update': 'project_comments_u',
+        'destroy': 'project_comments_d'
     }
 
 
