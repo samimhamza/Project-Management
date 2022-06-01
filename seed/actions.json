@@ -2,91 +2,112 @@
 	{
 		"model": "users.action",
 		"pk": "1b7e8c84-37d7-48f5-8adb-233fbf72fd3f",
-		"fields": { "name": "project_incomes", "codename": "pi" }
+		"fields": {
+			"name": "project_incomes",
+			"codename": "pi",
+			"model": "Project Incomes"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "25e03531-2778-46fb-9fa6-74aaca7adaef",
-		"fields": { "name": "users", "codename": "u" }
+		"fields": { "name": "users", "codename": "u", "model": "Users" }
 	},
 	{
 		"model": "users.action",
 		"pk": "36439923-fa3f-4c26-b581-20bfccab3ba9",
-		"fields": { "name": "task_comments", "codename": "tc" }
+		"fields": {
+			"name": "task_comments",
+			"codename": "tc",
+			"model": "Task Comments"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "555bdc04-6a41-479a-817f-5eaa74a92bc7",
-		"fields": { "name": "teams", "codename": "t" }
+		"fields": { "name": "teams", "codename": "t", "model": "Teams" }
 	},
 	{
 		"model": "users.action",
 		"pk": "6099c447-cba4-4b3e-a24e-a0ac3756af44",
-		"fields": { "name": "projects", "codename": "p" }
+		"fields": { "name": "projects", "codename": "p", "model": "Projects" }
 	},
 	{
 		"model": "users.action",
 		"pk": "7bf89bca-5b30-4b8c-bf18-0e52e8f45281",
-		"fields": { "name": "reminders", "codename": "r" }
+		"fields": {
+			"name": "reminders",
+			"codename": "r",
+			"model": "Reminders and Notes"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "8f5f7978-2876-47e8-9516-abeec21070e0",
-		"fields": { "name": "project_focal_points", "codename": "pf" }
+		"fields": {
+			"name": "project_focal_points",
+			"codename": "pf",
+			"model": "Project Focal Points"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "9ae31cd5-0471-4dc5-9e3a-b5ad3ec83016",
-		"fields": { "name": "project_payments", "codename": "pp" }
-	},
-	{
-		"model": "users.action",
-		"pk": "aabdf15b-c776-4ff8-aad6-ff26709c6673",
-		"fields": { "name": "project_locations", "codename": "pl" }
+		"fields": {
+			"name": "project_payments",
+			"codename": "pp",
+			"model": "Project Payments"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "b1aebaea-8a18-4c11-94d8-b367323e02ea",
-		"fields": { "name": "project_attachments", "codename": "pa" }
+		"fields": {
+			"name": "project_attachments",
+			"codename": "pa",
+			"model": "Project Attachments"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "b684c06e-aa4c-48e0-a6fd-3abc30fa8925",
-		"fields": { "name": "attachments", "codename": "a" }
-	},
-	{
-		"model": "users.action",
-		"pk": "bdc0c42d-0076-4627-99e7-7ab91ed1d4b2",
-		"fields": { "name": "holidays", "codename": "h" }
+		"fields": { "name": "attachments", "codename": "a", "model": "Attachments" }
 	},
 	{
 		"model": "users.action",
 		"pk": "c16a625c-2129-452d-afb2-0c331a40d77e",
-		"fields": { "name": "project_comments", "codename": "pco" }
+		"fields": {
+			"name": "project_comments",
+			"codename": "pco",
+			"model": "Project Comments"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "c371e6c2-2a10-4531-8d95-c4974d390d2a",
-		"fields": { "name": "task_attachments", "codename": "tat" }
+		"fields": {
+			"name": "task_attachments",
+			"codename": "tat",
+			"model": "Task Attachments"
+		}
 	},
 	{
 		"model": "users.action",
 		"pk": "c5079884-f0f8-43b9-aee8-0ba2015e3e83",
-		"fields": { "name": "tasks", "codename": "ta" }
+		"fields": { "name": "tasks", "codename": "ta", "model": "Tasks" }
 	},
 	{
 		"model": "users.action",
 		"pk": "e07b4ef3-176a-4aa9-aefa-a32b1b8af656",
-		"fields": { "name": "categories", "codename": "ca" }
+		"fields": { "name": "categories", "codename": "ca", "model": "Categories" }
 	},
 	{
 		"model": "users.action",
 		"pk": "eba6feb2-8086-4742-8705-a14c22114308",
-		"fields": { "name": "project_expenses", "codename": "pe" }
-	},
-	{
-		"model": "users.action",
-		"pk": "ffac593e-347b-41ba-b8cb-259b9b9c0a59",
-		"fields": { "name": "reasons", "codename": "re" }
+		"fields": {
+			"name": "project_expenses",
+			"codename": "pe",
+			"model": "Project Expenses"
+		}
 	}
 ]
