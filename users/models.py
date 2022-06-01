@@ -107,6 +107,8 @@ class Notification(models.Model):
 class Role(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
+    user = models.ManyToManyField(
+        User, related_name="roles_users")
 
 
 class SubAction(models.Model):
@@ -131,3 +133,9 @@ class Permission(models.Model):
         Role, related_name="permissions_roles")
     user = models.ManyToManyField(
         User, related_name="permissions_users")
+
+
+class UserPermissionList(models.Model):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="userpermissions")
+    permissions_list = models.JSONField()

@@ -1,6 +1,10 @@
-from email.mime import base
-import imp
+from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
+from users.models import User, Reminder, Holiday, Notification
+from common.base64_image import convertBase64ToImage
+from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from users.api.serializers import (
     UserSerializer,
     NotificationSerializer,
@@ -9,12 +13,6 @@ from users.api.serializers import (
     UserWithProfileSerializer,
     CreateUserSerializer
 )
-from users.models import User, Reminder, Holiday, Notification
-from common.custom import CustomPageNumberPagination
-from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from common.base64_image import convertBase64ToImage
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,7 +41,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        profile = data["profile"]
         imageField = convertBase64ToImage(data["profile"])
 
         data["created_by"] = request.user
