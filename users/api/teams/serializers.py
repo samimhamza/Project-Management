@@ -1,7 +1,7 @@
 from users.api.serializers import LessFieldsUserSerializer, UserWithProfileSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework import serializers
-from users.models import Team, TeamUser, Permission, Role, Action, SubAction
+from users.models import Team, TeamUser, User
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
@@ -13,7 +13,14 @@ class TeamUserSerializer(serializers.ModelSerializer):
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):
-    users = LessFieldsUserSerializer(many=True, read_only=True)
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, team):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, teams=team)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
 
     class Meta:
         model = Team

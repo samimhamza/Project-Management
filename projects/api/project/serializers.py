@@ -9,7 +9,7 @@ from users.models import User, Team
 class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(many=True, read_only=True)
     users = serializers.SerializerMethodField()
-    teams = serializers.SerializerMethodField()
+    # teams = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
 
@@ -20,12 +20,12 @@ class ProjectListSerializer(serializers.ModelSerializer):
             instance=qs, many=True, read_only=True)
         return serializer.data
 
-    def get_teams(self, team):
-        qs = Team.objects.filter(
-            deleted_at__isnull=True, projects=team)
-        serializer = LessFieldsTeamSerializer(
-            instance=qs, many=True, read_only=True)
-        return serializer.data
+    # def get_teams(self, team):
+    #     qs = Team.objects.filter(
+    #         deleted_at__isnull=True, projects=team)
+    #     serializer = LessFieldsTeamSerializer(
+    #         instance=qs, many=True, read_only=True)
+    #     return serializer.data
 
     class Meta:
         model = Project
@@ -44,25 +44,10 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "company_email",
             "company_location",
             "users",
-            "teams",
+            # "teams",
             "created_at",
             "updated_at",
             "created_by",
             "updated_by",
             "deleted_at",
         ]
-
-
-class ProjectUsersSerializer(serializers.ModelSerializer):
-    users = serializers.SerializerMethodField()
-
-    def get_users(self, project):
-        qs = User.objects.filter(
-            deleted_at__isnull=True, project_users=project)
-        serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True)
-        return serializer.data
-
-    class Meta:
-        model = Project
-        fields = ["users"]

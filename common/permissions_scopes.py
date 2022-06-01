@@ -28,7 +28,13 @@ class ProjectPermissions(CustomPermissions):
         'trashed': 'projects_d',
         'all': 'projects_v',
         'users': 'projects_v',
-        'add_users': 'projects_c'
+        'add_users': 'projects_c',
+        'teams': 'projects_v',
+        'add_teams': 'projects_c',
+        'excluded_users': "users_v",
+        'excluded_teams': "teams_v",
+        'delete_users': 'projects_u',
+        'delete_teams': 'projects_u'
     }
 
 
