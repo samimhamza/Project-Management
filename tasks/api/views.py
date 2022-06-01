@@ -9,6 +9,15 @@ from rest_framework.decorators import action
 from tasks.models import Task, Comment
 from projects.models import Project
 
+from users.models import UserPermissionList
+
+
+def checkScope(user, scope):
+    permissionScopes = UserPermissionList.objects.only(
+        'permissions_list').get(user=user)
+    if scope in permissionScopes:
+        return True
+
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.filter(
