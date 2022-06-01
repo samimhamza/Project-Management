@@ -30,7 +30,7 @@ def addPermissionList(user):
         permissions.append(per + "_" + action)
 
     userPer, created = UserPermissionList.objects.get_or_create(
-        user=user)
+        user=user, permissions_list=permissions)
     userPer.permissions_list = permissions
     userPer.save()
 
