@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
-from users.models import Role, User, Permission, UserPermissionList
-from django.db.models import Q
-from users.api.serializers import PermissionSerializer
+from users.models import Role, User
+from common.permissions import addPermissionList
 
 
 class Command(BaseCommand):
@@ -21,18 +20,4 @@ class Command(BaseCommand):
         role_obj = Role.objects.get(name=role)
         user_obj.roles_users.set([role_obj])
         user_obj.save()
-
-        user_role = Role.objects.only('codename').filter(user=user_obj)
-        permissions_list = Permission.objects.filter(
-            Q(user=user_obj) | Q(role__in=user_role))
-        serializer = PermissionSerializer(permissions_list, many=True)
-        permissions = []
-        for permission in serializer.data:
-            per = permission['action']['codename']
-            action = permission['sub_action']['code']
-            permissions.append(per + "" + action)
-
-        userPer, created = UserPermissionList.objects.get_or_create(
-            user=user_obj)
-        userPer.permissions_list = permissions
-        userPer.save()
+        addPermissionList(user_obj)
