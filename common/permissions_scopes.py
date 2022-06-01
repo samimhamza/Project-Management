@@ -27,7 +27,8 @@ class ProjectPermissions(CustomPermissions):
         'restore': 'projects_d',
         'trashed': 'projects_d',
         'all': 'projects_v',
-        'users': 'projects_v'
+        'users': 'projects_v',
+        'add_users': 'projects_c'
     }
 
 

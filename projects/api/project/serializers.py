@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from projects.models import Project
-from users.api.serializers import LessFieldsUserSerializer
+from users.api.serializers import UserWithProfileSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import LessFieldsLocationSerializer
 from users.models import User, Team
@@ -10,13 +10,13 @@ class ProjectListSerializer(serializers.ModelSerializer):
     company_location = LessFieldsLocationSerializer(many=True, read_only=True)
     users = serializers.SerializerMethodField()
     teams = serializers.SerializerMethodField()
-    created_by = LessFieldsUserSerializer()
-    updated_by = LessFieldsUserSerializer()
+    created_by = UserWithProfileSerializer()
+    updated_by = UserWithProfileSerializer()
 
     def get_users(self, project):
         qs = User.objects.filter(
             deleted_at__isnull=True, project_users=project)
-        serializer = LessFieldsUserSerializer(
+        serializer = UserWithProfileSerializer(
             instance=qs, many=True, read_only=True)
         return serializer.data
 
@@ -59,7 +59,7 @@ class ProjectUsersSerializer(serializers.ModelSerializer):
     def get_users(self, project):
         qs = User.objects.filter(
             deleted_at__isnull=True, project_users=project)
-        serializer = LessFieldsUserSerializer(
+        serializer = UserWithProfileSerializer(
             instance=qs, many=True, read_only=True)
         return serializer.data
 

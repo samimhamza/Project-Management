@@ -11,9 +11,11 @@ from common.permissions_scopes import ProjectPermissions
 from users.models import User, Team
 from rest_framework import viewsets, status
 from projects.models import Project
-
+from users.api.serializers import UserWithProfileSerializer
 
 # Sharing to Teams and Users
+
+
 def shareTo(request, project_data, new_project):
     if request.data.get("share"):
         if project_data["share"] != "justMe":
@@ -135,31 +137,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
     # Custom Actions
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
-        project = self.get_object()
-        return Response()
-        # users = Project.objects.only('users').filter(pk=project)
-        # if request.GET.get("items_per_page") == "-1":
-        #     return allItems(ProjectUsersSerializer, project.users)
-        # page = self.paginate_queryset(project.users)
-        # serializer = ProjectUsersSerializer(page, many=True)
-        # return self.get_paginated_response(serializer.data)
+        project = Project.objects.only('id').get(pk=pk)
+        users = User.objects.filter(project_users=project)
+        page = self.paginate_queryset(users)
+        serializer = UserWithProfileSerializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
-    # @action(detail=True, methods=["post"])
-    # def add_user(self, request, pk=None):
-    #     try:
-    #         data = request.data
-    #         team = self.get_object()
-    #         user = get_object_or_404(User, pk=data["id"])
-    #         team_user, created = TeamUser.objects.get_or_create(
-    #             team=team, user=user)
-    #         team_user.position = data["position"]
-    #         team_user.save()
-    #         serializer = TeamUserSerializer(team_user)
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     except:
-    #         return Response(
-    #             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-    #         )
+    @action(detail=True, methods=["post"])
+    def add_users(self, request, pk=None):
+        try:
+            data = request.data
+            project = self.get_object()
+            users = User.objects.filter(pk__in=data['ids'])
+            for user in data['ids']:
+                project.users.add(user)
+            serializer = UserWithProfileSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     # @action(detail=True, methods=["get"])
     # def excluded_users(self, request, pk=None):
