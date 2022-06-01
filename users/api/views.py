@@ -1,5 +1,5 @@
 from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
-from users.models import User, Reminder, Holiday, Notification
+from users.models import User, Reminder, Holiday, Notification, Action
 from common.base64_image import convertBase64ToImage
 from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
@@ -10,9 +10,11 @@ from users.api.serializers import (
     NotificationSerializer,
     ReminderSerializer,
     HolidaySerializer,
-    UserWithProfileSerializer
+    UserWithProfileSerializer,
+    ActionSerializer
 )
 from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
+from rest_framework import generics
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -140,6 +142,16 @@ class HolidayViewSet(viewsets.ModelViewSet):
     serializer_class = HolidaySerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (HolidayPermissions,)
+
+
+class PermmissionListAPIView(generics.ListAPIView):
+    queryset = Action.objects.all()
+    serializer_class = ActionSerializer
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = ActionSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

@@ -1,3 +1,4 @@
+from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
 from users.api.teams.views import TeamViewSet
 from users.api.views import (
@@ -5,6 +6,7 @@ from users.api.views import (
     HolidayViewSet,
     NotificationViewSet,
     ReminderViewSet,
+    PermmissionListAPIView
 )
 
 
@@ -15,4 +17,9 @@ router.register(r"holidays", HolidayViewSet, basename="holidays")
 router.register(r"reminders", ReminderViewSet, basename="reminders")
 router.register(r"notifications", NotificationViewSet,
                 basename="notifications")
-urlpatterns = router.urls
+
+# urlpatterns = router.urls
+urlpatterns = [
+    path('permissions/', PermmissionListAPIView.as_view(), name='permissions'),
+    re_path(r'', include((router.urls))),
+]

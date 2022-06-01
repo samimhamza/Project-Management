@@ -87,7 +87,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ["name"]
+        fields = ["id", "name", "model"]
 
 
 class SubActionSerializer(serializers.ModelSerializer):
