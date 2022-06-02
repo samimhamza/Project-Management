@@ -33,7 +33,8 @@ class ProjectPermissions(CustomPermissions):
         'excluded_users': "users_v",
         'excluded_teams': "teams_v",
         'delete_users': 'projects_u',
-        'delete_teams': 'projects_u'
+        'delete_teams': 'projects_u',
+        'add_attachments': 'project_attachments_c'
     }
 
 
