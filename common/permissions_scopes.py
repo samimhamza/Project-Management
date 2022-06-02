@@ -146,7 +146,10 @@ class IncomePermissions(CustomPermissions):
         'retrieve': "project_incomes_v",
         'update': 'project_incomes_u',
         'partial_update': 'project_incomes_u',
-        'destroy': 'project_incomes_d'
+        'destroy': 'project_incomes_d',
+        'restore': 'project_incomes_d',
+        'trashed': 'project_incomes_d',
+        'all': 'project_incomes_v',
     }
 
 
