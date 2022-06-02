@@ -1,6 +1,6 @@
 from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
 from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
-from users.models import User, Reminder, Holiday, Notification, Action
+from users.models import User, Reminder, Holiday, Notification, Action, Permission
 from common.base64_image import convertBase64ToImage
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +13,8 @@ from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
     UserWithProfileSerializer,
-    ActionSerializer
+    ActionSerializer,
+    PermissionActionSerializer
 )
 from rest_framework import generics
 
@@ -153,6 +154,13 @@ class PermmissionListAPIView(generics.ListAPIView):
     def list(self, request):
         queryset = self.get_queryset()
         serializer = ActionSerializer(queryset, many=True)
+        for permission in serializer.data:
+            sub_action_ids = Permission.objects.filter(action=permission['id'])
+            actionSerializer = PermissionActionSerializer(
+                sub_action_ids, many=True)
+            permission['actions'] = []
+            for action in actionSerializer.data:
+                permission['actions'].append(action['sub_action'])
         return Response(serializer.data)
 
 

@@ -93,7 +93,7 @@ class ActionSerializer(serializers.ModelSerializer):
 class SubActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubAction
-        fields = ["code"]
+        fields = ["id", "code", 'name']
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -103,6 +103,14 @@ class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = ["action", "sub_action"]
+
+
+class PermissionActionSerializer(serializers.ModelSerializer):
+    sub_action = SubActionSerializer()
+
+    class Meta:
+        model = Permission
+        fields = ["sub_action"]
 
 
 class UserPermissionListSerializer(serializers.ModelSerializer):
