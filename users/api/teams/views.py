@@ -10,6 +10,7 @@ from users.models import User, Team, TeamUser
 from rest_framework import viewsets, status
 from projects.models import Project
 from django.db import transaction
+from common.permissions_scopes import TeamPermissions
 from users.api.teams.serializers import (
     TeamListSerializer,
     TeamUserSerializer,
@@ -19,7 +20,6 @@ from users.api.teams.serializers import (
 
 
 )
-from common.permissions_scopes import TeamPermissions
 
 
 class TeamViewSet(viewsets.ModelViewSet):
