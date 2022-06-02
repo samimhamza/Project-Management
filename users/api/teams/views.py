@@ -16,9 +16,7 @@ from users.api.teams.serializers import (
     TeamUserSerializer,
     TeamNamesSerializer,
     TeamRetieveSerializer,
-    ProjectTeamSerializer,
-
-
+    ProjectTeamSerializer
 )
 
 
