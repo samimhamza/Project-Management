@@ -1,4 +1,3 @@
-from hashlib import new
 from .permissions import CustomPermissions
 
 
