@@ -15,6 +15,7 @@ from users.api.serializers import (
 )
 from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -147,6 +148,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
 class PermmissionListAPIView(generics.ListAPIView):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+    permission_classes = (IsAuthenticated,)
 
     def list(self, request):
         queryset = self.get_queryset()
