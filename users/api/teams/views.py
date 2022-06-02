@@ -1,4 +1,3 @@
-from django.forms import JSONField
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords
 from users.api.serializers import UserWithProfileSerializer
