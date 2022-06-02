@@ -121,7 +121,6 @@ class TeamViewSet(viewsets.ModelViewSet):
     # Custom Actions
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
-
         team = self.get_object()
         users = User.objects.filter(deleted_at__isnull=True, teams=team)
         page = self.paginate_queryset(users)
@@ -132,20 +131,6 @@ class TeamViewSet(viewsets.ModelViewSet):
             user['is_leader'] = team_user_serializer.data['is_leader']
             user['position'] = team_user_serializer.data['position']
         return self.get_paginated_response(serializer.data)
-        # users = TeamUser.objects.filter(team=team)
-
-        # # excluding users that are softdeted
-        # for team_user in users:
-        #     user = User.objects.get(pk=team_user.user.id)
-        #     if user.deleted_at:
-        #         users = users.exclude(user=team_user.user)
-        # # end of excluding users that are softdeted
-
-        # if request.GET.get("items_per_page") == "-1":
-        #     return allItems(TeamUserSerializer, users)
-        # page = self.paginate_queryset(users)
-        # serializer = TeamUserSerializer(page, many=True)
-        # return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=["post"])
     def add_user(self, request, pk=None):
@@ -166,7 +151,6 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
-
         users = User.objects.filter(
             deleted_at__isnull=True).exclude(teams__id=pk).order_by("-created_at")
         serializer = UserWithProfileSerializer(users, many=True)
@@ -174,7 +158,6 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def excluded_projects(self, request, pk=None):
-
         projects = Project.objects.filter(deleted_at__isnull=True).exclude(
             teams__id=pk).order_by("-created_at")
 
