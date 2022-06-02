@@ -71,6 +71,9 @@ class TeamUser(models.Model):
         else:
             return "No Position"
 
+    class Meta:
+        unique_together = ('team', 'user',)
+
 
 class Reminder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

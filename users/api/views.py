@@ -1,7 +1,9 @@
+from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
 from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
 from users.models import User, Reminder, Holiday, Notification, Action
 from common.base64_image import convertBase64ToImage
 from common.custom import CustomPageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -13,9 +15,7 @@ from users.api.serializers import (
     UserWithProfileSerializer,
     ActionSerializer
 )
-from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 
 
 class UserViewSet(viewsets.ModelViewSet):

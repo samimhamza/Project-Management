@@ -1,7 +1,7 @@
 from django.forms import JSONField
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords
-from users.api.serializers import LessFieldsUserSerializer
+from users.api.serializers import UserWithProfileSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -17,6 +17,7 @@ from users.api.teams.serializers import (
     TeamNamesSerializer,
     TeamRetieveSerializer,
     ProjectTeamSerializer,
+
 
 )
 from common.permissions_scopes import TeamPermissions
@@ -120,21 +121,31 @@ class TeamViewSet(viewsets.ModelViewSet):
     # Custom Actions
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
+
         team = self.get_object()
-        users = TeamUser.objects.filter(team=team)
-
-        # excluding users that are softdeted
-        for team_user in users:
-            user = User.objects.get(pk=team_user.user.id)
-            if user.deleted_at:
-                users = users.exclude(user=team_user.user)
-        # end of excluding users that are softdeted
-
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(TeamUserSerializer, users)
+        users = User.objects.filter(deleted_at__isnull=True, teams=team)
         page = self.paginate_queryset(users)
-        serializer = TeamUserSerializer(page, many=True)
+        serializer = UserWithProfileSerializer(page, many=True)
+        for user in serializer.data:
+            team_user = TeamUser.objects.get(user=user['id'], team=team)
+            team_user_serializer = TeamUserSerializer(team_user)
+            user['is_leader'] = team_user_serializer.data['is_leader']
+            user['position'] = team_user_serializer.data['position']
         return self.get_paginated_response(serializer.data)
+        # users = TeamUser.objects.filter(team=team)
+
+        # # excluding users that are softdeted
+        # for team_user in users:
+        #     user = User.objects.get(pk=team_user.user.id)
+        #     if user.deleted_at:
+        #         users = users.exclude(user=team_user.user)
+        # # end of excluding users that are softdeted
+
+        # if request.GET.get("items_per_page") == "-1":
+        #     return allItems(TeamUserSerializer, users)
+        # page = self.paginate_queryset(users)
+        # serializer = TeamUserSerializer(page, many=True)
+        # return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=["post"])
     def add_user(self, request, pk=None):
@@ -158,7 +169,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
         users = User.objects.filter(
             deleted_at__isnull=True).exclude(teams__id=pk).order_by("-created_at")
-        serializer = LessFieldsUserSerializer(users, many=True)
+        serializer = UserWithProfileSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])

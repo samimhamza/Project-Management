@@ -5,11 +5,11 @@ from users.models import Team, TeamUser, User
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
-    user = UserWithProfileSerializer(read_only=True)
+    # user = UserWithProfileSerializer(read_only=True)
 
     class Meta:
         model = TeamUser
-        fields = ["user", "position", "is_leader"]
+        fields = ["position", "is_leader"]
 
 
 class LessFieldsTeamSerializer(serializers.ModelSerializer):
