@@ -112,6 +112,23 @@ class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
     user = models.ManyToManyField(
         User, related_name="roles_users")
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="role_created_by",
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="role_updated_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 
 class SubAction(models.Model):
@@ -119,12 +136,18 @@ class SubAction(models.Model):
     code = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=64, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Action(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
     codename = models.CharField(max_length=64, unique=True)
     model = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Permission(models.Model):

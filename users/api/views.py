@@ -1,6 +1,6 @@
-from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions
+from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions, RolePermissions
 from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
-from users.models import User, Reminder, Holiday, Notification, Action, Permission
+from users.models import User, Reminder, Holiday, Notification, Action, Permission, Role
 from common.base64_image import convertBase64ToImage
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +14,8 @@ from users.api.serializers import (
     HolidaySerializer,
     UserWithProfileSerializer,
     ActionSerializer,
-    PermissionActionSerializer
+    PermissionActionSerializer,
+    RoleSerializer
 )
 from common.permissions import addPermissionsToUser
 from rest_framework import generics
@@ -197,3 +198,10 @@ class ReminderViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         return delete(self, request, Reminder)
+
+
+class RoleViewSet(viewsets.ModelViewSet):
+    queryset = Role.objects.all().order_by("-updated_at")
+    serializer_class = RoleSerializer
+    pagination_class = CustomPageNumberPagination
+    permission_classes = (RolePermissions,)

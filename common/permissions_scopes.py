@@ -181,7 +181,7 @@ class CategoryPermissions(CustomPermissions):
 class ExpensePermissions(CustomPermissions):
     actions_scopes = {
         'list': 'project_expenses_v',
-        'create': 'project_expenses_c',
+        'create': 'roles_c',
         'retrieve': "project_expenses_v",
         'update': 'project_expenses_u',
         'partial_update': 'project_expenses_u',
@@ -189,4 +189,15 @@ class ExpensePermissions(CustomPermissions):
         'restore': 'project_expenses_d',
         'trashed': 'project_expenses_d',
         'all': 'project_expenses_v'
+    }
+
+
+class RolePermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'roles_v',
+        'create': 'roles_c',
+        'retrieve': "roles_v",
+        'update': 'roles_u',
+        'partial_update': 'roles_u',
+        'destroy': 'roles_d'
     }

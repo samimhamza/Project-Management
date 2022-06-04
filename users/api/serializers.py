@@ -1,7 +1,7 @@
 import re
 from rest_framework import serializers
 from users.models import (User,  Reminder, Holiday, Notification,
-                          TeamUser, Action, SubAction, Permission, UserPermissionList)
+                          TeamUser, Action, SubAction, Permission, UserPermissionList, Role)
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
@@ -117,3 +117,9 @@ class UserPermissionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPermissionList
         fields = ["permissions_list"]
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = "__all__"

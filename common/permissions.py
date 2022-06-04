@@ -23,7 +23,6 @@ def addPermissionList(user, permissions_ids=None):
         user_role = Role.objects.only('name').filter(user=user)
         permissions_list = Permission.objects.filter(
             Q(users=user) | Q(roles__in=user_role))
-
     else:
         permissions_list = Permission.objects.filter(pk__in=permissions_ids)
     serializer = PermissionSerializer(permissions_list, many=True)
