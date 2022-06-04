@@ -18,16 +18,22 @@ def checkScope(user, scope):
         return False
 
 
-def addPermissionList(user):
-    user_role = Role.objects.only('name').filter(user=user)
-    permissions_list = Permission.objects.filter(
-        Q(users=user) | Q(roles__in=user_role))
+def addPermissionList(user, permissions_ids=None):
+    if permissions_ids is None:
+        user_role = Role.objects.only('name').filter(user=user)
+        permissions_list = Permission.objects.filter(
+            Q(users=user) | Q(roles__in=user_role))
+
+    else:
+        permissions_list = Permission.objects.filter(pk__in=permissions_ids)
     serializer = PermissionSerializer(permissions_list, many=True)
     permissions = []
     for permission in serializer.data:
         per = permission['action']['name']
         action = permission['sub_action']['code']
-        permissions.append(per + "_" + action)
+        code = per + "_" + action
+        if code not in permissions:
+            permissions.append(code)
 
     userPer, created = UserPermissionList.objects.get_or_create(
         user=user)
@@ -57,4 +63,4 @@ def addPermissionsToUser(permissions, user):
             for per in permissions_obj:
                 permissions_list.append(per.id)
     user.permissions_users.set(permissions_list)
-    addPermissionList(user)
+    addPermissionList(user, permissions_list)
