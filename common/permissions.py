@@ -1,7 +1,7 @@
 from django.db.models import Q
 from users.api.serializers import PermissionSerializer
 from users.models import Role, Permission, UserPermissionList
-from users.models import UserPermissionList
+from users.models import UserPermissionList, Permission, Action, SubAction
 from rest_framework import permissions
 
 
@@ -21,7 +21,7 @@ def checkScope(user, scope):
 def addPermissionList(user):
     user_role = Role.objects.only('name').filter(user=user)
     permissions_list = Permission.objects.filter(
-        Q(user=user) | Q(role__in=user_role))
+        Q(users=user) | Q(roles__in=user_role))
     serializer = PermissionSerializer(permissions_list, many=True)
     permissions = []
     for permission in serializer.data:
@@ -44,3 +44,14 @@ class CustomPermissions(permissions.BasePermission):
                 if view.action == attr:
                     return checkScope(request.user, value)
         return False
+
+
+def addPermissionsToUser(permissions, user):
+    for permission in permissions:
+        for key, value in permission.items():
+            action = Action.objects.only('id').get(pk=key)
+            sub_actions = SubAction.objects.only('id').filter(pk__in=value)
+            permissions = Permission.objects.filter(
+                action=action, sub_action__in=sub_actions)
+            permissions.users.add(user)
+            addPermissionList(user)

@@ -124,7 +124,7 @@ class Action(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
     codename = models.CharField(max_length=64, unique=True)
-    model = models.CharField(max_length=64)
+    model = models.CharField(max_length=64, unique=True)
 
 
 class Permission(models.Model):
@@ -133,9 +133,9 @@ class Permission(models.Model):
         Action, on_delete=models.CASCADE, related_name="permission_action")
     sub_action = models.ForeignKey(
         SubAction, on_delete=models.CASCADE, related_name="permission_sub_action")
-    role = models.ManyToManyField(
+    roles = models.ManyToManyField(
         Role, related_name="permissions_roles")
-    user = models.ManyToManyField(
+    users = models.ManyToManyField(
         User, related_name="permissions_users")
 
 

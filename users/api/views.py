@@ -16,6 +16,7 @@ from users.api.serializers import (
     ActionSerializer,
     PermissionActionSerializer
 )
+from common.permissions import addPermissionsToUser
 from rest_framework import generics
 
 
@@ -43,7 +44,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         imageField = convertBase64ToImage(data["profile"])
-
         data["created_by"] = request.user
         data["updated_by"] = request.user
         new_user = User.objects.create(
@@ -60,6 +60,9 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         new_user.set_password(data["password"])
         new_user.save()
+
+        if request.data.get("permissions"):
+            addPermissionsToUser(data['permissions'], new_user)
 
         serializer = UserSerializer(new_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
