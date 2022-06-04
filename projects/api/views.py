@@ -68,9 +68,9 @@ class IncomeViewSet(viewsets.ModelViewSet):
         if request.data.get("description"):
             income.description = request.data.get("description")
         if request.data.get("type"):
-            income.date = request.data.get("type")
+            income.type = request.data.get("type")
         if request.data.get("amount"):
-            income.date = request.data.get("amount")
+            income.amount = request.data.get("amount")
         income.updated_by = request.user
         income.save()
         serializer = IncomeSerializer(income)
