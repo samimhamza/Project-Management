@@ -15,7 +15,8 @@ from users.api.serializers import (
     UserWithProfileSerializer,
     ActionSerializer,
     PermissionActionSerializer,
-    RoleSerializer
+    RoleSerializer,
+    RoleListSerializer
 )
 from common.permissions import addPermissionsToUser
 from rest_framework import generics
@@ -205,3 +206,15 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (RolePermissions,)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(RoleListSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Role)
