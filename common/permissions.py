@@ -20,7 +20,7 @@ def checkScope(user, scope):
 
 def addPermissionList(user, permissions_ids=None):
     if permissions_ids is None:
-        user_role = Role.objects.only('name').filter(user=user)
+        user_role = Role.objects.only('name').filter(users=user)
         permissions_list = Permission.objects.filter(
             Q(users=user) | Q(roles__in=user_role))
     else:

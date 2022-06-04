@@ -110,7 +110,7 @@ class Notification(models.Model):
 class Role(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
-    user = models.ManyToManyField(
+    users = models.ManyToManyField(
         User, related_name="roles_users")
     created_by = models.ForeignKey(
         User,

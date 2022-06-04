@@ -120,6 +120,22 @@ class UserPermissionListSerializer(serializers.ModelSerializer):
 
 
 class RoleSerializer(serializers.ModelSerializer):
+    users = serializers.SerializerMethodField()
+    permissions_roles = serializers.SerializerMethodField()
+
+    def get_users(self, role):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, roles_users=role)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
+    def get_permissions_roles(self, role):
+        qs = Permission.objects.filter(roles=role)
+        serializer = PermissionSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
     class Meta:
         model = Role
         fields = "__all__"

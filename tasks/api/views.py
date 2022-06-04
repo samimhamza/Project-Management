@@ -58,13 +58,13 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             description = None
         if request.data.get('priority'):
-            priority=data['priority']
+            priority = data['priority']
         else:
-            priority="normal"
+            priority = "normal"
         if request.data.get('status'):
-            task_status=data['status']
+            task_status = data['status']
         else:
-            task_status="pending"
+            task_status = "pending"
 
         new_Task = Task.objects.create(
             parent=parent,
@@ -102,9 +102,9 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.progress = request.data.get("progress")
         if request.data.get("priority"):
             task.priority = request.data.get("priority")
-        Task.updated_by = request.user
+        task.updated_by = request.user
         task.save()
-        serializer = TaskSerializer(Task)
+        serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):

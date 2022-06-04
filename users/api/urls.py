@@ -6,7 +6,8 @@ from users.api.views import (
     HolidayViewSet,
     NotificationViewSet,
     ReminderViewSet,
-    PermmissionListAPIView
+    PermmissionListAPIView,
+    RoleViewSet
 )
 
 
@@ -15,6 +16,7 @@ router.register(r"teams", TeamViewSet, basename="teams")
 router.register(r"users", UserViewSet, basename="users")
 router.register(r"holidays", HolidayViewSet, basename="holidays")
 router.register(r"reminders", ReminderViewSet, basename="reminders")
+router.register(r"roles", RoleViewSet, basename="roles")
 router.register(r"notifications", NotificationViewSet,
                 basename="notifications")
 
