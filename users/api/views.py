@@ -59,10 +59,9 @@ class UserViewSet(viewsets.ModelViewSet):
             updated_by=data["updated_by"],
         )
         new_user.set_password(data["password"])
-        new_user.save()
-
         if request.data.get("permissions"):
             addPermissionsToUser(data['permissions'], new_user)
+        new_user.save()
 
         serializer = UserSerializer(new_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

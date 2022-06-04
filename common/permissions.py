@@ -30,7 +30,7 @@ def addPermissionList(user):
         permissions.append(per + "_" + action)
 
     userPer, created = UserPermissionList.objects.get_or_create(
-        user=user, permissions_list=permissions)
+        user=user)
     userPer.permissions_list = permissions
     userPer.save()
 
@@ -51,7 +51,7 @@ def addPermissionsToUser(permissions, user):
         for key, value in permission.items():
             action = Action.objects.only('id').get(pk=key)
             sub_actions = SubAction.objects.only('id').filter(pk__in=value)
-            permissions = Permission.objects.filter(
+            permissions_obj = Permission.objects.filter(
                 action=action, sub_action__in=sub_actions)
-            permissions.users.add(user)
+            user.permissions_users.set(permissions_obj)
             addPermissionList(user)

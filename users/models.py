@@ -142,4 +142,4 @@ class Permission(models.Model):
 class UserPermissionList(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="userpermissions")
-    permissions_list = models.JSONField()
+    permissions_list = models.JSONField(blank=True, null=True)
