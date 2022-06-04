@@ -33,7 +33,8 @@ class ProjectPermissions(CustomPermissions):
         'excluded_users': "users_v",
         'excluded_teams': "teams_v",
         'delete_users': 'projects_u',
-        'delete_teams': 'projects_u'
+        'delete_teams': 'projects_u',
+        'add_attachments': 'project_attachments_c'
     }
 
 
@@ -145,7 +146,10 @@ class IncomePermissions(CustomPermissions):
         'retrieve': "project_incomes_v",
         'update': 'project_incomes_u',
         'partial_update': 'project_incomes_u',
-        'destroy': 'project_incomes_d'
+        'destroy': 'project_incomes_d',
+        'restore': 'project_incomes_d',
+        'trashed': 'project_incomes_d',
+        'all': 'project_incomes_v',
     }
 
 
