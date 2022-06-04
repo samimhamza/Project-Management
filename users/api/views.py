@@ -60,6 +60,7 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         new_user.set_password(data["password"])
         new_user.save()
+
         serializer = UserSerializer(new_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

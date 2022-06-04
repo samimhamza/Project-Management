@@ -1,17 +1,22 @@
 from django.core.management.base import BaseCommand
-from users.models import Action, Permission, SubAction
+from users.models import Action, SubAction, Permission
+import json
 
 
 class Command(BaseCommand):
-    help = 'Create permissions'
+    help = 'Create Permissions'
 
     def handle(self, *args, **kwargs):
-        actions = Action.objects.all()
-        sub_actions = SubAction.objects.all()
-
+        info = open('common/actions.json')
+        actions = json.loads(info.read())
         for action in actions:
-            for sub_action in sub_actions:
-                Permission.objects.get_or_create(
-                    action=action,
-                    sub_action=sub_action
-                )
+            action_obj, created = Action.objects.get_or_create(
+                name=action['fields']['name'])
+            action_obj.codename = action['fields']['codename']
+            action_obj.model = action['fields']['model']
+            action_obj.save()
+            for sub_action in action['sub_actions']:
+                sub_action_obj, created = SubAction.objects.get_or_create(
+                    code=sub_action['code'], name=sub_action['name'])
+                permission, created = Permission.objects.get_or_create(
+                    action=action_obj, sub_action=sub_action_obj)
