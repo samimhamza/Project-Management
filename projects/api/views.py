@@ -1,5 +1,6 @@
 from common.permissions_scopes import (AttachmentPermissions, IncomePermissions,
-                                       FocalPointPermissions, LocationPermissions, PaymentPermissions)
+                                       FocalPointPermissions, LocationPermissions, PaymentPermissions)                                 
+from common.actions import delete                                       
 from projects.models import (
     Country,
     Location,
@@ -17,7 +18,7 @@ from projects.api.serializers import (
     AttachmentSerializer,
 )
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -59,6 +60,24 @@ class IncomeViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        income = self.get_object()
+        if request.data.get("title"):
+            income.title = request.data.get("title")
+        if request.data.get("description"):
+            income.description = request.data.get("description")
+        if request.data.get("type"):
+            income.type = request.data.get("type")
+        if request.data.get("amount"):
+            income.amount = request.data.get("amount")
+        income.updated_by = request.user
+        income.save()
+        serializer = IncomeSerializer(income)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Income)
 
 
 class FocalPointViewSet(viewsets.ModelViewSet):

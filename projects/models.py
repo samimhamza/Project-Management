@@ -166,6 +166,10 @@ class Income(models.Model):
         initial_cost = "initial_cost"
         maintenance = "maintenance"
         upgrades = "upgrades"
+        sales = "sales"
+        donates = "donates"
+        other = "other"
+
 
     type = models.CharField(
         max_length=24, choices=Types.choices, default="initial_cost"
