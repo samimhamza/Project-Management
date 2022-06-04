@@ -67,25 +67,27 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
-        project = self.get_object()
+        user = self.get_object()
         if request.data.get("username"):
-            project.username = request.data.get("username")
+            user.username = request.data.get("username")
         if request.data.get("first_name"):
-            project.first_name = request.data.get("first_name")
+            user.first_name = request.data.get("first_name")
         if request.data.get("last_name"):
-            project.last_name = request.data.get("last_name")
+            user.last_name = request.data.get("last_name")
         if request.data.get("phone"):
-            project.phone = request.data.get("phone")
+            user.phone = request.data.get("phone")
         if request.data.get("whatsapp"):
-            project.whatsapp = request.data.get("whatsapp")
+            user.whatsapp = request.data.get("whatsapp")
         if request.data.get("email"):
-            project.email = request.data.get("email")
+            user.email = request.data.get("email")
         if request.data.get("profile"):
             imageField = convertBase64ToImage(request.data.get("profile"))
-            project.profile = imageField
-        project.updated_by = request.user
-        project.save()
-        serializer = UserSerializer(project)
+            user.profile = imageField
+        user.updated_by = request.user
+        if request.data.get("permissions"):
+            addPermissionsToUser(request.data.get("permissions"), user)
+        user.save()
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
