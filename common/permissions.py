@@ -53,13 +53,12 @@ class CustomPermissions(permissions.BasePermission):
 
 def addPermissionsToUser(permissions, user):
     permissions_list = []
-    for permission in permissions:
-        for key, value in permission.items():
-            action = Action.objects.only('id').get(pk=key)
-            sub_actions = SubAction.objects.only('id').filter(pk__in=value)
-            permissions_obj = Permission.objects.filter(
-                action=action, sub_action__in=sub_actions)
-            for per in permissions_obj:
-                permissions_list.append(per.id)
+    for key, value in permissions.items():
+        action = Action.objects.only('id').get(pk=key)
+        sub_actions = SubAction.objects.only('id').filter(pk__in=value)
+        permissions_obj = Permission.objects.filter(
+            action=action, sub_action__in=sub_actions)
+        for per in permissions_obj:
+            permissions_list.append(per.id)
     user.permissions_users.set(permissions_list)
     addPermissionList(user, permissions_list)
