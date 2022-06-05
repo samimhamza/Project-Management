@@ -2,13 +2,13 @@ from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
 from users.api.teams.views import TeamViewSet
 from users.api.views import (
-    UserViewSet,
     HolidayViewSet,
     NotificationViewSet,
     ReminderViewSet,
     PermmissionListAPIView,
     RoleViewSet
 )
+from users.api.users.views import UserViewSet
 
 
 router = DefaultRouter()

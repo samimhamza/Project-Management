@@ -68,3 +68,16 @@ def addRolesToUser(roles, user):
     roles_obj = Role.objects.only('id').filter(pk__in=roles)
     user.roles_users.set(roles_obj)
     addPermissionList(user)
+
+
+def addPermissionsToRole(permissions, role):
+    permissions_list = []
+    for key, value in permissions.items():
+        action = Action.objects.only('id').get(pk=key)
+        sub_actions = SubAction.objects.only('id').filter(pk__in=value)
+        permissions_obj = Permission.objects.filter(
+            action=action, sub_action__in=sub_actions)
+        for per in permissions_obj:
+            permissions_list.append(per.id)
+    print('ss', permissions_list)
+    role.permissions_roles.set(permissions_list)

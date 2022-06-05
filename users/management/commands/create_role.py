@@ -11,8 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         role = kwargs['role']
-        role_obj = Role.objects.get(name=role)
-        if role == 'Admin':
-            permissions = Permission.objects.all()
-            role_obj.permissions_roles.set(permissions)
-            role_obj.save()
+        role_obj, created = Role.objects.get_or_create(name=role)
+        permissions = Permission.objects.all()
+        role_obj.permissions_roles.set(permissions)
+        role_obj.save()
