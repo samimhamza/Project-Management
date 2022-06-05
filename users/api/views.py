@@ -1,6 +1,7 @@
 from common.permissions_scopes import UserPermissions, HolidayPermissions, ReminderPermissions, RolePermissions
 from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
 from users.models import User, Reminder, Holiday, Notification, Action, Permission, Role
+from common.permissions import addPermissionsToUser, addRolesToUser
 from common.base64_image import convertBase64ToImage
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -18,7 +19,6 @@ from users.api.serializers import (
     RoleSerializer,
     RoleListSerializer
 )
-from common.permissions import addPermissionsToUser
 from rest_framework import generics
 
 
@@ -61,8 +61,8 @@ class UserViewSet(viewsets.ModelViewSet):
             updated_by=data["updated_by"],
         )
         new_user.set_password(data["password"])
-        if request.data.get("permissions"):
-            addPermissionsToUser(data['permissions'], new_user)
+        addPermissionsToUser(data['permissions'], new_user)
+        addRolesToUser(request.data.get("roles"), new_user)
         new_user.save()
 
         serializer = UserSerializer(new_user)
@@ -86,8 +86,8 @@ class UserViewSet(viewsets.ModelViewSet):
             imageField = convertBase64ToImage(request.data.get("profile"))
             user.profile = imageField
         user.updated_by = request.user
-        if request.data.get("permissions"):
-            addPermissionsToUser(request.data.get("permissions"), user)
+        addPermissionsToUser(request.data.get("permissions"), user)
+        addRolesToUser(request.data.get("roles"), user)
         user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

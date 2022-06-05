@@ -1,7 +1,7 @@
 from django.db.models import Q
 from users.api.serializers import PermissionSerializer
 from users.models import Role, Permission, UserPermissionList
-from users.models import UserPermissionList, Permission, Action, SubAction
+from users.models import UserPermissionList, Permission, Action, SubAction, Role
 from rest_framework import permissions
 
 
@@ -62,3 +62,9 @@ def addPermissionsToUser(permissions, user):
             permissions_list.append(per.id)
     user.permissions_users.set(permissions_list)
     addPermissionList(user, permissions_list)
+
+
+def addRolesToUser(roles, user):
+    roles_obj = Role.objects.only('id').filter(pk__in=roles)
+    user.roles_users.set(roles_obj)
+    addPermissionList(user)
