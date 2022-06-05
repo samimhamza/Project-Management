@@ -103,6 +103,25 @@ class RoleViewSet(viewsets.ModelViewSet):
         serializer = RoleSerializer(new_role)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def retrieve(self, request, pk=None):
+        role = self.get_object()
+        serializer = self.get_serializer(role)
+        data = serializer.data
+        permissions = Permission.objects.only(
+            'id').filter(roles=role)
+        actions = Action.objects.filter(
+            permission_action__in=permissions).distinct()
+        actionSerializer = ActionSerializer(actions, many=True)
+        for action in actionSerializer.data:
+            sub_action_ids = Permission.objects.filter(action=action['id'])
+            subActionSerializer = PermissionActionSerializer(
+                sub_action_ids, many=True)
+            action['actions'] = []
+            for subAction in subActionSerializer.data:
+                action['actions'].append(subAction['sub_action'])
+        data['permissions'] = actionSerializer.data
+        return Response(data, status=status.HTTP_200_OK)
+
     def update(self, request, pk=None):
         role = self.get_object()
         if request.data.get("name"):
