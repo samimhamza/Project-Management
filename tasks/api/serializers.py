@@ -3,6 +3,7 @@ from rest_framework import serializers
 from tasks.models import Task, UserTask, Comment
 from users.api.serializers import UserWithProfileSerializer
 from users.models import User
+from projects.api.serializers import AttachmentSerializer
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
@@ -60,7 +61,9 @@ class TaskNameSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     commented_by = UserWithProfileSerializer(read_only=True)
+    attachments = AttachmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ["id", "body", "created_at", "updated_at", "commented_by"]
+        fields = ["id", "body", "attachments",
+                  "created_at", "updated_at", "commented_by"]
