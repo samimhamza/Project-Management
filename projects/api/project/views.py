@@ -13,9 +13,12 @@ from rest_framework.decorators import action
 from users.models import User, Team
 from rest_framework import viewsets, status
 from projects.models import Project
-
+import os
+from pathlib import Path
 
 # Sharing to Teams and Users
+
+
 def shareTo(request, project_data, new_project):
     if request.data.get("share"):
         if project_data["share"] != "justMe":
@@ -40,9 +43,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectListSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
-    serializer_action_classes = {
-        "retrieve": ProjectRetirieveSerializer,
-    }
+
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
@@ -73,6 +74,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         new_project.save()
         serializer = ProjectListSerializer(new_project)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, pk=None):
+        project = self.get_object()
+        serializer = ProjectRetirieveSerializer(project)
+        # for attachment in serializer.data['attachments']:
+        #     attachment['size'] = os.path.getsize(
+        #         Path(__file__).resolve().parent.parent. attachment['attachment'])
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
         project = self.get_object()
@@ -229,13 +238,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-
-    # return different Serializers for different actions
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

@@ -1,13 +1,14 @@
-from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer
+from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from common.permissions_scopes import TaskPermissions, CommentPermissions
 from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes
 from common.custom import CustomPageNumberPagination
-from common.comments import commentsOfProject
+from common.comments import commentsOfProject, checkCommnetable
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
+from projects.models import Attachment
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -108,9 +109,38 @@ class CommentViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request)
-        if request.GET.get("project_id"):
+        if request.GET.get("id"):
             return commentsOfProject(self, request)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def create(self, request):
+        data = request.data
+        commentable = checkCommnetable(request)
+        if commentable:
+            comment = Comment.objects.create(
+                body=data['body'],
+                commented_by=request.user,
+                content_object=commentable
+            )
+            if request.data.get("attachments"):
+                for attachment in data['attachments']:
+                    Attachment.objects.create(
+                        content_object=comment,
+                        attachment=attachment['file'],
+                        name=attachment['file'])
+            serializer = CommentSerializer(comment)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': 'Object id is not correct'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None):
+        comment = self.get_object()
+        comment.body = request.data.get('body')
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Task)
