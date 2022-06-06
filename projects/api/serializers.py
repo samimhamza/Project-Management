@@ -100,4 +100,4 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
-        fields = ["id", "name", "attachment"]
+        fields = ["id", "name", "attachment", "size"]

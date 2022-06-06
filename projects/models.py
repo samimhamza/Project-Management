@@ -9,6 +9,7 @@ from django.core.validators import RegexValidator
 class Attachment(models.Model):
     name = models.CharField(max_length=64)
     attachment = models.FileField(upload_to="attachments")
+    size = models.CharField(max_length=128, blank=True, null=True)
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
@@ -21,6 +22,20 @@ class Attachment(models.Model):
         indexes = [
             models.Index(fields=["content_type", "object_id"]),
         ]
+
+    def fileSize(self):
+        x = self.attachment.size
+        y = 512000
+        if x < y:
+            value = round(x / 1024, 2)
+            ext = ' KB'
+        elif x < y * 1024:
+            value = round(x / (1024 * 1024), 2)
+            ext = ' MB'
+        else:
+            value = round(x / (1024 * 1024 * 1024), 2)
+            ext = ' GB'
+        return str(value) + ext
 
 
 class Reason(models.Model):
@@ -160,7 +175,8 @@ class Income(models.Model):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
     description = models.TextField(blank=True, null=True)
-    amount = models.DecimalField(max_digits=19, decimal_places=2,blank=True, null=True)
+    amount = models.DecimalField(
+        max_digits=19, decimal_places=2, blank=True, null=True)
 
     class Types(models.TextChoices):
         initial_cost = "initial_cost"
@@ -169,7 +185,6 @@ class Income(models.Model):
         sales = "sales"
         donates = "donates"
         other = "other"
-
 
     type = models.CharField(
         max_length=24, choices=Types.choices, default="initial_cost"
@@ -196,7 +211,8 @@ class Income(models.Model):
 
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True, related_name='payments')
+    income = models.ForeignKey(
+        Income, on_delete=models.SET_NULL, null=True, related_name='payments')
     source = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=19, decimal_places=2)
 
