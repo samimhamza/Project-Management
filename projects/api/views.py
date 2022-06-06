@@ -1,6 +1,8 @@
 from common.permissions_scopes import (AttachmentPermissions, IncomePermissions,
-                                       FocalPointPermissions, LocationPermissions, PaymentPermissions)                                 
-from common.actions import delete                                       
+                                       FocalPointPermissions, LocationPermissions, PaymentPermissions)
+from rest_framework.response import Response
+from rest_framework import viewsets, status
+from common.actions import delete
 from projects.models import (
     Country,
     Location,
@@ -17,8 +19,6 @@ from projects.api.serializers import (
     PaymentSerializer,
     AttachmentSerializer,
 )
-from rest_framework.response import Response
-from rest_framework import viewsets, status
 import pusher
 
 
