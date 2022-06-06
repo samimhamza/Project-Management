@@ -1,6 +1,6 @@
+from projects.api.project.serializers import ProjectListSerializer, ProjectRetirieveSerializer
 from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
-from projects.api.project.serializers import ProjectListSerializer, ProjectRetirieveSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
@@ -40,6 +40,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectListSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
+    serializer_action_classes = {
+        "retrieve": ProjectRetirieveSerializer,
+    }
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
@@ -55,11 +58,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
-
-    def retrieve(self, request, pk=None):
-        project = self.get_object()
-        data = ProjectRetirieveSerializer(project).data
-        return Response(data)
 
     def create(self, request):
         project_data = request.data
@@ -232,6 +230,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+    # return different Serializers for different actions
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:
