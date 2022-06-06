@@ -1,6 +1,6 @@
 from common.permissions_scopes import HolidayPermissions, ReminderPermissions, RolePermissions
 from users.models import Reminder, Holiday, Notification, Action, Permission, Role
-from common.actions import withTrashed, trashList, restore, delete, allItems
+from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import addPermissionsToRole
@@ -104,23 +104,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
-        role = self.get_object()
-        serializer = self.get_serializer(role)
-        data = serializer.data
-        permissions = Permission.objects.only('id').filter(roles=role)
-        actions = Action.objects.filter(
-            permission_action__in=permissions).distinct()
-        actionSerializer = ActionSerializer(actions, many=True)
-        for action in actionSerializer.data:
-            sub_action_ids = permissions.filter(
-                action=action['id'])
-            subActionSerializer = PermissionActionSerializer(
-                sub_action_ids, many=True)
-            action['actions'] = []
-            for subAction in subActionSerializer.data:
-                action['actions'].append(subAction['sub_action'])
-        data['permissions'] = actionSerializer.data
-        return Response(data, status=status.HTTP_200_OK)
+        return dataWithPermissions(self, 'roles')
 
     def update(self, request, pk=None):
         role = self.get_object()

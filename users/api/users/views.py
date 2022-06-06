@@ -1,4 +1,4 @@
-from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords
+from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords, dataWithPermissions
 from users.api.serializers import UserSerializer, UserWithProfileSerializer
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
@@ -79,6 +79,9 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def retrieve(self, request, pk=None):
+        return dataWithPermissions(self, 'users')
 
     def destroy(self, request, pk=None):
         return delete(self, request, User)

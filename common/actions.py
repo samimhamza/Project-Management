@@ -2,7 +2,8 @@ import datetime
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from users.models import Team
+from users.models import Team, Permission, Action, Role
+from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from .team_actions import get_leader_by_id, get_total_users
 from projects.models import Project
 from expenses.models import Expense
@@ -125,3 +126,26 @@ def expensesOfProject(self, request):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
+
+
+def dataWithPermissions(self, field):
+    object = self.get_object()
+    serializer = self.get_serializer(object)
+    data = serializer.data
+    if field == 'users':
+        role = Role.objects.filter(users=object)
+        data['roles'] = RoleListSerializer(role, many=True).data
+    permissions = Permission.objects.only('id').filter(**{field: object})
+    actions = Action.objects.filter(
+        permission_action__in=permissions).distinct()
+    actionSerializer = ActionSerializer(actions, many=True)
+    for action in actionSerializer.data:
+        sub_action_ids = permissions.filter(
+            action=action['id'])
+        subActionSerializer = PermissionActionSerializer(
+            sub_action_ids, many=True)
+        action['actions'] = []
+        for subAction in subActionSerializer.data:
+            action['actions'].append(subAction['sub_action'])
+    data['permissions'] = actionSerializer.data
+    return Response(data, status=status.HTTP_200_OK)
