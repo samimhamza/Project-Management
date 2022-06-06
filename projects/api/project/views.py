@@ -1,6 +1,6 @@
 from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
-from projects.api.project.serializers import ProjectListSerializer
+from projects.api.project.serializers import ProjectListSerializer, ProjectRetirieveSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
@@ -58,11 +58,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         project = self.get_object()
-        data = ProjectListSerializer(project).data
-        attachments = Attachment.objects.filter(
-            object_id=project.id)
-        data["attachments"] = AttachmentSerializer(
-            attachments, many=True).data
+        data = ProjectRetirieveSerializer(project).data
         return Response(data)
 
     def create(self, request):
