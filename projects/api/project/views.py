@@ -213,21 +213,18 @@ class ProjectViewSet(viewsets.ModelViewSet):
         try:
             project = self.get_object()
             data = request.data
-            attachments = []
-            for attachment in data['attachments']:
-                attachment_obj = Attachment.objects.create(
-                    content_object=project,
-                    attachment=attachment['attachment'],
-                    name=attachment['name'])
-                attachments.append(attachment_obj)
-            serializer = AttachmentSerializer(attachments, many=True)
+            attachment_obj = Attachment.objects.create(
+                content_object=project,
+                attachment=data['file'],
+                name=data['file'])
+            serializer = AttachmentSerializer(attachment_obj)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=["post"])
+    @ action(detail=True, methods=["post"])
     def delete_teams(self, request, pk=None):
         try:
             project = self.get_object()

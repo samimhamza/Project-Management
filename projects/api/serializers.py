@@ -56,7 +56,7 @@ class IncomeSerializer(serializers.ModelSerializer):
 
     def get_payments(self, income):
         qs = Payment.objects.filter(
-        deleted_at__isnull=True, income=income)
+            deleted_at__isnull=True, income=income)
         serializer = PaymentSerializer(instance=qs, many=True)
         return serializer.data
 
@@ -100,5 +100,4 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
-        fields = "__all__"
-        depth = 1
+        fields = ["id", "name", "attachment"]
