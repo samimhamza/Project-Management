@@ -1,7 +1,7 @@
 from django.db.models import Q
 from users.api.serializers import PermissionSerializer
 from users.models import Role, Permission, UserPermissionList
-from users.models import UserPermissionList, Permission, Action, SubAction
+from users.models import UserPermissionList, Permission, Action, SubAction, Role
 from rest_framework import permissions
 
 
@@ -53,13 +53,31 @@ class CustomPermissions(permissions.BasePermission):
 
 def addPermissionsToUser(permissions, user):
     permissions_list = []
-    for permission in permissions:
-        for key, value in permission.items():
-            action = Action.objects.only('id').get(pk=key)
-            sub_actions = SubAction.objects.only('id').filter(pk__in=value)
-            permissions_obj = Permission.objects.filter(
-                action=action, sub_action__in=sub_actions)
-            for per in permissions_obj:
-                permissions_list.append(per.id)
+    for key, value in permissions.items():
+        action = Action.objects.only('id').get(pk=key)
+        sub_actions = SubAction.objects.only('id').filter(pk__in=value)
+        permissions_obj = Permission.objects.filter(
+            action=action, sub_action__in=sub_actions)
+        for per in permissions_obj:
+            permissions_list.append(per.id)
     user.permissions_users.set(permissions_list)
     addPermissionList(user, permissions_list)
+
+
+def addRolesToUser(roles, user):
+    roles_obj = Role.objects.only('id').filter(pk__in=roles)
+    user.roles_users.set(roles_obj)
+    addPermissionList(user)
+
+
+def addPermissionsToRole(permissions, role):
+    permissions_list = []
+    for key, value in permissions.items():
+        action = Action.objects.only('id').get(pk=key)
+        sub_actions = SubAction.objects.only('id').filter(pk__in=value)
+        permissions_obj = Permission.objects.filter(
+            action=action, sub_action__in=sub_actions)
+        for per in permissions_obj:
+            permissions_list.append(per.id)
+    print('ss', permissions_list)
+    role.permissions_roles.set(permissions_list)
