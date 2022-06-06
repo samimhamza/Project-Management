@@ -93,11 +93,10 @@ class RoleViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
-        data["updated_by"] = request.user
         new_role = Role.objects.create(
             name=data["name"],
             created_by=data["created_by"],
-            updated_by=data["updated_by"],
+            updated_by=data["created_by"],
         )
         addPermissionsToRole(data['permissions'], new_role)
         serializer = RoleSerializer(new_role)

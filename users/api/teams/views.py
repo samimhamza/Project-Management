@@ -62,12 +62,11 @@ class TeamViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
-        data["updated_by"] = request.user
         new_team = Team.objects.create(
             name=data["name"],
             description=data["description"],
             created_by=data["created_by"],
-            updated_by=data["updated_by"],
+            updated_by=data["created_by"],
         )
         if request.data.get("team_leader"):
             user = get_object_or_404(User, pk=request.data.get("team_leader"))

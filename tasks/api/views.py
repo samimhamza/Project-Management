@@ -1,14 +1,13 @@
 from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer
-from common.tasks_actions import tasksOfProject, tasksResponse
+from common.permissions_scopes import TaskPermissions, CommentPermissions
+from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes
 from common.custom import CustomPageNumberPagination
 from common.comments import commentsOfProject
-from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import viewsets, status
 from tasks.models import Task, Comment
-from projects.models import Project
-from common.permissions_scopes import TaskPermissions, CommentPermissions
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -34,47 +33,17 @@ class TaskViewSet(viewsets.ModelViewSet):
         return tasksResponse(self, serializer)
 
     def create(self, request):
-        data = request.data
-        creator = request.user
-        updator = request.user
-        if request.data.get("parent"):
-            parent = Task.objects.only('id').get(pk=data['parent'])
-        else:
-            parent = None
-        if request.data.get("project"):
-            project = Project.objects.only('id').get(pk=data['project'])
-        else:
-            project = None
-        if request.data.get("p_start_date"):
-            start_date = data["p_start_date"]
-        else:
-            start_date = None
-        if request.data.get("p_end_date"):
-            end_date = data["p_end_date"]
-        else:
-            end_date = None
-        if request.data.get("description"):
-            description = data["description"]
-        else:
-            description = None
-        if request.data.get('priority'):
-            priority = data['priority']
-        else:
-            priority = "normal"
-        if request.data.get('status'):
-            task_status = data['status']
-        else:
-            task_status = "pending"
-
+        [name, parent, project, start_date, end_date, description,
+            priority, task_status, creator] = checkAttributes(request)
         new_Task = Task.objects.create(
             parent=parent,
-            name=data['name'],
+            name=name,
             p_start_date=start_date,
             p_end_date=end_date,
             description=description,
             project=project,
             created_by=creator,
-            updated_by=updator,
+            updated_by=creator,
             priority=priority,
             status=task_status,
         )

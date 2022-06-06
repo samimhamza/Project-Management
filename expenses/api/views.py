@@ -1,6 +1,7 @@
 from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords, expensesOfProject
 from common.permissions_scopes import CategoryPermissions, ExpensePermissions
 from expenses.models import Expense, ExpenseItem, Category
+from common.custom import CustomPageNumberPagination
 from expenses.api.serializers import (
     ExpenseSerializer,
     ExpenseItemSerializer,
@@ -10,8 +11,9 @@ from expenses.api.serializers import (
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from common.custom import CustomPageNumberPagination
+from django.shortcuts import get_object_or_404
 from projects.models import Project
+from users.models import User
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -72,8 +74,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-        data["created_by"] = request.user
-        data["updated_by"] = request.user
+        creator = request.user
         if data['category']:
             category = Category.objects.only('id').get(pk=data['category'])
         else:
@@ -82,15 +83,16 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             project = Project.objects.only('id').get(pk=data['project'])
         else:
             project = None
+        expense_by = get_object_or_404(User, pk=data['expense_by'])
         new_Task = Expense.objects.create(
             category=category,
             title=data["title"],
             date=data["date"],
             project=project,
-            expense_by=request.user,
+            expense_by=expense_by,
             type=data["type"],
-            created_by=data["created_by"],
-            updated_by=data["updated_by"],
+            created_by=creator,
+            updated_by=creator,
         )
         new_Task.save()
         serializer = ExpenseSerializer(new_Task)
