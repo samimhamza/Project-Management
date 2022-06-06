@@ -107,13 +107,13 @@ class RoleViewSet(viewsets.ModelViewSet):
         role = self.get_object()
         serializer = self.get_serializer(role)
         data = serializer.data
-        permissions = Permission.objects.only(
-            'id').filter(roles=role)
+        permissions = Permission.objects.only('id').filter(roles=role)
         actions = Action.objects.filter(
             permission_action__in=permissions).distinct()
         actionSerializer = ActionSerializer(actions, many=True)
         for action in actionSerializer.data:
-            sub_action_ids = Permission.objects.filter(action=action['id'])
+            sub_action_ids = permissions.filter(
+                action=action['id'])
             subActionSerializer = PermissionActionSerializer(
                 sub_action_ids, many=True)
             action['actions'] = []
