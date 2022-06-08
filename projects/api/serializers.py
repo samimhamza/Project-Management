@@ -7,6 +7,7 @@ from projects.models import (
     Payment,
     Project,
     Attachment,
+    State
 )
 
 
@@ -16,8 +17,28 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CountryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ["id", "name"]
+
+
+class StateListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        fields = ["id", "name"]
+
+
+class StateSerializer(serializers.ModelSerializer):
+    country = CountryListSerializer(read_only=True)
+
+    class Meta:
+        model = State
+        fields = "__all__"
+
+
 class LocationSerializer(serializers.ModelSerializer):
-    country = CountrySerializer(read_only=True)
+    state = StateSerializer(read_only=True)
 
     class Meta:
         model = Location
@@ -25,7 +46,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class LessFieldsLocationSerializer(serializers.ModelSerializer):
-    country = CountrySerializer()
+    state = StateSerializer(read_only=True)
 
     class Meta:
         model = Location

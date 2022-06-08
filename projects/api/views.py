@@ -1,8 +1,8 @@
-from common.permissions_scopes import (AttachmentPermissions, IncomePermissions,
+from common.permissions_scopes import (IncomePermissions,
                                        FocalPointPermissions, LocationPermissions, PaymentPermissions)
+from common.actions import delete, allItems, filterRecords
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from common.actions import delete
 from projects.models import (
     Country,
     Location,
@@ -10,21 +10,51 @@ from projects.models import (
     Income,
     Payment,
     Attachment,
+    State
 )
 from projects.api.serializers import (
+    FocalPointSerializer,
     CountrySerializer,
     LocationSerializer,
-    FocalPointSerializer,
     IncomeSerializer,
     PaymentSerializer,
     AttachmentSerializer,
+    CountryListSerializer,
+    StateListSerializer,
+    StateSerializer
+
 )
+from rest_framework import generics
+
 import pusher
 
 
-class CountryViewSet(viewsets.ModelViewSet):
-    queryset = Country.objects.all()
+class CountryListAPIView(generics.ListAPIView):
+    queryset = Country.objects.all().order_by('name')
     serializer_class = CountrySerializer
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(CountryListSerializer, queryset)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+
+class StateListAPIView(generics.ListAPIView):
+    queryset = State.objects.all().order_by('name')
+    serializer_class = StateSerializer
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(StateListSerializer, queryset)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class AttachmentViewSet(viewsets.ModelViewSet):

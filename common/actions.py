@@ -37,6 +37,8 @@ def filterRecords(queryset, request, columns=[]):
             elif value.startswith('exact@@'):
                 exactValue = value[7:]
                 queryset = queryset.filter(**{key: exactValue})
+            elif "__" in key:
+                queryset = queryset.filter(**{key: value})
         else:
             queryset = queryset.filter(**{"%s__in" % key: value})
     return queryset
