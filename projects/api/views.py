@@ -30,7 +30,7 @@ class CountryViewSet(viewsets.ModelViewSet):
 class AttachmentViewSet(viewsets.ModelViewSet):
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
-    permission_classes = (AttachmentPermissions,)
+    # permission_classes = (AttachmentPermissions,)
 
     def destroy(self, request, pk=None):
         return delete(self, request, Attachment, 'attachment')
@@ -97,3 +97,22 @@ class FocalPointViewSet(viewsets.ModelViewSet):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
     permission_classes = (FocalPointPermissions,)
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("project_id"):
+            queryset = FocalPoint.objects.filter(
+                deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
+        # pusher_client = pusher.Pusher(
+        #     app_id='1419045',
+        #     key='237907cedac4eed704cd',
+        #     secret='2afd20009cf5404d0df6',
+        #     cluster='ap2',
+        #     ssl=True
+        # )
+        # pusher_client.trigger('my-channel', 'my-event', {'message': 'hello world Django'})
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
