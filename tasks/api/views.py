@@ -143,4 +143,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        return delete(self, request, Task)
+        return delete(self, request, Comment)

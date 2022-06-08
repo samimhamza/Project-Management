@@ -20,19 +20,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../project_management_froentend/store/noteSlice.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expenses/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expenses/migrations/0010_merge_20220526_0810.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expenses/migrations/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taskmanager/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/Note.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/Note.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NoteForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NoteForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NotesDrawer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/main/NotesDrawer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/project/[id]/focalpoints.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/project/[id]/focalpoints.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/store/store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projects/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tasks/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/api/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/AttachmentList.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/AttachmentList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanyField.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanyField.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/ProjectViewMain.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/ProjectViewMain.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/AddModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/AddModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/EditModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/EditModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/focalpoints.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/focalpoints.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/incomes.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/incomes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/store/projectSlice.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/store/projectSlice.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +61,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/store&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/project&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
@@ -69,11 +70,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\store" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\customComponents" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\focalPoint" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
@@ -124,6 +125,10 @@
       <workItem from="1653537837151" duration="20302000" />
       <workItem from="1653710069890" duration="28573000" />
       <workItem from="1653795504609" duration="374000" />
+      <workItem from="1654506746740" duration="11959000" />
+      <workItem from="1654573105719" duration="13715000" />
+      <workItem from="1654592741024" duration="11948000" />
+      <workItem from="1654659508622" duration="8645000" />
     </task>
     <servers />
   </component>
@@ -171,6 +176,10 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js</url>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskComponent.js</url>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
