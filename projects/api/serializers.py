@@ -34,7 +34,8 @@ class StateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = State
-        fields = "__all__"
+        fields = ["id", "name", "state_code",
+                  "latitude", "longitude", "country"]
 
 
 class LocationSerializer(serializers.ModelSerializer):
