@@ -8,6 +8,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from users.models import User
+import os
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -71,6 +72,9 @@ class UserViewSet(viewsets.ModelViewSet):
             user.email = request.data.get("email")
         if request.data.get("profile"):
             imageField = convertBase64ToImage(request.data.get("profile"))
+
+            if os.path.isfile('media/'+str(user.profile)):
+                os.remove('media/'+str(user.profile))
             user.profile = imageField
         user.updated_by = request.user
         addPermissionsToUser(request.data.get("permissions"), user)
