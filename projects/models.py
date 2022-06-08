@@ -56,14 +56,49 @@ class Reason(models.Model):
 
 
 class Country(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64, blank=True, null=True, unique=True)
+    name = models.CharField(max_length=64, unique=True)
+    phone_code = models.CharField(max_length=64)
+    currency = models.CharField(max_length=64, blank=True, null=True)
+    capital = models.CharField(max_length=64)
+    iso3 = models.CharField(max_length=64)
+    iso2 = models.CharField(max_length=64)
+    region = models.CharField(max_length=64)
+    subregion = models.CharField(max_length=64)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         if self.name:
             return self.name
         else:
             return "No Name"
+
+
+class State(models.Model):
+    name = models.CharField(max_length=128)
+    state_code = models.CharField(max_length=64)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
+
+
+# class City(models.Model):
+#     name = models.CharField(max_length=128)
+#     latitude = models.FloatField(blank=True, null=True)
+#     longitude = models.FloatField(blank=True, null=True)
+#     state = models.ForeignKey(State, on_delete=models.CASCADE, null=True)
+
+#     def __str__(self):
+#         if self.name:
+#             return self.name
+#         else:
+#             return "No Name"
 
 
 class Project(models.Model):
@@ -148,11 +183,7 @@ class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     address_line_one = models.TextField(blank=True, null=True)
     address_line_two = models.TextField(blank=True, null=True)
-    city = models.CharField(max_length=64, blank=True, null=True)
-    state = models.CharField(max_length=64, blank=True, null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    latitude = models.CharField(max_length=128, null=True, blank=True)
-    longitude = models.CharField(max_length=128, null=True, blank=True)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     project = models.ForeignKey(

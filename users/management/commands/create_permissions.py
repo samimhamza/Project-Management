@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'Create Permissions'
 
     def handle(self, *args, **kwargs):
-        info = open('common/actions.json')
+        info = open('json/actions.json')
         actions = json.loads(info.read())
         for action in actions:
             action_obj, created = Action.objects.get_or_create(

@@ -155,12 +155,12 @@ class IncomePermissions(CustomPermissions):
 
 class AttachmentPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'attachments_v',
-        'create': 'attachments_c',
-        'retrieve': "attachments_v",
-        'update': 'attachments_u',
-        'partial_update': 'attachments_u',
-        'destroy': 'attachments_d'
+        'list': 'project_attachments_v',
+        'create': 'project_attachments_c',
+        'retrieve': "project_attachments_v",
+        'update': 'project_attachments_u',
+        'partial_update': 'project_attachments_u',
+        'destroy': 'project_attachments_d'
     }
 
 

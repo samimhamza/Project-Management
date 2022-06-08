@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "expenses",
     "tasks",
     "users",
+    # 'cities'
 ]
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
