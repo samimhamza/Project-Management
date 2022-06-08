@@ -83,7 +83,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return dataWithPermissions(self, 'users')
 
     def destroy(self, request, pk=None):
-        return delete(self, request, User)
+        return delete(self, request, User, 'profile')
 
     @action(detail=False, methods=["get"])
     def all(self, request):
