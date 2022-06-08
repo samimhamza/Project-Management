@@ -32,6 +32,9 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     serializer_class = AttachmentSerializer
     # permission_classes = (AttachmentPermissions,)
 
+    def destroy(self, request, pk=None):
+        return delete(self, request, Attachment, 'attachment')
+
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()

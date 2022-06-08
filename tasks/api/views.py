@@ -139,6 +139,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         comment = self.get_object()
         comment.body = request.data.get('body')
+        comment.save()
         serializer = CommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
