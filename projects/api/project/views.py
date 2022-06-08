@@ -211,7 +211,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 name=data['file'])
             attachment_obj.size = attachment_obj.fileSize()
             attachment_obj.save()
-            serializer = AttachmentSerializer(attachment_obj)
+            serializer = AttachmentSerializer(
+                attachment_obj, context={"request": request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(
