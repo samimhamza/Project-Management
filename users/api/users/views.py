@@ -53,7 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
         addRolesToUser(request.data.get("roles"), new_user)
         new_user.save()
 
-        serializer = UserSerializer(new_user)
+        serializer = UserSerializer(new_user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -80,7 +80,7 @@ class UserViewSet(viewsets.ModelViewSet):
         addPermissionsToUser(request.data.get("permissions"), user)
         addRolesToUser(request.data.get("roles"), user)
         user.save()
-        serializer = UserSerializer(user)
+        serializer = UserSerializer(user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def retrieve(self, request, pk=None):
