@@ -7,7 +7,7 @@ from .models import (
     Reason,
     Attachment,
     Country,
-    Location,
+    Location
 )
 
 admin.site.register(Project)

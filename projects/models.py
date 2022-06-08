@@ -184,6 +184,7 @@ class Location(models.Model):
     address_line_one = models.TextField(blank=True, null=True)
     address_line_two = models.TextField(blank=True, null=True)
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
+    city = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     project = models.ForeignKey(
@@ -196,7 +197,7 @@ class Location(models.Model):
 
     def __str__(self):
         if self.city and self.state:
-            return self.city + " " + self.state
+            return self.city + " " + self.address_line_one
         else:
             return "No City Added"
 

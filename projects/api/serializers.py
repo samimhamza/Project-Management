@@ -56,7 +56,6 @@ class LessFieldsLocationSerializer(serializers.ModelSerializer):
             "address_line_two",
             "city",
             "state",
-            "country",
         ]
 
 
