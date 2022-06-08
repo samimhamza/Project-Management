@@ -1,13 +1,14 @@
-import datetime
+from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
+from expenses.api.serializers import LessFieldExpenseSerializer
+from .team_actions import get_leader_by_id, get_total_users
+from users.models import Team, Permission, Action, Role
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from users.models import Team, Permission, Action, Role
-from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
-from .team_actions import get_leader_by_id, get_total_users
 from projects.models import Project
 from expenses.models import Expense
-from expenses.api.serializers import LessFieldExpenseSerializer
+import datetime
+import os
 
 
 def countStatuses(table, countables, project_id=None):
@@ -69,29 +70,35 @@ def trashList(self, table, *args, **kwargs):
     return self.get_paginated_response(serializer.data)
 
 
-def delete(self, request, table):
+def delete(self, request, table, imageField=None):
     data = request.data
     if data:
         items = table.objects.filter(pk__in=data["ids"])
         for item in items:
-            if getattr(table, 'deleted_at', False):
+            if getattr(item, 'deleted_at', False):
                 if item.deleted_at:
                     item.delete()
                 else:
                     item.deleted_at = datetime.datetime.now()
                     item.save()
             else:
+                if imageField:
+                    if os.path.isfile('media/'+str(getattr(item, imageField))):
+                        os.remove('media/'+str(getattr(item, imageField)))
                 item.delete()
 
     else:
         item = self.get_object()
-        if getattr(table, 'deleted_at', False):
+        if getattr(item, 'deleted_at', False):
             if item.deleted_at:
                 item.delete()
             else:
                 item.deleted_at = datetime.datetime.now()
                 item.save()
         else:
+            if imageField:
+                if os.path.isfile('media/'+str(getattr(item, imageField))):
+                    os.remove('media/'+str(getattr(item, imageField)))
             item.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 

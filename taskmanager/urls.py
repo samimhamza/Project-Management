@@ -20,8 +20,5 @@ urlpatterns = [
     path("api/", include("users.api.urls")),
     path("api/", include("expenses.api.urls")),
 
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL,
+           document_root=settings.MEDIA_ROOT)
