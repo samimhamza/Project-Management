@@ -131,7 +131,8 @@ class CommentViewSet(viewsets.ModelViewSet):
                         content_object=comment,
                         attachment=attachment['file'],
                         name=attachment['file'])
-            serializer = CommentSerializer(comment)
+            serializer = CommentSerializer(
+                comment, context={"request": request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({'error': 'Object id is not correct'}, status=status.HTTP_400_BAD_REQUEST)
@@ -140,7 +141,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = self.get_object()
         comment.body = request.data.get('body')
         comment.save()
-        serializer = CommentSerializer(comment)
+        serializer = CommentSerializer(comment,  context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
