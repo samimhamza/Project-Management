@@ -70,7 +70,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         )
         new_project = shareTo(request, project_data, new_project)
         new_project.save()
-        serializer = ProjectListSerializer(new_project)
+        serializer = ProjectListSerializer(
+            new_project, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -107,7 +108,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             project.teams.set(teams)
         project.updated_by = request.user
         project.save()
-        serializer = ProjectListSerializer(project)
+        serializer = ProjectListSerializer(
+            project, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
