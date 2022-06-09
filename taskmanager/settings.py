@@ -66,6 +66,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "taskmanager.urls"
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -179,3 +182,8 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+
+EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST_USER = 'a9c3ea573a804c'
+EMAIL_HOST_PASSWORD = '2f140c9fb25937'
+EMAIL_PORT = '2525'

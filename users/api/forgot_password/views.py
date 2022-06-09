@@ -3,7 +3,9 @@ from users.models import User, PasswordReset
 from .serializers import PasswordResetSerializer
 from rest_framework.response import Response
 import django.utils.timezone
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
 
 
 class ForgotPasswordCreateAPIView(generics.CreateAPIView):
@@ -19,6 +21,17 @@ class ForgotPasswordCreateAPIView(generics.CreateAPIView):
         except User.DoesNotExist:
             return Response({"error": 'No such user with provided email!'}, status=404)
         password_reset = PasswordReset.objects.create(user=user)
+        plaintext = "sdafasd"
+        htmly = get_template('email.html')
+
+        d = Context({'username': user.username})
+
+        subject, from_email, to = 'hello', 'from@example.com', user.email
+        text_content = plaintext.render(d)
+        html_content = htmly.render(d)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
         return Response({'success': "Reset Link has sent to your email. Please check your email!"}, status=201)
 
 
