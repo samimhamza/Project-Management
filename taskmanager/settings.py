@@ -37,6 +37,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "projects",
+    "expenses",
+    "tasks",
+    "users",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -47,11 +51,6 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
-    "projects",
-    "expenses",
-    "tasks",
-    "users",
-    # 'cities'
 ]
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -67,7 +66,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "taskmanager.urls"
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'templates/'),
 )
 TEMPLATES = [
     {

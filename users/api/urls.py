@@ -10,7 +10,7 @@ from users.api.views import (
     RoleViewSet
 )
 from users.api.users.views import UserViewSet
-
+from users import views
 router = DefaultRouter()
 router.register(r"teams", TeamViewSet, basename="teams")
 router.register(r"users", UserViewSet, basename="users")
@@ -27,5 +27,6 @@ urlpatterns = [
          name='forgot_password'),
     path('forgot_password/<uuid:pk>/', ForgotPasswordRetrieveAPIView.as_view(),
          name='forgot_password'),
+    path('html/', views.index, name='html'),
     re_path(r'', include((router.urls))),
 ]
