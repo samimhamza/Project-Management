@@ -43,14 +43,6 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = "__all__"
-
-
-class LessFieldsLocationSerializer(serializers.ModelSerializer):
-    state = StateSerializer(read_only=True)
-
-    class Meta:
-        model = Location
         fields = [
             "id",
             "address_line_one",
@@ -87,7 +79,7 @@ class IncomeSerializer(serializers.ModelSerializer):
 
 
 class ProjectLessListSerializer(serializers.ModelSerializer):
-    company_location = LessFieldsLocationSerializer(many=True, read_only=True)
+    company_location = LocationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project

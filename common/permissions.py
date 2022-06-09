@@ -42,11 +42,15 @@ def addPermissionList(user, permissions_ids=None):
 
 class CustomPermissions(permissions.BasePermission):
     actions_scopes = {}
+    methods_scopes = {}
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:
             for attr, value in self.actions_scopes.items():
                 if view.action == attr:
+                    return checkScope(request.user, value)
+            for attr, value in self.methods_scopes.items():
+                if request.method == attr:
                     return checkScope(request.user, value)
         return False
 
@@ -79,5 +83,4 @@ def addPermissionsToRole(permissions, role):
             action=action, sub_action__in=sub_actions)
         for per in permissions_obj:
             permissions_list.append(per.id)
-    print('ss', permissions_list)
     role.permissions_roles.set(permissions_list)

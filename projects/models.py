@@ -79,26 +79,14 @@ class State(models.Model):
     state_code = models.CharField(max_length=64)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.CASCADE, null=True, related_name="country")
 
     def __str__(self):
         if self.name:
             return self.name
         else:
             return "No Name"
-
-
-# class City(models.Model):
-#     name = models.CharField(max_length=128)
-#     latitude = models.FloatField(blank=True, null=True)
-#     longitude = models.FloatField(blank=True, null=True)
-#     state = models.ForeignKey(State, on_delete=models.CASCADE, null=True)
-
-#     def __str__(self):
-#         if self.name:
-#             return self.name
-#         else:
-#             return "No Name"
 
 
 class Project(models.Model):
@@ -183,15 +171,14 @@ class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     address_line_one = models.TextField(blank=True, null=True)
     address_line_two = models.TextField(blank=True, null=True)
-    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
+    state = models.ForeignKey(
+        State, on_delete=models.SET_NULL, null=True, related_name="state")
     city = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    project = models.ForeignKey(
+    project = models.OneToOneField(
         Project,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.CASCADE,
         related_name="company_location",
     )
 

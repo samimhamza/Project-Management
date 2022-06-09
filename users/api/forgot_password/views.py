@@ -3,6 +3,7 @@ from users.models import User, PasswordReset
 from .serializers import PasswordResetSerializer
 from rest_framework.response import Response
 import django.utils.timezone
+from django.core.mail import send_mail
 
 
 class ForgotPasswordCreateAPIView(generics.CreateAPIView):

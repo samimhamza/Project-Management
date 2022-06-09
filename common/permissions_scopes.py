@@ -107,13 +107,8 @@ class ReminderPermissions(CustomPermissions):
 
 
 class LocationPermissions(CustomPermissions):
-    actions_scopes = {
-        'list': 'project_locations_v',
-        'create': 'project_locations_c',
-        'retrieve': "project_locations_v",
-        'update': 'project_locations_u',
-        'partial_update': 'project_locations_u',
-        'destroy': 'project_locations_d'
+    methods_scopes = {
+        'POST': 'projects_u',
     }
 
 

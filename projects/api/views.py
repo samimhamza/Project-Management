@@ -10,7 +10,8 @@ from projects.models import (
     Income,
     Payment,
     Attachment,
-    State
+    State,
+    Project
 )
 from projects.api.serializers import (
     FocalPointSerializer,
@@ -25,7 +26,6 @@ from projects.api.serializers import (
 
 )
 from rest_framework import generics
-
 import pusher
 
 
@@ -60,16 +60,31 @@ class StateListAPIView(generics.ListAPIView):
 class AttachmentViewSet(viewsets.ModelViewSet):
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
-    # permission_classes = (AttachmentPermissions,)
 
     def destroy(self, request, pk=None):
         return delete(self, request, Attachment, 'attachment')
 
 
-class LocationViewSet(viewsets.ModelViewSet):
+class LocationCreateAPIView(generics.CreateAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
     permission_classes = (LocationPermissions,)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        project = Project.objects.get(pk=data['project_id'])
+        location, created = Location.objects.get_or_create(project=project)
+        location.address_line_one = data['address_line_one']
+        location.address_line_two = data['address_line_two']
+        location.city = data['city']
+        state = State.objects.only('id').get(pk=data['state_id'])
+        location.state = state
+        location.save()
+        country = Country.objects.only('id').get(pk=data['country_id'])
+        state.country = country
+        state.save()
+        serializer = self.get_serializer(location)
+        return Response(serializer.data, status=201)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
