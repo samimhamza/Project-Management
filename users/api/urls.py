@@ -1,3 +1,4 @@
+from users.api.forgot_password.views import ForgotPasswordCreateAPIView, ForgotPasswordRetrieveAPIView
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
 from users.api.teams.views import TeamViewSet
@@ -9,7 +10,6 @@ from users.api.views import (
     RoleViewSet
 )
 from users.api.users.views import UserViewSet
-
 
 router = DefaultRouter()
 router.register(r"teams", TeamViewSet, basename="teams")
@@ -23,5 +23,9 @@ router.register(r"notifications", NotificationViewSet,
 # urlpatterns = router.urls
 urlpatterns = [
     path('permissions/', PermmissionListAPIView.as_view(), name='permissions'),
+    path('forgot_password/', ForgotPasswordCreateAPIView.as_view(),
+         name='forgot_password'),
+    path('forgot_password/<uuid:pk>/', ForgotPasswordRetrieveAPIView.as_view(),
+         name='forgot_password'),
     re_path(r'', include((router.urls))),
 ]

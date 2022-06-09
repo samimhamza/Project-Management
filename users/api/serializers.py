@@ -1,7 +1,7 @@
-import re
-from rest_framework import serializers
 from users.models import (User,  Reminder, Holiday, Notification,
                           TeamUser, Action, SubAction, Permission, UserPermissionList, Role)
+
+from rest_framework import serializers
 
 
 class LessFieldsUserSerializer(serializers.ModelSerializer):
