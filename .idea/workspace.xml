@@ -21,19 +21,6 @@
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tasks/api/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/api/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/AttachmentList.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/AttachmentList.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanyField.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanyField.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/ProjectViewMain.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/ProjectViewMain.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/AddModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/AddModal.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/EditModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/focalPoint/EditModal.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/focalpoints.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/focalpoints.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/incomes.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/incomes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/[id]/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/projects/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/store/projectSlice.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/store/projectSlice.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +115,8 @@
       <workItem from="1654506746740" duration="11959000" />
       <workItem from="1654573105719" duration="13715000" />
       <workItem from="1654592741024" duration="11948000" />
-      <workItem from="1654659508622" duration="8645000" />
+      <workItem from="1654659508622" duration="15560000" />
+      <workItem from="1654745631937" duration="3615000" />
     </task>
     <servers />
   </component>
