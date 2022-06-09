@@ -18,8 +18,7 @@ class ForgotPasswordCreateAPIView(generics.CreateAPIView):
         except User.DoesNotExist:
             return Response({"error": 'No such user with provided email!'}, status=404)
         password_reset = PasswordReset.objects.create(user=user)
-        serializer = self.get_serializer(password_reset)
-        return Response(serializer.data, status=201)
+        return Response({'success': "Reset Link has sent to your email. Please check your email!"}, status=201)
 
 
 class ForgotPasswordRetrieveAPIView(generics.RetrieveAPIView):
@@ -32,7 +31,6 @@ class ForgotPasswordRetrieveAPIView(generics.RetrieveAPIView):
         password_reset = self.get_object()
         diff = django.utils.timezone.now() - password_reset.created_at
         if diff.total_seconds() < 300:
-            serializer = self.get_serializer(password_reset)
-            return Response(serializer.data)
+            return Response({'success': ""})
         else:
-            return Response({"error": "Token expired"})
+            return Response({"error": "Access expired please try again"})
