@@ -29,7 +29,7 @@ class ForgotPasswordCreateAPIView(generics.CreateAPIView):
         baseUrl = "http: // localhost: 3000/"
         context = {'baseUrl': baseUrl, 'resetUrl': resetUrl}
         subject, from_email, to = 'Password Reset Link', env(
-            'Email'), user.email
+            'EMAIL'), user.email
         html_content = htmly.render(context)
         msg = EmailMultiAlternatives(subject, '', from_email, [to])
         msg.attach_alternative(html_content, "text/html")
