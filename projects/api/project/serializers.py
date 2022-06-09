@@ -6,7 +6,7 @@ from users.models import User
 
 
 class ProjectListSerializer(serializers.ModelSerializer):
-    company_location = LocationSerializer(many=True, read_only=True)
+    company_location = LocationSerializer( read_only=True)
     users = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
@@ -44,7 +44,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
 
 
 class ProjectRetirieveSerializer(serializers.ModelSerializer):
-    company_location = LocationSerializer(many=True, read_only=True)
+    company_location = LocationSerializer( read_only=True)
     attachments = AttachmentSerializer(many=True, read_only=True)
     users = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer()
