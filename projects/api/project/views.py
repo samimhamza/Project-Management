@@ -1,5 +1,5 @@
-from projects.api.project.serializers import ProjectListSerializer, ProjectRetirieveSerializer
-from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords
+from projects.api.project.serializers import ProjectListSerializer, ProjectRetrieveSerializer
+from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords, countStatuses
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from users.api.serializers import UserWithProfileSerializer
@@ -10,9 +10,7 @@ from projects.models import Project, Attachment
 from users.models import User, Team
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from users.models import User, Team
-from rest_framework import viewsets, status
-from projects.models import Project
+from tasks.models import Task
 
 
 def shareTo(request, project_data, new_project):
@@ -40,7 +38,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
     serializer_action_classes = {
-        "retrieve": ProjectRetirieveSerializer,
+        "retrieve": ProjectRetrieveSerializer,
     }
     queryset_actions = {
         "destroy": Project.objects.all(),
@@ -57,6 +55,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        project = self.get_object()
+        serializer = self.get_serializer(project)
+        countables = [
+            'pendingTasksTotal', 'status', 'pending',
+            'inProgressTasksTotal', 'status', 'in_progress',
+            'completedTasksTotal', 'status', 'completed',
+            'issuFacedTasksTotal', 'status', 'issue_faced',
+            'failedTasksTotal', 'status', 'failed',
+            'cancelledTasksTotal', 'status', 'cancelled'
+        ]
+        data = serializer.data
+        data['statusTotals'] = countStatuses(Task, countables, project.id)
+        return Response(data)
 
     def create(self, request):
         project_data = request.data
