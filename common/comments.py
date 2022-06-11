@@ -30,7 +30,7 @@ def listComments(self, request):
     if request.GET.get("id"):
         id = request.GET.get("id")
         return commentsOfTable(self, request, id)
-    return self.get_paginated_response([])
+    return Response([])
 
 
 def createComments(self, request):
