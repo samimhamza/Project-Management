@@ -45,7 +45,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
 
 class ProjectRetrieveSerializer(serializers.ModelSerializer):
     company_location = LocationSerializer(read_only=True)
-    attachments = AttachmentSerializer(many=True, read_only=True)
+    # attachments = AttachmentSerializer(many=True, read_only=True)
     users = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
@@ -74,7 +74,7 @@ class ProjectRetrieveSerializer(serializers.ModelSerializer):
             "company_email",
             "company_location",
             "users",
-            "attachments",
+            # "attachments",
             "created_at",
             "updated_at",
             "created_by",
