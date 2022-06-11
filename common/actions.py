@@ -163,7 +163,6 @@ def dataWithPermissions(self, field):
 
 def searchRecords(queryset, request, columns=[]):
     # search for different columns in one function
-    # it's magic
     if request.query_params.get('content'):
         queries = Q()
         for column in columns:
