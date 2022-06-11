@@ -1,5 +1,5 @@
 from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords, expensesOfProject
-from common.permissions_scopes import CategoryPermissions, ExpensePermissions
+from common.permissions_scopes import ExpensePermissions
 from expenses.models import Expense, ExpenseItem, Category
 from common.custom import CustomPageNumberPagination
 from expenses.api.serializers import (
@@ -21,7 +21,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = CategorySerializer
     pagination_class = CustomPageNumberPagination
-    permission_classes = (CategoryPermissions,)
+    permission_classes = (ExpensePermissions,)
     queryset_actions = {
         "destroy": Category.objects.all(),
     }

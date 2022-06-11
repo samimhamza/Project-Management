@@ -38,7 +38,7 @@ class ProjectPermissions(CustomPermissions):
     }
 
 
-class CommentPermissions(CustomPermissions):
+class ProjectCommentPermissions(CustomPermissions):
     actions_scopes = {
         'list': 'project_comments_v',
         'create': 'project_comments_c',
@@ -46,6 +46,17 @@ class CommentPermissions(CustomPermissions):
         'update': 'project_comments_u',
         'partial_update': 'project_comments_u',
         'destroy': 'project_comments_d'
+    }
+
+
+class TaskCommentPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'task_comments_v',
+        'create': 'task_comments_c',
+        'retrieve': "task_comments_v",
+        'update': 'task_comments_u',
+        'partial_update': 'task_comments_u',
+        'destroy': 'task_comments_d'
     }
 
 
@@ -148,7 +159,7 @@ class IncomePermissions(CustomPermissions):
     }
 
 
-class AttachmentPermissions(CustomPermissions):
+class ProjectAttachmentPermissions(CustomPermissions):
     actions_scopes = {
         'list': 'project_attachments_v',
         'create': 'project_attachments_c',
@@ -159,17 +170,14 @@ class AttachmentPermissions(CustomPermissions):
     }
 
 
-class CategoryPermissions(CustomPermissions):
+class TaskAttachmentPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'categories_v',
-        'create': 'categories_c',
-        'retrieve': "categories_v",
-        'update': 'categories_u',
-        'partial_update': 'categories_u',
-        'destroy': 'categories_d',
-        'restore': 'categories_d',
-        'trashed': 'categories_d',
-        'all': 'categories_v'
+        'list': 'task_attachments_v',
+        'create': 'task_attachments_c',
+        'retrieve': "task_attachments_v",
+        'update': 'task_attachments_u',
+        'partial_update': 'task_attachments_u',
+        'destroy': 'task_attachments_d'
     }
 
 

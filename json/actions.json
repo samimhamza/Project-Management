@@ -100,7 +100,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "do", "name": "Download" }
 		]
 	},
 	{
@@ -108,6 +109,19 @@
 			"name": "project_comments",
 			"codename": "pco",
 			"model": "Project Comments"
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "u", "name": "Update" }
+		]
+	},
+	{
+		"fields": {
+			"name": "task_comments",
+			"codename": "tc",
+			"model": "Task Comments"
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -126,7 +140,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "do", "name": "Download" }
 		]
 	},
 	{
@@ -134,19 +149,6 @@
 			"name": "tasks",
 			"codename": "ta",
 			"model": "Tasks"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-	{
-		"fields": {
-			"name": "categories",
-			"codename": "ca",
-			"model": "Categories"
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
