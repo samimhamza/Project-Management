@@ -9,6 +9,7 @@ from projects.models import (
     Attachment,
     State
 )
+from users.api.serializers import UserWithProfileSerializer
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -110,6 +111,7 @@ class ProjectNameListSerializer(serializers.ModelSerializer):
 
 
 class AttachmentSerializer(serializers.ModelSerializer):
+    uploaded_by = UserWithProfileSerializer()
 
     class Meta:
         model = Attachment

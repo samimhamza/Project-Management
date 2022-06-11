@@ -17,6 +17,7 @@ class Attachment(models.Model):
         null=True,
         related_name="attachment_uploaded_by",
     )
+    created_at = models.DateTimeField(auto_now_add=True)
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()

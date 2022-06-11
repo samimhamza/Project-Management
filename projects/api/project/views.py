@@ -243,7 +243,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             attachment_obj = Attachment.objects.create(
                 content_object=project,
                 attachment=data['file'],
-                name=data['file'])
+                name=data['file'],
+                uploaded_by=request.user
+            )
             attachment_obj.size = attachment_obj.fileSize()
             attachment_obj.save()
             serializer = AttachmentSerializer(
