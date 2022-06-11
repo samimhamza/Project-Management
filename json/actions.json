@@ -113,9 +113,7 @@
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "v", "name": "View" }
 		]
 	},
 	{
@@ -126,9 +124,7 @@
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "v", "name": "View" }
 		]
 	},
 	{
