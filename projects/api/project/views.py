@@ -73,7 +73,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if attachments_permission:
             attachments = Attachment.objects.filter(object_id=project.id)
             data['attachments'] = AttachmentSerializer(
-                attachments, many=True).data
+                attachments, many=True, context={"request": request}).data
 
         data['statusTotals'] = countStatuses(Task, countables, project.id)
         return Response(data)
@@ -225,24 +225,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
         try:
-            attachments_permission = checkCustomPermissions(
-                request, "project_attachments_c")
-            if attachments_permission:
-                project = self.get_object()
-                data = request.data
-                attachment_obj = Attachment.objects.create(
-                    content_object=project,
-                    attachment=data['file'],
-                    name=data['file'])
-                attachment_obj.size = attachment_obj.fileSize()
-                attachment_obj.save()
-                serializer = AttachmentSerializer(
-                    attachment_obj, context={"request": request})
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response({
-                    "detail": "You do not have permission to perform this action."
-                }, status=status.HTTP_403_FORBIDDEN)
+            project = self.get_object()
+            data = request.data
+            attachment_obj = Attachment.objects.create(
+                content_object=project,
+                attachment=data['file'],
+                name=data['file'])
+            attachment_obj.size = attachment_obj.fileSize()
+            attachment_obj.save()
+            serializer = AttachmentSerializer(
+                attachment_obj, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=["delete"])
+    def delete_attachments(self, request, pk=None):
+        try:
+            return delete(self, request, Attachment, 'attachment')
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
