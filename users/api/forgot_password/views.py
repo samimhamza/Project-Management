@@ -1,11 +1,11 @@
-from rest_framework import generics
-from users.models import User, PasswordReset
 from .serializers import PasswordResetSerializer, PasswordResetUserSerializer
-from users.api.serializers import UserSerializer
-from rest_framework.response import Response
-import django.utils.timezone
 from django.core.mail import EmailMultiAlternatives
+from users.api.serializers import UserSerializer
 from django.template.loader import get_template
+from rest_framework.response import Response
+from users.models import User, PasswordReset
+from rest_framework import generics
+import django.utils.timezone
 import environ
 env = environ.Env()
 environ.Env.read_env()
