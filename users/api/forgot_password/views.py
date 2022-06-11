@@ -1,6 +1,7 @@
 from rest_framework import generics
 from users.models import User, PasswordReset
 from .serializers import PasswordResetSerializer, PasswordResetUserSerializer
+from users.api.serializers import UserSerializer
 from rest_framework.response import Response
 import django.utils.timezone
 from django.core.mail import EmailMultiAlternatives
@@ -51,3 +52,22 @@ class ForgotPasswordRetrieveAPIView(generics.RetrieveAPIView):
             return Response(serializer.data)
         else:
             return Response({"error": "Access expired please try again"}, status=403)
+
+
+class ChangePasswordAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        try:
+            user = User.objects.get(pk=data['id'])
+        except User.DoesNotExist:
+            return Response({"error": 'No such user with provided email!'}, status=404)
+        user.set_password(data["password"])
+        user.save()
+        passwrod_resets = PasswordReset.objects.filter(user=user)
+        passwrod_resets.delete()
+        return Response({'success': "Password Successfully changed!"}, status=201)
