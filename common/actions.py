@@ -7,6 +7,7 @@ from rest_framework import status
 from django.db import transaction
 from projects.models import Project
 from expenses.models import Expense
+from django.db.models import Q
 import datetime
 import os
 
@@ -158,3 +159,14 @@ def dataWithPermissions(self, field):
             action['actions'].append(subAction['sub_action'])
     data['permissions'] = actionSerializer.data
     return Response(data, status=status.HTTP_200_OK)
+
+
+def searchRecords(queryset, request, columns=[]):
+    # search for different columns in one function
+    # it's magic
+    if request.query_params.get('content'):
+        queries = Q()
+        for column in columns:
+            queries = queries | Q(
+                **{'%s__icontains' % column: request.query_params.get('content')})
+    return queryset.filter(queries)

@@ -1,4 +1,5 @@
-from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords, dataWithPermissions
+from common.actions import (withTrashed, trashList, restore, delete,
+                            allItems, filterRecords, dataWithPermissions, searchRecords)
 from users.api.serializers import UserSerializer, UserWithProfileSerializer
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
@@ -25,6 +26,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request)
+        columns = ['username', 'first_name',
+                   'last_name', 'email', 'phone', 'whatsapp']
+        queryset = searchRecords(queryset, request, columns)
         if request.GET.get("items_per_page") == "-1":
             return allItems(UserWithProfileSerializer, queryset)
 
