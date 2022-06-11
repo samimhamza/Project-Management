@@ -1,6 +1,6 @@
 from rest_framework import generics
 from users.models import User, PasswordReset
-from .serializers import PasswordResetSerializer
+from .serializers import PasswordResetSerializer, PasswordResetUserSerializer
 from rest_framework.response import Response
 import django.utils.timezone
 from django.core.mail import EmailMultiAlternatives
@@ -46,7 +46,8 @@ class ForgotPasswordRetrieveAPIView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         password_reset = self.get_object()
         diff = django.utils.timezone.now() - password_reset.created_at
-        if diff.total_seconds() < 300:
-            return Response({'success': ""})
+        if diff.total_seconds() < 1200:
+            serializer = PasswordResetUserSerializer(password_reset)
+            return Response(serializer.data)
         else:
-            return Response({"error": "Access expired please try again"})
+            return Response({"error": "Access expired please try again"}, status=403)
