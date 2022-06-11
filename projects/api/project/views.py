@@ -1,17 +1,18 @@
-from projects.api.project.serializers import ProjectSerializer
-from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords, countStatuses
+from common.actions import (restore, delete, withTrashed, trashList,
+                            allItems, filterRecords, countStatuses, searchRecords)
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
+from projects.api.project.serializers import ProjectSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
+from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
-from rest_framework import viewsets, status
 from projects.models import Project, Attachment
-from users.models import User, Team
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import viewsets, status
+from users.models import User, Team
 from tasks.models import Task
-from common.permissions import checkCustomPermissions
 
 
 def shareTo(request, project_data, new_project):
@@ -153,6 +154,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def users(self, request, pk=None):
         project = Project.objects.only('id').get(pk=pk)
         users = User.objects.filter(project_users=project)
+        if request.query_params.get('content'):
+            columns = ['first_name', 'last_name', 'email']
+            users = searchRecords(users, request, columns)
         page = self.paginate_queryset(users)
         serializer = UserWithProfileSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -209,7 +213,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = LessFieldsTeamSerializer(teams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["delete"])
     def delete_users(self, request, pk=None):
         try:
             project = self.get_object()
@@ -250,7 +254,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @ action(detail=True, methods=["post"])
+    @ action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
         try:
             project = self.get_object()
