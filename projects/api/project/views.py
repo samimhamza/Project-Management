@@ -157,6 +157,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.query_params.get('content'):
             columns = ['first_name', 'last_name', 'email']
             users = searchRecords(users, request, columns)
+            serializer = UserWithProfileSerializer(users, many=True)
+            return Response(serializer.data)
+
         page = self.paginate_queryset(users)
         serializer = UserWithProfileSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -180,6 +183,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def teams(self, request, pk=None):
         project = Project.objects.only('id').get(pk=pk)
         teams = Team.objects.filter(projects=project)
+        if request.query_params.get('content'):
+            columns = ['name']
+            teams = searchRecords(teams, request, columns)
+            serializer = LessFieldsTeamSerializer(teams, many=True)
+            return Response(serializer.data)
+
         page = self.paginate_queryset(teams)
         serializer = LessFieldsTeamSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
