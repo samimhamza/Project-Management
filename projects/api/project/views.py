@@ -1,4 +1,4 @@
-from projects.api.project.serializers import ProjectListSerializer, ProjectRetrieveSerializer
+from projects.api.project.serializers import ProjectSerializer
 from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords, countStatuses
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
@@ -35,12 +35,10 @@ def shareTo(request, project_data, new_project):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
-    serializer_class = ProjectListSerializer
+    serializer_class = ProjectSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
-    serializer_action_classes = {
-        "retrieve": ProjectRetrieveSerializer,
-    }
+    serializer_action_classes = {}
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
@@ -92,7 +90,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         )
         new_project = shareTo(request, project_data, new_project)
         new_project.save()
-        serializer = ProjectListSerializer(
+        serializer = ProjectSerializer(
             new_project, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -130,7 +128,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             project.teams.set(teams)
         project.updated_by = request.user
         project.save()
-        serializer = ProjectListSerializer(
+        serializer = ProjectSerializer(
             project, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
