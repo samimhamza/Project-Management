@@ -47,7 +47,7 @@ class ForgotPasswordRetrieveAPIView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         password_reset = self.get_object()
         diff = django.utils.timezone.now() - password_reset.created_at
-        if diff.total_seconds() < 1200:
+        if diff.total_seconds() < 300:
             serializer = PasswordResetUserSerializer(password_reset)
             return Response(serializer.data)
         else:
