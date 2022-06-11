@@ -169,4 +169,5 @@ def searchRecords(queryset, request, columns=[]):
         for column in columns:
             queries = queries | Q(
                 **{'%s__icontains' % column: request.query_params.get('content')})
-    return queryset.filter(queries)
+        queryset = queryset.filter(queries)
+    return queryset

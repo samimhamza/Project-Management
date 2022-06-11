@@ -1,5 +1,5 @@
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
-from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords
+from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords, searchRecords
 from users.api.serializers import UserWithProfileSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from rest_framework.response import Response
@@ -40,7 +40,9 @@ class TeamViewSet(viewsets.ModelViewSet):
             Team.objects.filter(
                 deleted_at__isnull=True).order_by("-created_at")
         )
+        columns = ['name']
         queryset = filterRecords(queryset, request)
+        queryset = searchRecords(queryset, request, columns)
         if request.GET.get("items_per_page") == "-1":
             return allItems(TeamNamesSerializer, queryset)
 
