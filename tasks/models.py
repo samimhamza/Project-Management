@@ -45,6 +45,7 @@ class Task(models.Model):
     p_end_date = models.DateField(blank=True, null=True)
     a_start_date = models.DateField(blank=True, null=True)
     a_end_date = models.DateField(blank=True, null=True)
+    pin = models.BooleanField(default=False)
 
     class Priority(models.TextChoices):
         critical = "critical"
