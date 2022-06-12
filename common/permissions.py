@@ -84,3 +84,9 @@ def addPermissionsToRole(permissions, role):
         for per in permissions_obj:
             permissions_list.append(per.id)
     role.permissions_roles.set(permissions_list)
+
+
+def checkCustomPermissions(request, value):
+    if request.user.is_authenticated:
+        return checkScope(request.user, value)
+    return False

@@ -1,15 +1,17 @@
-from projects.api.project.serializers import ProjectListSerializer, ProjectRetrieveSerializer
-from common.actions import restore, delete, withTrashed, trashList, allItems, filterRecords, countStatuses
+from common.actions import (restore, delete, withTrashed, trashList,
+                            allItems, filterRecords, countStatuses, searchRecords)
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
+from projects.api.project.serializers import ProjectSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
+from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
-from rest_framework import viewsets, status
 from projects.models import Project, Attachment
-from users.models import User, Team
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import viewsets, status
+from users.models import User, Team
 from tasks.models import Task
 
 
@@ -34,12 +36,10 @@ def shareTo(request, project_data, new_project):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
-    serializer_class = ProjectListSerializer
+    serializer_class = ProjectSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
-    serializer_action_classes = {
-        "retrieve": ProjectRetrieveSerializer,
-    }
+    serializer_action_classes = {}
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
@@ -59,6 +59,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         project = self.get_object()
         serializer = self.get_serializer(project)
+        data = serializer.data
         countables = [
             'pendingTasksTotal', 'status', 'pending',
             'inProgressTasksTotal', 'status', 'in_progress',
@@ -67,7 +68,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
             'failedTasksTotal', 'status', 'failed',
             'cancelledTasksTotal', 'status', 'cancelled'
         ]
-        data = serializer.data
+        # custom permission checking for project_attachments
+        attachments_permission = checkCustomPermissions(
+            request, "project_attachments_v")
+        if attachments_permission:
+            attachments = Attachment.objects.filter(object_id=project.id)
+            data['attachments'] = AttachmentSerializer(
+                attachments, many=True, context={"request": request}).data
+
         data['statusTotals'] = countStatuses(Task, countables, project.id)
         return Response(data)
 
@@ -83,7 +91,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         )
         new_project = shareTo(request, project_data, new_project)
         new_project.save()
-        serializer = ProjectListSerializer(
+        serializer = ProjectSerializer(
             new_project, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -121,7 +129,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             project.teams.set(teams)
         project.updated_by = request.user
         project.save()
-        serializer = ProjectListSerializer(
+        serializer = ProjectSerializer(
             project, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
@@ -146,6 +154,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def users(self, request, pk=None):
         project = Project.objects.only('id').get(pk=pk)
         users = User.objects.filter(project_users=project)
+        if request.query_params.get('content'):
+            columns = ['first_name', 'last_name', 'email']
+            users = searchRecords(users, request, columns)
+            serializer = UserWithProfileSerializer(users, many=True)
+            return Response(serializer.data)
+
         page = self.paginate_queryset(users)
         serializer = UserWithProfileSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -169,6 +183,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def teams(self, request, pk=None):
         project = Project.objects.only('id').get(pk=pk)
         teams = Team.objects.filter(projects=project)
+        if request.query_params.get('content'):
+            columns = ['name']
+            teams = searchRecords(teams, request, columns)
+            serializer = LessFieldsTeamSerializer(teams, many=True)
+            return Response(serializer.data)
+
         page = self.paginate_queryset(teams)
         serializer = LessFieldsTeamSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -202,7 +222,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = LessFieldsTeamSerializer(teams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["delete"])
     def delete_users(self, request, pk=None):
         try:
             project = self.get_object()
@@ -223,7 +243,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             attachment_obj = Attachment.objects.create(
                 content_object=project,
                 attachment=data['file'],
-                name=data['file'])
+                name=data['file'],
+                uploaded_by=request.user
+            )
             attachment_obj.size = attachment_obj.fileSize()
             attachment_obj.save()
             serializer = AttachmentSerializer(
@@ -234,7 +256,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @ action(detail=True, methods=["post"])
+    @action(detail=True, methods=["delete"])
+    def delete_attachments(self, request, pk=None):
+        try:
+            return delete(self, request, Attachment, 'attachment')
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @ action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
         try:
             project = self.get_object()

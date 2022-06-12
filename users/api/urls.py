@@ -1,4 +1,4 @@
-from users.api.forgot_password.views import ForgotPasswordCreateAPIView, ForgotPasswordRetrieveAPIView
+from users.api.forgot_password.views import ForgotPasswordCreateAPIView, ForgotPasswordRetrieveAPIView, ChangePasswordAPIView
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
 from users.api.teams.views import TeamViewSet
@@ -27,6 +27,8 @@ urlpatterns = [
          name='forgot_password'),
     path('forgot_password/<uuid:pk>/', ForgotPasswordRetrieveAPIView.as_view(),
          name='forgot_password'),
-    path('html/', views.index, name='html'),
+    path('change_password/', ChangePasswordAPIView.as_view(),
+         name='change_password'),
+    # path('html/', views.index, name='html'),
     re_path(r'', include((router.urls))),
 ]

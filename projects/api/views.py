@@ -9,7 +9,6 @@ from projects.models import (
     FocalPoint,
     Income,
     Payment,
-    Attachment,
     State,
     Project
 )
@@ -19,7 +18,6 @@ from projects.api.serializers import (
     LocationSerializer,
     IncomeSerializer,
     PaymentSerializer,
-    AttachmentSerializer,
     CountryListSerializer,
     StateListSerializer,
     StateSerializer
@@ -55,14 +53,6 @@ class StateListAPIView(generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
-
-
-class AttachmentViewSet(viewsets.ModelViewSet):
-    queryset = Attachment.objects.all()
-    serializer_class = AttachmentSerializer
-
-    def destroy(self, request, pk=None):
-        return delete(self, request, Attachment, 'attachment')
 
 
 class LocationCreateAPIView(generics.CreateAPIView):

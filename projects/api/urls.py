@@ -4,7 +4,6 @@ from projects.api.views import (
     IncomeViewSet,
     PaymentViewSet,
     FocalPointViewSet,
-    AttachmentViewSet,
     LocationCreateAPIView,
     CountryListAPIView,
     StateListAPIView
@@ -16,7 +15,6 @@ router.register(r"projects", ProjectViewSet, basename="projects")
 router.register(r"payments", PaymentViewSet, basename="payments")
 router.register(r"focal_points", FocalPointViewSet, basename="focal_points")
 router.register(r"incomes", IncomeViewSet, basename="incomes")
-router.register(r"attachments", AttachmentViewSet, basename="attachments")
 
 urlpatterns = [
     path('locations/', LocationCreateAPIView.as_view(), name='locations'),

@@ -1,5 +1,6 @@
-from common.actions import withTrashed, trashList, restore, delete, allItems, filterRecords, dataWithPermissions
-from users.api.serializers import UserSerializer, UserWithProfileSerializer
+from common.actions import (withTrashed, trashList, restore, delete,
+                            allItems, filterRecords, dataWithPermissions, searchRecords)
+from users.api.serializers import UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
 from common.custom import CustomPageNumberPagination
@@ -7,7 +8,7 @@ from common.base64_image import convertBase64ToImage
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from users.models import User
+from users.models import User, UserPermissionList
 import os
 
 
@@ -25,6 +26,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request)
+        columns = ['username', 'first_name',
+                   'last_name', 'email', 'phone', 'whatsapp']
+        queryset = searchRecords(queryset, request, columns)
         if request.GET.get("items_per_page") == "-1":
             return allItems(UserWithProfileSerializer, queryset)
 
@@ -81,6 +85,14 @@ class UserViewSet(viewsets.ModelViewSet):
         addRolesToUser(request.data.get("roles"), user)
         user.save()
         serializer = UserSerializer(user, context={"request": request})
+        if user == request.user:
+            try:
+                permissions = UserPermissionList.objects.get(user=user)
+                serializer.data['permissions'] = UserPermissionListSerializer(
+                    permissions).data['permissions_list']
+
+            except UserPermissionList.DoesNotExist:
+                serializer.data['permissions'] = []
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def retrieve(self, request, pk=None):

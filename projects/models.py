@@ -10,6 +10,14 @@ class Attachment(models.Model):
     name = models.CharField(max_length=64)
     attachment = models.FileField(upload_to="attachments")
     size = models.CharField(max_length=128, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    uploaded_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="attachment_uploaded_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
