@@ -9,6 +9,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         info = open('json/actions.json')
         actions = json.loads(info.read())
+        Action.objects.all().delete()
+        SubAction.objects.all().delete()
+        Permission.objects.all().delete()
         for action in actions:
             action_obj, created = Action.objects.get_or_create(
                 name=action['fields']['name'])
