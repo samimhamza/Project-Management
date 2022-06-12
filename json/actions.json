@@ -101,7 +101,6 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" },
 			{ "code": "do", "name": "Download" }
 		]
 	},
