@@ -99,7 +99,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = self.get_object()
         if request.data.get("name"):
             project.name = request.data.get("name")
-        if request.data.get("description"):
+        if request.data.get("description") is not None:
             project.description = request.data.get("description")
         if request.data.get("p_start_date"):
             project.p_start_date = request.data.get("p_start_date")
@@ -115,9 +115,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             project.progress = request.data.get("progress")
         if request.data.get("priority"):
             project.priority = request.data.get("priority")
-        if request.data.get("company_name"):
+        if request.data.get("company_name") is not None:
             project.company_name = request.data.get("company_name")
-        if request.data.get("company_email"):
+        if request.data.get("company_email") is not None:
             project.company_email = request.data.get("company_email")
         if request.data.get("users"):
             users = User.objects.only('id').filter(
