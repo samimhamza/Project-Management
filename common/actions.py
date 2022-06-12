@@ -8,6 +8,7 @@ from django.db import transaction
 from projects.models import Project
 from expenses.models import Expense
 from django.db.models import Q
+from django.utils import timezone
 import datetime
 import os
 
@@ -82,7 +83,7 @@ def delete(self, request, table, imageField=None):
                 if item.deleted_at:
                     item.delete()
                 else:
-                    item.deleted_at = datetime.datetime.now()
+                    item.deleted_at = datetime.datetime.now(tz=timezone.utc)
                     item.save()
             else:
                 if imageField:
@@ -92,16 +93,16 @@ def delete(self, request, table, imageField=None):
 
     else:
         item = self.get_object()
-        if getattr(item, 'deleted_at', False):
+        if getattr(table, 'deleted_at', False):
             if item.deleted_at:
                 item.delete()
             else:
-                item.deleted_at = datetime.datetime.now()
+                item.deleted_at = datetime.datetime.now(tz=timezone.utc)
                 item.save()
         else:
             if imageField:
-                if os.path.isfile('media/'+str(getattr(item, imageField))):
-                    os.remove('media/'+str(getattr(item, imageField)))
+                if os.path.isfile('media/'+str(getattr(table, imageField))):
+                    os.remove('media/'+str(getattr(table, imageField)))
             item.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
