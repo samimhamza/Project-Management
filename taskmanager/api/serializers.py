@@ -46,7 +46,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         data = super().validate(attrs)
         auth_user = User.objects.filter(pk=self.user.id).first()
-        data['user'] = AuthUserSerializer(auth_user).data
+        data['user'] = AuthUserSerializer(
+            auth_user).data
         try:
             permissions = UserPermissionList.objects.get(user=auth_user)
             data['permissions'] = UserPermissionListSerializer(

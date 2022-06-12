@@ -1,5 +1,5 @@
+from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
-from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer
 from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes
 from common.comments import listComments, createComments, updateComments
@@ -16,6 +16,9 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (TaskPermissions,)
+    serializer_action_classes = {
+        "retrieve": TaskListSerializer
+    }
     queryset_actions = {
         "destroy": Task.objects.all(),
     }
@@ -91,6 +94,12 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Task)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

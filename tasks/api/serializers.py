@@ -53,10 +53,82 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
 
-class TaskNameSerializer(serializers.ModelSerializer):
+class SubTaskSerializer(serializers.ModelSerializer):
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, user):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, users=user)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
     class Meta:
         model = Task
-        fields = ["id", "name"]
+        fields = [
+            "id",
+            "name",
+            "description",
+            "p_start_date",
+            "p_end_date",
+            "a_start_date",
+            "a_end_date",
+            "priority",
+            "status",
+            "type",
+            "users",
+            "deleted_at"
+        ]
+
+
+class TaskListSerializer(serializers.ModelSerializer):
+    users = serializers.SerializerMethodField()
+    parent = LessFieldsTaskSerializer()
+    sub_tasks = serializers.SerializerMethodField()
+    dependencies = serializers.SerializerMethodField()
+
+    def get_users(self, user):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, users=user)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
+    def get_sub_tasks(self, task):
+        qs = Task.objects.filter(
+            deleted_at__isnull=True, parent=task)
+        serializer = SubTaskSerializer(
+            instance=qs, many=True, read_only=True)
+        return serializer.data
+
+    def get_dependencies(self, task):
+        if task.dependencies:
+            qs = Task.objects.filter(
+                deleted_at__isnull=True, pk__in=task.dependencies)
+            serializer = SubTaskSerializer(
+                instance=qs, many=True, read_only=True)
+            return serializer.data
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "name",
+            "description",
+            "p_start_date",
+            "p_end_date",
+            "a_start_date",
+            "a_end_date",
+            "parent",
+            "priority",
+            "status",
+            "type",
+            "dependencies",
+            "sub_tasks",
+            "users",
+            "deleted_at",
+            "project"
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
