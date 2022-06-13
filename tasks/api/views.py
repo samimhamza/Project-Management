@@ -58,7 +58,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
         if request.data.get("name"):
             task.name = request.data.get("name")
-        if request.data.get("description"):
+        if request.data.get("description") is not None:
             task.description = request.data.get("description")
         if request.data.get("p_start_date"):
             task.p_start_date = request.data.get("p_start_date")
@@ -70,7 +70,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.a_end_date = request.data.get("a_end_date")
         if request.data.get("status"):
             task.status = request.data.get("status")
-        if request.data.get("progress"):
+        if request.data.get("progress") is not None:
             task.progress = request.data.get("progress")
         if request.data.get("priority"):
             task.priority = request.data.get("priority")
