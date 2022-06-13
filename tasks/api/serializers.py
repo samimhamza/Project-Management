@@ -4,12 +4,15 @@ from tasks.models import Task, UserTask, Comment
 from users.api.serializers import UserWithProfileSerializer
 from users.models import User
 from projects.api.serializers import AttachmentSerializer
+from tasks.models import UserTask
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
+    user = UserWithProfileSerializer()
+
     class Meta:
         model = UserTask
-        fields = "__all__"
+        fields = ["id", "description", "progress", "type", "user"]
 
 
 class LessFieldsTaskSerializer(serializers.ModelSerializer):
@@ -60,7 +63,7 @@ class SubTaskSerializer(serializers.ModelSerializer):
         qs = User.objects.filter(
             deleted_at__isnull=True, users=user)
         serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True)
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
         return serializer.data
 
     class Meta:
@@ -87,18 +90,19 @@ class TaskListSerializer(serializers.ModelSerializer):
     sub_tasks = serializers.SerializerMethodField()
     dependencies = serializers.SerializerMethodField()
 
-    def get_users(self, user):
-        qs = User.objects.filter(
-            deleted_at__isnull=True, users=user)
-        serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True)
+    def get_users(self, task):
+        qs = UserTask.objects.filter(task=task)
+        # qs = User.objects.filter(
+        #     deleted_at__isnull=True, users=user)
+        serializer = UserTaskSerializer(
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
         return serializer.data
 
     def get_sub_tasks(self, task):
         qs = Task.objects.filter(
             deleted_at__isnull=True, parent=task)
         serializer = SubTaskSerializer(
-            instance=qs, many=True, read_only=True)
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
         return serializer.data
 
     def get_dependencies(self, task):
@@ -106,7 +110,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             qs = Task.objects.filter(
                 deleted_at__isnull=True, pk__in=task.dependencies)
             serializer = SubTaskSerializer(
-                instance=qs, many=True, read_only=True)
+                instance=qs, many=True, read_only=True, context={"request": self.context['request']})
             return serializer.data
 
     class Meta:

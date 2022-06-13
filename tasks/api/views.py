@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
+from common.pusher import pusher_client
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -32,8 +33,15 @@ class TaskViewSet(viewsets.ModelViewSet):
             return allItems(LessFieldsTaskSerializer, queryset)
 
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = self.get_serializer(
+            page, many=True, context={"request": request})
         return tasksResponse(self, serializer)
+
+    def retrieve(self, request, pk=None):
+        task = self.get_object()
+        serializer = self.get_serializer(
+            task, context={"request": request})
+        return Response(serializer.data)
 
     def create(self, request):
         [name, parent, project, start_date, end_date, description,

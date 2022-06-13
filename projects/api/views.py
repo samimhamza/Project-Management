@@ -24,7 +24,6 @@ from projects.api.serializers import (
 
 )
 from rest_framework import generics
-import pusher
 
 
 class CountryListAPIView(generics.ListAPIView):
