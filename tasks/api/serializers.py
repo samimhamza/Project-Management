@@ -92,10 +92,12 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     def get_users(self, task):
         qs = UserTask.objects.filter(task=task)
-        # qs = User.objects.filter(
-        #     deleted_at__isnull=True, users=user)
         serializer = UserTaskSerializer(
             instance=qs, many=True, read_only=True, context={"request": self.context['request']})
+        for data in serializer.data:
+            user = data['user']
+            del data['user']
+            data.update(user)
         return serializer.data
 
     def get_sub_tasks(self, task):
