@@ -12,7 +12,7 @@ class UserTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserTask
-        fields = ["id", "description", "progress", "type", "user"]
+        fields = ["description", "progress", "type", "user"]
 
 
 class LessFieldsTaskSerializer(serializers.ModelSerializer):
