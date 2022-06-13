@@ -16,20 +16,14 @@ from tasks.models import Task
 
 
 def shareTo(request, project_data, new_project):
-    if request.data.get("share"):
-        if project_data["share"] != "justMe":
-            users = User.objects.filter(pk__in=project_data["users"])
-            new_project.users.set(users)
-            teams = Team.objects.filter(pk__in=project_data["teams"])
-            new_project.teams.set(teams)
-        if project_data["share"] == "everyone":
-            users = User.objects.all()
-            new_project.users.set(users)
-    else:
+    if project_data["share"] != "justMe":
         users = User.objects.filter(pk__in=project_data["users"])
         new_project.users.set(users)
         teams = Team.objects.filter(pk__in=project_data["teams"])
         new_project.teams.set(teams)
+    if project_data["share"] == "everyone":
+        users = User.objects.all()
+        new_project.users.set(users)
     return new_project
 
 
