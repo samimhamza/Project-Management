@@ -44,9 +44,9 @@ class ProjectCommentPermissions(CustomPermissions):
         'list': 'project_comments_v',
         'create': 'project_comments_c',
         'retrieve': "project_comments_v",
-        'update': 'project_comments_u',
-        'partial_update': 'project_comments_u',
-        'destroy': 'project_comments_d'
+        'update': 'project_comments_c',
+        'partial_update': 'project_comments_c',
+        'destroy': 'project_comments_c'
     }
 
 
@@ -55,9 +55,9 @@ class TaskCommentPermissions(CustomPermissions):
         'list': 'task_comments_v',
         'create': 'task_comments_c',
         'retrieve': "task_comments_v",
-        'update': 'task_comments_u',
-        'partial_update': 'task_comments_u',
-        'destroy': 'task_comments_d'
+        'update': 'task_comments_c',
+        'partial_update': 'task_comments_c',
+        'destroy': 'task_comments_c'
     }
 
 

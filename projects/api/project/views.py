@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from users.models import User, Team
 from tasks.models import Task
+from common.pusher import pusher_client
 
 
 def shareTo(request, project_data, new_project):
@@ -24,6 +25,8 @@ def shareTo(request, project_data, new_project):
     if project_data["share"] == "everyone":
         users = User.objects.all()
         new_project.users.set(users)
+    pusher_client.trigger(u'share_to', u'notification', {
+                          'success': 'shared Successfully'})
     return new_project
 
 
