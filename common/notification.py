@@ -5,7 +5,7 @@ from users.api.serializers import UserNotificationSerializer
 
 def prepareData(user, data):
     pusher_client.trigger(
-        u'notifications.'+str(user.id), u'share', {
+        u'notifications.'+str(user.id), u'share',   {
             'sender': data['sender'],
             'receiver': data['receiver'],
             'notification': data['notification'],
