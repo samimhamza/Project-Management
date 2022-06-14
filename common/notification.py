@@ -1,6 +1,7 @@
 from common.pusher import pusher_client
 from users.models import User, Notification, UserNotification
 from users.api.serializers import UserNotificationSerializer
+import json
 
 
 def prepareData(user, data):
