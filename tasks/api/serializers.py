@@ -52,7 +52,8 @@ class TaskSerializer(serializers.ModelSerializer):
             "dependencies",
             "users",
             "deleted_at",
-            "project"
+            "project",
+            "pin"
         ]
 
 
