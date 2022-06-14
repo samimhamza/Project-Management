@@ -1,11 +1,12 @@
 from common.pusher import pusher_client
 from users.models import User, Notification, UserNotification
 from users.api.serializers import UserNotificationSerializer
+import json
 
 
 def prepareData(user, data):
     pusher_client.trigger(
-        u'notifications.'+str(user.id), u'share',   {
+        u'notifications.'+str(user.id), u'share', {
             'sender': data['sender'],
             'receiver': data['receiver'],
             'notification': data['notification'],
