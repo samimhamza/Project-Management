@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.dispatch import receiver
 
 
 class User(AbstractUser):
@@ -105,6 +106,29 @@ class Notification(models.Model):
 
     type = models.CharField(
         max_length=24, choices=Types.choices, default="notify")
+    users = models.ManyToManyField(
+        User, through="UserNotification", related_name="user_notifications", through_fields=('notification', 'receiver'))
+
+
+class UserNotification(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    seen = models.BooleanField(default=False)
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="sender",
+    )
+    receiver = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="receiver",
+    )
+    notification = models.ForeignKey(
+        Notification, on_delete=models.CASCADE, related_name="notification")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Role(models.Model):

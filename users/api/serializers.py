@@ -1,5 +1,5 @@
 from users.models import (User,  Reminder, Holiday, Notification,
-                          TeamUser, Action, SubAction, Permission, UserPermissionList, Role)
+                          TeamUser, Action, SubAction, Permission, UserPermissionList, Role, UserNotification)
 
 from rest_framework import serializers
 
@@ -81,7 +81,39 @@ class HolidaySerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = "__all__"
+        fields = ["id", "title", "description", "icon", "type"]
+
+
+class UserNotificationSerializer(serializers.ModelSerializer):
+    sender = UserWithProfileSerializer()
+    receiver = UserWithProfileSerializer()
+    notification = NotificationSerializer()
+    # receiver = serializers.SerializerMethodField()
+    # sender = serializers.SerializerMethodField()
+    # notification = serializers.SerializerMethodField()
+
+    # def get_receiver(self, user):
+    #     qs = User.objects.get(receiver=user)
+    #     serializer = UserWithProfileSerializer(
+    #         instance=qs)
+    #     return serializer.data
+
+    # def get_notification(self, notification):
+    #     qs = Notification.objects.get(notification=notification)
+    #     serializer = NotificationSerializer(
+    #         instance=qs, read_only=True)
+    #     return serializer.data
+
+    # def get_sender(self, user):
+    #     qs = User.objects.get(sender=user)
+    #     serializer = UserWithProfileSerializer(
+    #         instance=qs)
+    #     return serializer.data
+
+    class Meta:
+        model = UserNotification
+        fields = ["sender", "receiver",
+                  "notification", "seen", "created_at"]
 
 
 class ActionSerializer(serializers.ModelSerializer):

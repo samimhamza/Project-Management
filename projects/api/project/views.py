@@ -13,20 +13,19 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from users.models import User, Team
 from tasks.models import Task
-from common.pusher import pusher_client
+from common.notification import sendNotification
 
 
 def shareTo(request, project_data, new_project):
     if project_data["share"] != "justMe":
-        users = User.objects.filter(pk__in=project_data["users"])
+        users = User.objects.only('id').filter(pk__in=project_data["users"])
         new_project.users.set(users)
-        teams = Team.objects.filter(pk__in=project_data["teams"])
+        teams = Team.objects.only('id').filter(pk__in=project_data["teams"])
         new_project.teams.set(teams)
     if project_data["share"] == "everyone":
         users = User.objects.all()
         new_project.users.set(users)
-    pusher_client.trigger(u'share_to', u'notification', {
-                          'success': 'shared Successfully'})
+    sendNotification(request, users, project_data)
     return new_project
 
 
