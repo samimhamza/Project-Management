@@ -84,6 +84,8 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.progress = request.data.get("progress")
         if request.data.get("priority"):
             task.priority = request.data.get("priority")
+        if request.data.get("pin"):
+            task.pin = request.data.get("pin")
         if request.data.get("dependencies"):
             if task.dependencies is not None:
                 task.dependencies = task.dependencies + \

@@ -15,6 +15,13 @@ def commentsOfTable(self, request, id):
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
 
+def latestcommentsOfTable(self, request, id):
+    queryset = Comment.objects.filter(
+        object_id=id).order_by("-created_at")
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
+
 
 def checkCommnetable(request):
     if request.data.get("task_id"):
@@ -29,6 +36,8 @@ def listComments(self, request):
     queryset = filterRecords(queryset, request)
     if request.GET.get("id"):
         id = request.GET.get("id")
+        if request.GET.get("latest"):
+            return latestcommentsOfTable(self, request, id)
         return commentsOfTable(self, request, id)
     return Response([])
 
