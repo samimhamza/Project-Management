@@ -4,6 +4,7 @@ from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes,
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments)
 from common.comments import listComments, createComments, updateComments
+from projects.api.serializers import AttachmentSerializer
 from common.custom import CustomPageNumberPagination
 from common.permissions import checkCustomPermissions
 from rest_framework.response import Response
@@ -11,7 +12,6 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
 from projects.models import Attachment
-from projects.api.serializers import AttachmentSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):

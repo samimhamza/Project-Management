@@ -1,5 +1,5 @@
 from common.permissions_scopes import HolidayPermissions, ReminderPermissions, RolePermissions
-from users.models import Reminder, Holiday, Notification, Action, Permission, Role, UserNotification
+from users.models import Reminder, Holiday, Action, Permission, Role, UserNotification
 from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -8,13 +8,13 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from users.api.serializers import (
-    NotificationSerializer,
     ReminderSerializer,
     HolidaySerializer,
     ActionSerializer,
     PermissionActionSerializer,
     RoleSerializer,
-    RoleListSerializer
+    RoleListSerializer,
+    UserNotificationSerializer
 )
 from rest_framework import generics
 
@@ -45,17 +45,17 @@ class PermmissionListAPIView(generics.ListAPIView):
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
-    queryset = Notification.objects.all()
-    serializer_class = NotificationSerializer
+    queryset = UserNotification.objects.all()
+    serializer_class = UserNotificationSerializer
     pagination_class = CustomPageNumberPagination
 
     def list(self, request):
-        queryset = self.get_queryset().filter(users=request.user)
+        queryset = self.get_queryset().filter(receiver=request.user)
         page = self.paginate_queryset(queryset)
         serializer = self.serializer_class(page, many=True)
-        userNotification = UserNotification.objects
-        for data in serializer.data:
-            data
+        # for data in serializer.data:
+        #     data['notification'] =
+
         return self.get_paginated_response(serializer.data)
 
 
