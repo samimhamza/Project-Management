@@ -1,7 +1,7 @@
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
-from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes
+from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes, excludedDependencies
 from common.comments import listComments, createComments, updateComments
 from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
@@ -30,6 +30,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         if request.GET.get("project_id"):
             return tasksOfProject(self, request)
         if request.GET.get("items_per_page") == "-1":
+            if request.GET.get("excluded_dependencies"):
+                return excludedDependencies(LessFieldsTaskSerializer, queryset, request)
             return allItems(LessFieldsTaskSerializer, queryset)
 
         page = self.paginate_queryset(queryset)

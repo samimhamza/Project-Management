@@ -72,3 +72,10 @@ def checkAttributes(request):
     else:
         task_status = "pending"
     return [data['name'], parent, project, start_date, end_date, description, priority, task_status, creator]
+
+
+def excludedDependencies(serializerName, queryset, request):
+    task = Task.objects.get(pk=request.GET.get("excluded_dependencies"))
+    queryset = queryset.exclude(pk=task.id).exclude(pk__in=task.dependencies)
+    serializer = serializerName(queryset, many=True)
+    return Response(serializer.data, status=200)
