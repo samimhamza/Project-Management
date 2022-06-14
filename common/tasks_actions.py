@@ -76,6 +76,8 @@ def checkAttributes(request):
 
 def excludedDependencies(serializerName, queryset, request):
     task = Task.objects.get(pk=request.GET.get("excluded_dependencies"))
-    queryset = queryset.exclude(pk=task.id).exclude(pk__in=task.dependencies)
+    queryset = queryset.exclude(pk=task.id)
+    if task.dependencies:
+        queryset = queryset.exclude(pk__in=task.dependencies)
     serializer = serializerName(queryset, many=True)
     return Response(serializer.data, status=200)
