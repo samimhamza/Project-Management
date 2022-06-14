@@ -1,7 +1,8 @@
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
-from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords
 from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes, excludedDependencies
+from common.actions import (withTrashed, trashList, delete, restore,
+                            allItems, filterRecords, addAttachment, deleteAttachments)
 from common.comments import listComments, createComments, updateComments
 from common.custom import CustomPageNumberPagination
 from common.permissions import checkCustomPermissions
@@ -131,6 +132,14 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Task)
+
+    @action(detail=True, methods=["post"])
+    def add_attachments(self, request, pk=None):
+        return addAttachment(self, request)
+
+    @action(detail=True, methods=["delete"])
+    def delete_attachments(self, request, pk=None):
+        return deleteAttachments(self, request)
 
     def get_serializer_class(self):
         try:

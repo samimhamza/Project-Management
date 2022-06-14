@@ -1,5 +1,5 @@
 from common.actions import (restore, delete, withTrashed, trashList,
-                            allItems, filterRecords, countStatuses, searchRecords)
+                            allItems, filterRecords, countStatuses, searchRecords, addAttachment, deleteAttachments)
 from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.project.serializers import ProjectSerializer
@@ -233,33 +233,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
-        try:
-            project = self.get_object()
-            data = request.data
-            attachment_obj = Attachment.objects.create(
-                content_object=project,
-                attachment=data['file'],
-                name=data['file'],
-                uploaded_by=request.user
-            )
-            attachment_obj.size = attachment_obj.fileSize()
-            attachment_obj.save()
-            serializer = AttachmentSerializer(
-                attachment_obj, context={"request": request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return addAttachment(self, request)
 
     @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
-        try:
-            return delete(self, request, Attachment, 'attachment')
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return deleteAttachments(self, request)
 
     @ action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):

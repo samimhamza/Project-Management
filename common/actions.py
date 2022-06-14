@@ -1,11 +1,12 @@
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from expenses.api.serializers import LessFieldExpenseSerializer
+from projects.api.serializers import AttachmentSerializer
 from .team_actions import get_leader_by_id, get_total_users
 from users.models import Team, Permission, Action, Role
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from projects.models import Project
+from projects.models import Project, Attachment
 from expenses.models import Expense
 from django.db.models import Q
 from django.utils import timezone
@@ -171,3 +172,33 @@ def searchRecords(queryset, request, columns=[]):
                 **{'%s__icontains' % column: request.query_params.get('content')})
         queryset = queryset.filter(queries)
     return queryset
+
+
+def addAttachment(self, request):
+    try:
+        item = self.get_object()
+        data = request.data
+        attachment_obj = Attachment.objects.create(
+            content_object=item,
+            attachment=data['file'],
+            name=data['file'],
+            uploaded_by=request.user
+        )
+        attachment_obj.size = attachment_obj.fileSize()
+        attachment_obj.save()
+        serializer = AttachmentSerializer(
+            attachment_obj, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except:
+        return Response(
+            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+def deleteAttachments(self, request):
+    try:
+        return delete(self, request, Attachment, 'attachment')
+    except:
+        return Response(
+            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )
