@@ -20,14 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanySelect.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/api/project/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/projects/api/project/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taskmanager/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/AttachmentList.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/AttachmentList.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanyField.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/CompanyField.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/ProjectMainView.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/ProjectMainView.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/Nav.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/Nav.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskDependence.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskDependence.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +35,14 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../project_management_froentend" />
   </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="75199aad-3740-4907-94a1-5d395995fbc7" />
+        <option name="url" value="https://github.com/Asadullahmoradi/project_management_froentend.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -50,25 +53,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/project&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/project/tasks",
+    "nodejs_package_manager_path": "yarn",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\store" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\customComponents" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\focalPoint" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
@@ -124,7 +128,16 @@
       <workItem from="1654592741024" duration="11948000" />
       <workItem from="1654659508622" duration="15560000" />
       <workItem from="1654745631937" duration="23766000" />
-      <workItem from="1654773661003" duration="2047000" />
+      <workItem from="1654773661003" duration="4187000" />
+      <workItem from="1654918471563" duration="15547000" />
+      <workItem from="1654938434055" duration="10374000" />
+      <workItem from="1655004938418" duration="13516000" />
+      <workItem from="1655022943376" duration="10917000" />
+      <workItem from="1655091147448" duration="6113000" />
+      <workItem from="1655098295463" duration="3932000" />
+      <workItem from="1655102576700" duration="4401000" />
+      <workItem from="1655111044380" duration="10712000" />
+      <workItem from="1655177985138" duration="6228000" />
     </task>
     <servers />
   </component>
