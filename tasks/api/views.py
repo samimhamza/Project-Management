@@ -101,6 +101,13 @@ class TaskViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Task)
 
+    @action(detail=True, methods=["delete"])
+    def delete(self, request, pk=None):
+        task = self.get_object()
+        task.dependencies.remove(request.data.get('id'))
+        task.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Task, order_by="-created_at")
