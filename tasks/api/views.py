@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
-from common.pusher import pusher_client
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -18,7 +17,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     permission_classes = (TaskPermissions,)
     serializer_action_classes = {
-        "retrieve": TaskListSerializer
+        "retrieve": TaskListSerializer,
+        "update": TaskListSerializer
     }
     queryset_actions = {
         "destroy": Task.objects.all(),
@@ -82,9 +82,16 @@ class TaskViewSet(viewsets.ModelViewSet):
             task.progress = request.data.get("progress")
         if request.data.get("priority"):
             task.priority = request.data.get("priority")
+        if request.data.get("dependencies"):
+            if task.dependencies is not None:
+                task.dependencies = task.dependencies + \
+                    list(set(request.data.get("dependencies")) -
+                         set(task.dependencies))
+            else:
+                task.dependencies = request.data.get("dependencies")
         task.updated_by = request.user
         task.save()
-        serializer = TaskSerializer(task)
+        serializer = self.get_serializer(task)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
