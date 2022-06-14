@@ -1,5 +1,5 @@
 from common.permissions_scopes import HolidayPermissions, ReminderPermissions, RolePermissions
-from users.models import Reminder, Holiday, Notification, Action, Permission, Role
+from users.models import Reminder, Holiday, Notification, Action, Permission, Role, UserNotification
 from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -48,6 +48,15 @@ class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset().filter(users=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = self.serializer_class(page, many=True)
+        userNotification = UserNotification.objects
+        for data in serializer.data:
+            data
+        return self.get_paginated_response(serializer.data)
 
 
 class ReminderViewSet(viewsets.ModelViewSet):

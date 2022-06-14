@@ -25,7 +25,7 @@ def shareTo(request, project_data, new_project):
     if project_data["share"] == "everyone":
         users = User.objects.all()
         new_project.users.set(users)
-    sendNotification(request, users, project_data)
+    sendNotification(request, users, project_data, new_project)
     return new_project
 
 

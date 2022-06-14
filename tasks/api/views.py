@@ -4,10 +4,13 @@ from common.actions import withTrashed, trashList, delete, restore, allItems, fi
 from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes, excludedDependencies
 from common.comments import listComments, createComments, updateComments
 from common.custom import CustomPageNumberPagination
+from common.permissions import checkCustomPermissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
+from projects.models import Attachment
+from projects.api.serializers import AttachmentSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -43,7 +46,15 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
         serializer = self.get_serializer(
             task, context={"request": request})
-        return Response(serializer.data)
+        data = serializer.data
+        # custom permission checking for task_attachments
+        attachments_permission = checkCustomPermissions(
+            request, "task_attachments_v")
+        if attachments_permission:
+            attachments = Attachment.objects.filter(object_id=task.id)
+            data['attachments'] = AttachmentSerializer(
+                attachments, many=True, context={"request": request}).data
+        return Response(data)
 
     def create(self, request):
         [name, parent, project, start_date, end_date, description,
