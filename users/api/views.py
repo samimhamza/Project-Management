@@ -14,7 +14,6 @@ from users.api.serializers import (
     PermissionActionSerializer,
     RoleSerializer,
     RoleListSerializer,
-    UserNotificationSerializer,
     UserNotificationListSerializer
 )
 from rest_framework import generics
