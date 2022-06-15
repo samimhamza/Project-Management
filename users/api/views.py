@@ -14,7 +14,7 @@ from users.api.serializers import (
     PermissionActionSerializer,
     RoleSerializer,
     RoleListSerializer,
-    UserNotificationListSerializer
+    UserNotificationSerializer
 )
 from rest_framework import generics
 
@@ -46,7 +46,7 @@ class PermmissionListAPIView(generics.ListAPIView):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = UserNotification.objects.all()
-    serializer_class = UserNotificationListSerializer
+    serializer_class = UserNotificationSerializer
     pagination_class = CustomPageNumberPagination
 
     def list(self, request):

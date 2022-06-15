@@ -96,14 +96,6 @@ class UserNotificationSerializer(serializers.ModelSerializer):
                   "notification", "seen", "description", "created_at", "model_name", "instance_id"]
 
 
-class UserNotificationListSerializer(serializers.ModelSerializer):
-    notification = NotificationSerializer()
-
-    class Meta:
-        model = UserNotification
-        fields = ["id", "notification", "seen", "description", "created_at"]
-
-
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
