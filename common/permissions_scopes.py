@@ -12,7 +12,8 @@ class TaskPermissions(CustomPermissions):
         'restore': 'tasks_d',
         'trashed': 'tasks_d',
         'all': 'tasks_v',
-        'delete': 'tasks_u'
+        'delete': 'tasks_u',
+        'excluded_users': 'users_v'
     }
 
 

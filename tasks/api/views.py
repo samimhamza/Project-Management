@@ -12,6 +12,8 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
 from projects.models import Attachment
+from users.models import User
+from users.api.serializers import UserWithProfileSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -112,6 +114,14 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         return delete(self, request, Task)
+
+    @action(detail=True, methods=["get"])
+    def excluded_users(self, request, pk=None):
+        task = self.get_object()
+        users = User.objects.filter(
+            project_users=task.project).exclude(users=task)
+        serializer = UserWithProfileSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
