@@ -4,16 +4,20 @@ from users.api.serializers import UserNotificationSerializer
 
 
 def prepareData(user, data):
+    returnObj = {
+        'id': data['id'],
+        'seen': data['seen'],
+        'notification': data['notification'],
+        'created_at': data['created_at'],
+    }
+    if data['description'] is not None:
+        returnObj['description'] = data['description']
+    if data['instance_id'] is not None:
+        returnObj['instance_id'] = data['instance_id']
+    if data['model_name'] is not None:
+        returnObj['model_name'] = data['model_name']
     pusher_client.trigger(
-        u'notifications.'+str(user.id), u'share', {
-            'id': data['id'],
-            'seen': data['seen'],
-            'notification': data['notification'],
-            'description': data['description'],
-            'created_at': data['created_at'],
-            'instance_id': data['instance_id'],
-            'model_name': data['model_name'],
-        })
+        u'notifications.'+str(user.id), u'share', returnObj)
 
 
 def userNotifications(request, user, notification, data):
