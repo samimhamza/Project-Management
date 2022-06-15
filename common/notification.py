@@ -27,7 +27,7 @@ def userNotifications(request, user, notification, data):
             userNotification.description = data['description']
         if 'model_name' in data.keys():
             userNotification.model_name = data['model_name']
-        if 'intance_id' in data.keys():
+        if 'instance_id' in data.keys():
             userNotification.instance_id = data['instance_id']
         userNotification.save()
         serializer = UserNotificationSerializer(userNotification)
