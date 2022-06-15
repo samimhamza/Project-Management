@@ -13,7 +13,7 @@ class TaskPermissions(CustomPermissions):
         'trashed': 'tasks_d',
         'all': 'tasks_v',
         'delete': 'tasks_u',
-        'excluded_users': 'users_v'
+        'excluded_users': 'tasks_u'
     }
 
 
