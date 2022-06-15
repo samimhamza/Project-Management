@@ -7,6 +7,17 @@ from projects.api.serializers import AttachmentSerializer
 from tasks.models import UserTask
 
 
+def users(self, task):
+    qs = UserTask.objects.filter(task=task)
+    serializer = UserTaskSerializer(
+        instance=qs, many=True, read_only=True, context={"request": self.context['request']})
+    for data in serializer.data:
+        user = data['user']
+        del data['user']
+        data.update(user)
+    return serializer.data
+
+
 class UserTaskSerializer(serializers.ModelSerializer):
     user = UserWithProfileSerializer()
 
@@ -28,12 +39,8 @@ class TaskSerializer(serializers.ModelSerializer):
     users = serializers.SerializerMethodField()
     parent = LessFieldsTaskSerializer()
 
-    def get_users(self, user):
-        qs = User.objects.filter(
-            deleted_at__isnull=True, users=user)
-        serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True)
-        return serializer.data
+    def get_users(self, task):
+        return users(self, task)
 
     class Meta:
         model = Task
@@ -60,12 +67,8 @@ class TaskSerializer(serializers.ModelSerializer):
 class SubTaskSerializer(serializers.ModelSerializer):
     users = serializers.SerializerMethodField()
 
-    def get_users(self, user):
-        qs = User.objects.filter(
-            deleted_at__isnull=True, users=user)
-        serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
-        return serializer.data
+    def get_users(self, task):
+        return users(self, task)
 
     class Meta:
         model = Task
@@ -92,14 +95,7 @@ class TaskListSerializer(serializers.ModelSerializer):
     dependencies = serializers.SerializerMethodField()
 
     def get_users(self, task):
-        qs = UserTask.objects.filter(task=task)
-        serializer = UserTaskSerializer(
-            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
-        for data in serializer.data:
-            user = data['user']
-            del data['user']
-            data.update(user)
-        return serializer.data
+        return users(self, task)
 
     def get_sub_tasks(self, task):
         qs = Task.objects.filter(
