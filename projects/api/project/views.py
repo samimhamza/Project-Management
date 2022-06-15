@@ -16,6 +16,19 @@ from tasks.models import Task
 from common.notification import sendNotification
 
 
+def getNotificationData(project_data, new_project, request):
+    team_users = User.objects.only('id').filter(
+        teams__in=project_data["teams"])
+    data = {
+        'title': 'Project Assignment',
+        'description': (str(new_project.name) + " Project has assigned to you by " +
+                        str(request.user.first_name) + " " + str(request.user.last_name)),
+        'instance_id': new_project.id,
+        'model_name': 'projects'
+    }
+    return [team_users, data]
+
+
 def shareTo(request, project_data, new_project):
     if project_data["share"] != "justMe":
         users = User.objects.only('id').filter(pk__in=project_data["users"])
@@ -25,7 +38,9 @@ def shareTo(request, project_data, new_project):
     if project_data["share"] == "everyone":
         users = User.objects.all()
         new_project.users.set(users)
-    sendNotification(request, users, project_data, new_project)
+    [team_users, data] = getNotificationData(
+        project_data, new_project, request)
+    sendNotification(request, users, data, team_users)
     return new_project
 
 
