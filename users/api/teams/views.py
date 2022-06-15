@@ -28,6 +28,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     permission_classes = (TeamPermissions,)
     serializer_action_classes = {
         "retrieve": TeamRetieveSerializer,
+        "update": TeamRetieveSerializer,
         "add_project": ProjectTeamSerializer,
     }
     queryset_actions = {
@@ -88,13 +89,11 @@ class TeamViewSet(viewsets.ModelViewSet):
             team.name = request.data.get("name")
         if request.data.get("description"):
             team.description = request.data.get("description")
-        if request.data.get("projects"):
-            teams = Project.objects.filter(
-                pk__in=request.data.get("projects"))
-            team.projects.set(teams)
+        if request.data.get("projects") is not None:
+            team.projects.set(request.data.get("projects"))
         team.updated_by = request.user
         team.save()
-        serializer = TeamListSerializer(team)
+        serializer = self.get_serializer(team)
         data = serializer.data
         data["total_users"] = get_total(team)
         data["leader"] = get_leader(team)

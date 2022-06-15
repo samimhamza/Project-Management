@@ -130,14 +130,14 @@ class UserTask(models.Model):
     task = models.ForeignKey(
         Task, on_delete=models.SET_NULL, null=True, related_name="users"
     )
-    progress = models.IntegerField()
+    progress = models.IntegerField(default=0)
 
     class UserTaskTypes(models.TextChoices):
         assign = "assign"
         revoke = "revoke"
 
     type = models.CharField(
-        max_length=24, choices=UserTaskTypes.choices, default="revoke"
+        max_length=24, choices=UserTaskTypes.choices, default="assign"
     )
     created_by = models.ForeignKey(
         "users.User",

@@ -130,14 +130,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
             project.company_name = request.data.get("company_name")
         if request.data.get("company_email") is not None:
             project.company_email = request.data.get("company_email")
-        if request.data.get("users"):
-            users = User.objects.only('id').filter(
-                pk__in=request.data.get("users"))
-            project.users.set(users)
-        if request.data.get("teams"):
-            teams = Team.objects.only('id').filter(
-                pk__in=request.data.get("teams"))
-            project.teams.set(teams)
+        if request.data.get("users") is not None:
+            project.users.set(request.data.get("users"))
+        if request.data.get("teams") is not None:
+            project.teams.set(request.data.get("teams"))
         project.updated_by = request.user
         project.save()
         serializer = ProjectSerializer(

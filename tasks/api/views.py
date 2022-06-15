@@ -10,7 +10,7 @@ from common.permissions import checkCustomPermissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
-from tasks.models import Task, Comment
+from tasks.models import Task, Comment, UserTask
 from projects.models import Attachment
 from users.models import User
 from users.api.serializers import UserWithProfileSerializer
@@ -107,6 +107,8 @@ class TaskViewSet(viewsets.ModelViewSet):
                          set(task.dependencies))
             else:
                 task.dependencies = request.data.get("dependencies")
+        if request.data.get('users') is not None:
+            task.task_users.set(request.data.get('users'))
         task.updated_by = request.user
         task.save()
         serializer = self.get_serializer(task)
