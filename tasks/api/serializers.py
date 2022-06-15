@@ -1,9 +1,7 @@
-from os import read
-from rest_framework import serializers
-from tasks.models import Task, UserTask, Comment
 from users.api.serializers import UserWithProfileSerializer
-from users.models import User
 from projects.api.serializers import AttachmentSerializer
+from tasks.models import Task, UserTask, Comment
+from rest_framework import serializers
 from tasks.models import UserTask
 
 
