@@ -4,13 +4,15 @@ from users.api.serializers import UserNotificationSerializer
 
 
 def prepareData(request, user, data, new_project):
-    data['notification']['description'] = data['notification']['description'].format(
-        str(new_project.name), request.user.first_name + " " + request.user.last_name)
+    # data['notification']['description'] = data['notification']['description'].format(
+    #     str(new_project.name), request.user.first_name + " " + request.user.last_name)
+    print('ssssss')
     pusher_client.trigger(
         u'notifications.'+str(user.id), u'share', {
             'id': data['id'],
             'seen': data['seen'],
             'notification': data['notification'],
+            'description': data['description'],
             'created_at': data['created_at']
         })
 

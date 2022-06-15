@@ -127,6 +127,7 @@ class UserNotification(models.Model):
     )
     notification = models.ForeignKey(
         Notification, on_delete=models.CASCADE, related_name="notification")
+    description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

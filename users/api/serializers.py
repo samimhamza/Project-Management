@@ -93,7 +93,15 @@ class UserNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserNotification
         fields = ["id", "sender", "receiver",
-                  "notification", "seen", "created_at"]
+                  "notification", "seen", "description", "created_at"]
+
+
+class UserNotificationListSerializer(serializers.ModelSerializer):
+    notification = NotificationSerializer()
+
+    class Meta:
+        model = UserNotification
+        fields = ["id", "notification", "seen", "description", "created_at"]
 
 
 class ActionSerializer(serializers.ModelSerializer):

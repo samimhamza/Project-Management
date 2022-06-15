@@ -1,6 +1,6 @@
+from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions
 from common.permissions_scopes import HolidayPermissions, ReminderPermissions, RolePermissions
 from users.models import Reminder, Holiday, Action, Permission, Role, UserNotification
-from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import addPermissionsToRole
@@ -14,7 +14,8 @@ from users.api.serializers import (
     PermissionActionSerializer,
     RoleSerializer,
     RoleListSerializer,
-    UserNotificationSerializer
+    UserNotificationSerializer,
+    UserNotificationListSerializer
 )
 from rest_framework import generics
 
@@ -46,17 +47,25 @@ class PermmissionListAPIView(generics.ListAPIView):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = UserNotification.objects.all()
-    serializer_class = UserNotificationSerializer
+    serializer_class = UserNotificationListSerializer
     pagination_class = CustomPageNumberPagination
 
     def list(self, request):
-        queryset = self.get_queryset().filter(receiver=request.user)
+        queryset = self.get_queryset().filter(
+            receiver=request.user).order_by('-created_at')
+        unseenTotal = queryset.filter(seen=False).count()
         page = self.paginate_queryset(queryset)
-        serializer = self.serializer_class(page, many=True)
-        # for data in serializer.data:
-        #     data['notification'] =
+        serializer = self.get_serializer(page, many=True)
+        data = self.get_paginated_response(serializer.data).data
+        data['unseenTotal'] = unseenTotal
+        return Response(data)
 
-        return self.get_paginated_response(serializer.data)
+    @action(detail=True, methods=["get"])
+    def seen(self, request, pk=None):
+        userNotification = self.get_object()
+        userNotification.seen = True
+        userNotification.save()
+        return Response()
 
 
 class ReminderViewSet(viewsets.ModelViewSet):
