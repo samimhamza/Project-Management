@@ -85,12 +85,11 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         team = self.get_object()
-        if request.data.get("name"):
-            team.name = request.data.get("name")
-        if request.data.get("description"):
-            team.description = request.data.get("description")
-        if request.data.get("projects") is not None:
+        if "projects" in request.data:
             team.projects.set(request.data.get("projects"))
+        for key, value in request.data.items():
+            if key != "projects":
+                setattr(team, key, value)
         team.updated_by = request.user
         team.save()
         serializer = self.get_serializer(team)

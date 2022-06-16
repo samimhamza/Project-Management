@@ -110,14 +110,8 @@ class IncomeViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         income = self.get_object()
-        if request.data.get("title"):
-            income.title = request.data.get("title")
-        if request.data.get("description"):
-            income.description = request.data.get("description")
-        if request.data.get("type"):
-            income.type = request.data.get("type")
-        if request.data.get("amount"):
-            income.amount = request.data.get("amount")
+        for key, value in request.data.items():
+            setattr(income, key, value)
         income.updated_by = request.user
         income.save()
         serializer = IncomeSerializer(income)

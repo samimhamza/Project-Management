@@ -80,35 +80,18 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         task = self.get_object()
-        if request.data.get("name"):
-            task.name = request.data.get("name")
-        if request.data.get("description") is not None:
-            task.description = request.data.get("description")
-        if request.data.get("p_start_date"):
-            task.p_start_date = request.data.get("p_start_date")
-        if request.data.get("p_end_date"):
-            task.p_end_date = request.data.get("p_end_date")
-        if request.data.get("a_start_date"):
-            task.a_start_date = request.data.get("a_start_date")
-        if request.data.get("a_end_date"):
-            task.a_end_date = request.data.get("a_end_date")
-        if request.data.get("status"):
-            task.status = request.data.get("status")
-        if request.data.get("progress") is not None:
-            task.progress = request.data.get("progress")
-        if request.data.get("priority"):
-            task.priority = request.data.get("priority")
-        if request.data.get("pin"):
-            task.pin = request.data.get("pin")
-        if request.data.get("dependencies"):
+        if "dependencies" in request.data:
             if task.dependencies is not None:
                 task.dependencies = task.dependencies + \
                     list(set(request.data.get("dependencies")) -
                          set(task.dependencies))
             else:
                 task.dependencies = request.data.get("dependencies")
-        if request.data.get('users') is not None:
+        if "users" in request.data:
             task.task_users.set(request.data.get('users'))
+        for key, value in request.data.items():
+            if key != "users" and key != "dependencies" and key != "id":
+                setattr(task, key, value)
         task.updated_by = request.user
         task.save()
         serializer = self.get_serializer(task)

@@ -7,13 +7,13 @@ from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
 from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
+from common.notification import sendNotification
 from projects.models import Project, Attachment
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from users.models import User, Team
 from tasks.models import Task
-from common.notification import sendNotification
 
 
 def getNotificationData(project_data, new_project, request):
@@ -108,32 +108,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         project = self.get_object()
-        if request.data.get("name"):
-            project.name = request.data.get("name")
-        if request.data.get("description") is not None:
-            project.description = request.data.get("description")
-        if request.data.get("p_start_date"):
-            project.p_start_date = request.data.get("p_start_date")
-        if request.data.get("p_end_date"):
-            project.p_end_date = request.data.get("p_end_date")
-        if request.data.get("a_start_date"):
-            project.a_start_date = request.data.get("a_start_date")
-        if request.data.get("a_end_date"):
-            project.a_end_date = request.data.get("a_end_date")
-        if request.data.get("status"):
-            project.status = request.data.get("status")
-        if request.data.get("progress"):
-            project.progress = request.data.get("progress")
-        if request.data.get("priority"):
-            project.priority = request.data.get("priority")
-        if request.data.get("company_name") is not None:
-            project.company_name = request.data.get("company_name")
-        if request.data.get("company_email") is not None:
-            project.company_email = request.data.get("company_email")
+        data = request.data
         if request.data.get("users") is not None:
             project.users.set(request.data.get("users"))
         if request.data.get("teams") is not None:
             project.teams.set(request.data.get("teams"))
+        for key, value in data.items():
+            if key != "users" and key != "teams" and key != "id":
+                setattr(project, key, value)
         project.updated_by = request.user
         project.save()
         serializer = ProjectSerializer(
@@ -143,16 +125,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Project)
 
-    @ action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Project, order_by="-created_at")
 
-    @ action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, Project)
 
     # for multi and single restore
-    @ action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Project)
 
@@ -250,7 +232,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
 
-    @ action(detail=True, methods=["delete"])
+    @action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
         try:
             project = self.get_object()

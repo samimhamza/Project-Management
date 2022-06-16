@@ -124,7 +124,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         role = self.get_object()
-        if request.data.get("name"):
+        if "name" in request.data:
             role.name = request.data.get("name")
         role.updated_by = request.user
         addPermissionsToRole(request.data.get('permissions'), role)

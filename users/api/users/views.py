@@ -62,24 +62,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         user = self.get_object()
-        if request.data.get("username"):
-            user.username = request.data.get("username")
-        if request.data.get("first_name"):
-            user.first_name = request.data.get("first_name")
-        if request.data.get("last_name"):
-            user.last_name = request.data.get("last_name")
-        if request.data.get("phone"):
-            user.phone = request.data.get("phone")
-        if request.data.get("whatsapp"):
-            user.whatsapp = request.data.get("whatsapp")
-        if request.data.get("email"):
-            user.email = request.data.get("email")
         if request.data.get("profile"):
             imageField = convertBase64ToImage(request.data.get("profile"))
-
             if os.path.isfile('media/'+str(user.profile)):
                 os.remove('media/'+str(user.profile))
             user.profile = imageField
+        for key, value in request.data.items():
+            if key != "profile" and key != "permissions_users" and key != "roles_users":
+                setattr(user, key, value)
         user.updated_by = request.user
         addPermissionsToUser(request.data.get("permissions"), user)
         addRolesToUser(request.data.get("roles"), user)
