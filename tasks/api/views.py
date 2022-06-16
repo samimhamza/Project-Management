@@ -184,7 +184,6 @@ class ProjectCommentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         response = delete(self, request, Comment)
-        print(response.data)
         broadcastDeleteComment(response.data)
         return response
 
