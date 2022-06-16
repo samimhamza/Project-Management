@@ -22,7 +22,7 @@ def getNotificationData(data, request):
         'title': 'Task Assignment',
         'description': ("Task " + str(data.name) + " has assigned to you by " +
                         str(request.user.first_name) + " " + str(request.user.last_name)),
-        'instance_id': data.id,
+        # 'instance_id': data.id,
         'model_name': "projects/"+str(data.project.id) + '/tasks/'
     }
     return data
