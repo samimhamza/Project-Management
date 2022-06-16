@@ -1,9 +1,15 @@
-from tasks.models import Comment, Task
 from tasks.api.serializers import CommentSerializer
-from .actions import allItems, filterRecords
 from projects.models import Project, Attachment
-from rest_framework import status
+from .actions import allItems, filterRecords
 from rest_framework.response import Response
+from common.pusher import pusher_client
+from tasks.models import Comment, Task
+from rest_framework import status
+
+
+def broadcastComment(item, data):
+    pusher_client.trigger(
+        u'projectComment.'+str(item.id), u'share', {})
 
 
 def commentsOfTable(self, request, id):
@@ -14,6 +20,7 @@ def commentsOfTable(self, request, id):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
+
 
 def latestcommentsOfTable(self, request, id):
     queryset = Comment.objects.filter(
@@ -59,6 +66,7 @@ def createComments(self, request):
                     name=attachment['file'])
         serializer = CommentSerializer(
             comment, context={"request": request})
+        broadcastComment(commentable, serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response({'error': 'Object id is not correct'}, status=status.HTTP_400_BAD_REQUEST)
