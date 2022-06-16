@@ -8,12 +8,24 @@ from projects.api.serializers import AttachmentSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
+from common.notification import sendNotification
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from tasks.models import Task, Comment
 from projects.models import Attachment
 from users.models import User
+
+
+def getNotificationData(data, request):
+    data = {
+        'title': 'Project Assignment',
+        'description': ("Task " + str(data.name) + " has assigned to you by " +
+                        str(request.user.first_name) + " " + str(request.user.last_name)),
+        'instance_id': data.id,
+        'model_name': str(data.project) + '/tasks/'
+    }
+    return data
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -89,6 +101,12 @@ class TaskViewSet(viewsets.ModelViewSet):
                 task.dependencies = request.data.get("dependencies")
         if "users" in request.data:
             task.task_users.set(request.data.get('users'))
+            if len(request.data.get('users')) > 0:
+                users = User.objects.only('id').filter(
+                    pk__in=request.data.get('users'))
+                data = getNotificationData(
+                    task, request)
+                sendNotification(request, users, data)
         for key, value in request.data.items():
             if key != "users" and key != "dependencies" and key != "id":
                 setattr(task, key, value)
