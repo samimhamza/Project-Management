@@ -19,11 +19,11 @@ from users.models import User
 
 def getNotificationData(data, request):
     data = {
-        'title': 'Project Assignment',
+        'title': 'Task Assignment',
         'description': ("Task " + str(data.name) + " has assigned to you by " +
                         str(request.user.first_name) + " " + str(request.user.last_name)),
         'instance_id': data.id,
-        'model_name': str(data.project) + '/tasks/'
+        'model_name': "projects/"+str(data.project.id) + '/tasks/'
     }
     return data
 
@@ -106,7 +106,6 @@ class TaskViewSet(viewsets.ModelViewSet):
                     pk__in=request.data.get('users'))
                 data = getNotificationData(
                     task, request)
-                print('ssss', users)
                 sendNotification(request, users, data)
         for key, value in request.data.items():
             if key != "users" and key != "dependencies" and key != "id":

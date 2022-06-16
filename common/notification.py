@@ -39,7 +39,6 @@ def userNotifications(request, user, notification, data):
 
 
 def sendNotification(request, users, data, team_users=[]):
-    print('WWWWWW')
     if len(team_users) > 0 or len(users) > 0:
         notification, created = Notification.objects.get_or_create(
             title=data['title'])
