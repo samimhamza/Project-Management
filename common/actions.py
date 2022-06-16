@@ -77,9 +77,11 @@ def trashList(self, table, *args, **kwargs):
 
 def delete(self, request, table, imageField=None):
     data = request.data
+    ids = []
     if data:
         items = table.objects.filter(pk__in=data["ids"])
         for item in items:
+            ids.append(item.id)
             if getattr(item, 'deleted_at', False):
                 if item.deleted_at:
                     item.delete()
@@ -91,9 +93,9 @@ def delete(self, request, table, imageField=None):
                     if os.path.isfile('media/'+str(getattr(item, imageField))):
                         os.remove('media/'+str(getattr(item, imageField)))
                 item.delete()
-
     else:
         item = self.get_object()
+        ids.append(item.id)
         if getattr(table, 'deleted_at', False):
             if item.deleted_at:
                 item.delete()
@@ -105,7 +107,7 @@ def delete(self, request, table, imageField=None):
                 if os.path.isfile('media/'+str(getattr(table, imageField))):
                     os.remove('media/'+str(getattr(table, imageField)))
             item.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response({'deleted_ids': ids}, status=status.HTTP_204_NO_CONTENT)
 
 
 def restore(self, request, table):

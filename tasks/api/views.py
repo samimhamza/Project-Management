@@ -3,7 +3,7 @@ from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions
 from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes, excludedDependencies
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments)
-from common.comments import listComments, createComments, updateComments
+from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from projects.api.serializers import AttachmentSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions import checkCustomPermissions
@@ -183,7 +183,10 @@ class ProjectCommentViewSet(viewsets.ModelViewSet):
         return updateComments(self, request, pk)
 
     def destroy(self, request, pk=None):
-        return delete(self, request, Comment)
+        response = delete(self, request, Comment)
+        print(response.data)
+        broadcastDeleteComment(response.data)
+        return response
 
 
 class TaskCommentViewSet(viewsets.ModelViewSet):

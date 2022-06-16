@@ -7,9 +7,25 @@ from tasks.models import Comment, Task
 from rest_framework import status
 
 
-def broadcastComment(item, data):
+def broadcastComment(item, data, update=False):
+    try:
+        project_id = item.id
+    except:
+        project_id = item
     pusher_client.trigger(
-        u'projectComment.'+str(item.id), u'share', {})
+        u'projectComment.'+str(project_id), u'comments', {
+            "id": data['id'],
+            "body": data['body'],
+            "created_at": data['created_at'],
+            "updated_at": data['updated_at'],
+            "commented_by": data['commented_by'],
+            "update": update,
+        })
+
+
+def broadcastDeleteComment(deleted_ids):
+    pusher_client.trigger(
+        u'deleteComments', u'comments', deleted_ids)
 
 
 def commentsOfTable(self, request, id):
@@ -58,8 +74,8 @@ def createComments(self, request):
             commented_by=request.user,
             content_object=commentable
         )
-        if request.data.get("attachments"):
-            for attachment in data['attachments']:
+        if "attachment" in request.data:
+            for attachment in data['attachment']:
                 Attachment.objects.create(
                     content_object=comment,
                     attachment=attachment['file'],
@@ -77,4 +93,5 @@ def updateComments(self, request, pk):
     comment.body = request.data.get('body')
     comment.save()
     serializer = CommentSerializer(comment,  context={"request": request})
+    broadcastComment(comment.object_id, serializer.data, update=True)
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
