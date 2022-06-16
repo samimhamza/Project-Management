@@ -106,6 +106,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                     pk__in=request.data.get('users'))
                 data = getNotificationData(
                     task, request)
+                print('ssss', users)
                 sendNotification(request, users, data)
         for key, value in request.data.items():
             if key != "users" and key != "dependencies" and key != "id":

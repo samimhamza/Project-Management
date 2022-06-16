@@ -13,7 +13,9 @@ class TaskPermissions(CustomPermissions):
         'trashed': 'tasks_d',
         'all': 'tasks_v',
         'delete': 'tasks_u',
-        'excluded_users': 'tasks_u'
+        'excluded_users': 'tasks_u',
+        'add_attachments': 'project_attachments_c',
+        'delete_attachments': 'project_attachments_d'
     }
 
 
