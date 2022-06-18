@@ -213,3 +213,13 @@ def deleteAttachments(self, request):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+# def getAttachments(self, request, permission):
+#     # custom permission checking for project_attachments
+#     attachments_permission = checkCustomPermissions(
+#         request, permission)
+#     if attachments_permission:
+#         attachments = Attachment.objects.filter(object_id=income.id)
+#         data['attachments'] = AttachmentSerializer(
+#             attachments, many=True, context={"request": request}).data

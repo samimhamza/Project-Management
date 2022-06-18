@@ -97,8 +97,7 @@ class IncomeViewSet(viewsets.ModelViewSet):
         if request.GET.get("project_id"):
             queryset = Income.objects.filter(
                 deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(queryset, many=True)
             for data in serializer.data:
                 # custom permission checking for expense_attachments
                 attachments_permission = checkCustomPermissions(
@@ -108,10 +107,9 @@ class IncomeViewSet(viewsets.ModelViewSet):
                         object_id=data['id'])
                     data['attachments'] = AttachmentSerializer(
                         attachments, many=True, context={"request": request}).data
-            return self.get_paginated_response(serializer.data)
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+            return Response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         income = self.get_object()
