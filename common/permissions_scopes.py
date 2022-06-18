@@ -15,7 +15,8 @@ class TaskPermissions(CustomPermissions):
         'delete': 'tasks_u',
         'excluded_users': 'tasks_u',
         'add_attachments': 'task_attachments_c',
-        'delete_attachments': 'task_attachments_d'
+        'delete_attachments': 'task_attachments_d',
+        'progress': 'tasks_u'
     }
 
 

@@ -13,6 +13,12 @@ class UserTaskSerializer(serializers.ModelSerializer):
         fields = ["description", "progress", "type", "user"]
 
 
+class ProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserTask
+        fields = ["progress"]
+
+
 def users(self, task):
     qs = UserTask.objects.filter(task=task)
     serializer = UserTaskSerializer(

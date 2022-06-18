@@ -8,11 +8,12 @@ from projects.api.serializers import AttachmentSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
+from tasks.api.serializers import ProgressSerializer
 from common.notification import sendNotification
+from tasks.models import Task, Comment, UserTask
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
-from tasks.models import Task, Comment
 from projects.models import Attachment
 from users.models import User
 
@@ -100,7 +101,8 @@ class TaskViewSet(viewsets.ModelViewSet):
             else:
                 task.dependencies = request.data.get("dependencies")
         if "users" in request.data:
-            task.task_users.set(request.data.get('users'))
+            task.task_users.set(request.data.get(
+                'users'), created_by=request.user, updated_by=request.user)
             if len(request.data.get('users')) > 0:
                 users = User.objects.only('id').filter(
                     pk__in=request.data.get('users'))
@@ -153,6 +155,21 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
+
+    @action(detail=True, methods=["put"])
+    def progress(self, request, pk=None):
+        try:
+            task = self.get_object()
+            data = request.data
+            user = User.objects.get(pk=data['user_id'])
+            userTask = UserTask.objects.get(user=user, task=task)
+            userTask.progress = data['progress']
+            userTask.save()
+            serializer = ProgressSerializer(
+                userTask)
+            return Response(serializer.data)
+        except:
+            return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_serializer_class(self):
         try:
