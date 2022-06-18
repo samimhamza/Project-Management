@@ -1,7 +1,10 @@
 from common.permissions_scopes import (IncomePermissions,
                                        FocalPointPermissions, LocationPermissions, PaymentPermissions)
-from common.actions import delete, allItems, filterRecords
+from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments
+from projects.api.serializers import AttachmentSerializer
+from common.permissions import checkCustomPermissions
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from projects.models import (
     Country,
@@ -10,7 +13,8 @@ from projects.models import (
     Income,
     Payment,
     State,
-    Project
+    Project,
+    Attachment
 )
 from projects.api.serializers import (
     FocalPointSerializer,
@@ -108,6 +112,20 @@ class IncomeViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        income = self.get_object()
+        serializer = self.get_serializer(income)
+        data = serializer.data
+
+        # custom permission checking for project_attachments
+        attachments_permission = checkCustomPermissions(
+            request, "income_attachments_v")
+        if attachments_permission:
+            attachments = Attachment.objects.filter(object_id=income.id)
+            data['attachments'] = AttachmentSerializer(
+                attachments, many=True, context={"request": request}).data
+        return Response(data)
+
     def update(self, request, pk=None):
         income = self.get_object()
         for key, value in request.data.items():
@@ -119,6 +137,14 @@ class IncomeViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         return delete(self, request, Income)
+
+    @action(detail=True, methods=["post"])
+    def add_attachments(self, request, pk=None):
+        return addAttachment(self, request)
+
+    @action(detail=True, methods=["delete"])
+    def delete_attachments(self, request, pk=None):
+        return deleteAttachments(self, request)
 
 
 class FocalPointViewSet(viewsets.ModelViewSet):

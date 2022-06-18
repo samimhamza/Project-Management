@@ -1,18 +1,21 @@
-from common.actions import withTrashed, trashList, delete, restore, allItems, filterRecords, expensesOfProject
+from common.actions import (withTrashed, trashList, delete, restore, allItems,
+                            filterRecords, expensesOfProject, addAttachment, deleteAttachments)
 from common.permissions_scopes import ExpensePermissions
 from expenses.models import Expense, ExpenseItem, Category
+from projects.api.serializers import AttachmentSerializer
+from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
+from projects.models import Project, Attachment
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework import viewsets, status
 from expenses.api.serializers import (
     ExpenseSerializer,
     ExpenseItemSerializer,
     CategorySerializer,
     LessFieldExpenseSerializer
 )
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-from projects.models import Project
 from users.models import User
 
 
@@ -29,16 +32,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Category)
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Category, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, Category)
 
     # for multi restore
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Category)
 
@@ -71,6 +74,20 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        expense = self.get_object()
+        serializer = self.get_serializer(expense)
+        data = serializer.data
+
+        # custom permission checking for project_attachments
+        attachments_permission = checkCustomPermissions(
+            request, "expense_attachments_v")
+        if attachments_permission:
+            attachments = Attachment.objects.filter(object_id=expense.id)
+            data['attachments'] = AttachmentSerializer(
+                attachments, many=True, context={"request": request}).data
+        return Response(data)
 
     def create(self, request):
         data = request.data
@@ -118,18 +135,26 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Expense)
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Expense, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, Expense)
 
     # for multi restore
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Expense)
+
+    @ action(detail=True, methods=["post"])
+    def add_attachments(self, request, pk=None):
+        return addAttachment(self, request)
+
+    @ action(detail=True, methods=["delete"])
+    def delete_attachments(self, request, pk=None):
+        return deleteAttachments(self, request)
 
     def get_queryset(self):
         try:
@@ -178,16 +203,16 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, ExpenseItem)
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, ExpenseItem, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, ExpenseItem)
 
     # for multi restore
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, ExpenseItem)
 

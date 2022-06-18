@@ -161,28 +161,8 @@ class IncomePermissions(CustomPermissions):
         'restore': 'project_incomes_d',
         'trashed': 'project_incomes_d',
         'all': 'project_incomes_v',
-    }
-
-
-class ProjectAttachmentPermissions(CustomPermissions):
-    actions_scopes = {
-        'list': 'project_attachments_v',
-        'create': 'project_attachments_c',
-        'retrieve': "project_attachments_v",
-        'update': 'project_attachments_u',
-        'partial_update': 'project_attachments_u',
-        'destroy': 'project_attachments_d'
-    }
-
-
-class TaskAttachmentPermissions(CustomPermissions):
-    actions_scopes = {
-        'list': 'task_attachments_v',
-        'create': 'task_attachments_c',
-        'retrieve': "task_attachments_v",
-        'update': 'task_attachments_u',
-        'partial_update': 'task_attachments_u',
-        'destroy': 'task_attachments_d'
+        'add_attachments': 'income_attachments_c',
+        'delete_attachments': 'income_attachments_d'
     }
 
 
@@ -196,7 +176,9 @@ class ExpensePermissions(CustomPermissions):
         'destroy': 'project_expenses_d',
         'restore': 'project_expenses_d',
         'trashed': 'project_expenses_d',
-        'all': 'project_expenses_v'
+        'all': 'project_expenses_v',
+        'add_attachments': 'expense_attachments_c',
+        'delete_attachments': 'expense_attachments_d'
     }
 
 
