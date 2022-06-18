@@ -1,11 +1,9 @@
 from common.actions import (withTrashed, trashList, delete, restore, allItems,
-                            filterRecords, expensesOfProject, addAttachment, deleteAttachments)
+                            filterRecords, expensesOfProject, addAttachment, deleteAttachments, getAttachments)
 from common.permissions_scopes import ExpensePermissions
 from expenses.models import Expense, ExpenseItem, Category
-from projects.api.serializers import AttachmentSerializer
-from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
-from projects.models import Project, Attachment
+from projects.models import Project
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -80,14 +78,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         expense = self.get_object()
         serializer = self.get_serializer(expense)
         data = serializer.data
-
-        # custom permission checking for project_attachments
-        attachments_permission = checkCustomPermissions(
-            request, "expense_attachments_v")
-        if attachments_permission:
-            attachments = Attachment.objects.filter(object_id=expense.id)
-            data['attachments'] = AttachmentSerializer(
-                attachments, many=True, context={"request": request}).data
+        data = getAttachments(request, data, expense.id,
+                              "expense_attachments_v")
         return Response(data)
 
     def create(self, request):

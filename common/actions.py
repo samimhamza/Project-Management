@@ -15,6 +15,17 @@ import datetime
 import os
 
 
+def getAttachments(request, data, id, permission):
+    # custom permission checking for attachments scopes
+    attachments_permission = checkCustomPermissions(
+        request, permission)
+    if attachments_permission:
+        attachments = Attachment.objects.filter(object_id=id)
+        data['attachments'] = AttachmentSerializer(
+            attachments, many=True, context={"request": request}).data
+    return data
+
+
 def countStatuses(table, countables, project_id=None):
     totals = {}
     for x in range(0, len(countables), 3):
@@ -141,13 +152,8 @@ def expensesOfProject(self, request):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     for data in serializer.data:
-        # custom permission checking for expense_attachments
-        attachments_permission = checkCustomPermissions(
-            request, "expense_attachments_v")
-        if attachments_permission:
-            attachments = Attachment.objects.filter(object_id=data['id'])
-            data['attachments'] = AttachmentSerializer(
-                attachments, many=True, context={"request": request}).data
+        data = getAttachments(
+            request, data, data['id'], "expense_attachments_v")
     return self.get_paginated_response(serializer.data)
 
 
@@ -213,13 +219,3 @@ def deleteAttachments(self, request):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
-
-
-# def getAttachments(self, request, permission):
-#     # custom permission checking for project_attachments
-#     attachments_permission = checkCustomPermissions(
-#         request, permission)
-#     if attachments_permission:
-#         attachments = Attachment.objects.filter(object_id=income.id)
-#         data['attachments'] = AttachmentSerializer(
-#             attachments, many=True, context={"request": request}).data

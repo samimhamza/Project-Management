@@ -2,11 +2,9 @@ from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, Comm
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes, excludedDependencies
 from common.actions import (withTrashed, trashList, delete, restore,
-                            allItems, filterRecords, addAttachment, deleteAttachments)
+                            allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
-from projects.api.serializers import AttachmentSerializer
 from users.api.serializers import UserWithProfileSerializer
-from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
 from tasks.api.serializers import ProgressSerializer
 from common.notification import sendNotification
@@ -15,7 +13,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.pusher import pusher_client
-from projects.models import Attachment
 from users.models import User
 
 
@@ -71,13 +68,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(
             task, context={"request": request})
         data = serializer.data
-        # custom permission checking for task_attachments
-        attachments_permission = checkCustomPermissions(
-            request, "task_attachments_v")
-        if attachments_permission:
-            attachments = Attachment.objects.filter(object_id=task.id)
-            data['attachments'] = AttachmentSerializer(
-                attachments, many=True, context={"request": request}).data
+        data = getAttachments(request, data, task.id, "task_attachments_v")
         return Response(data)
 
     def create(self, request):

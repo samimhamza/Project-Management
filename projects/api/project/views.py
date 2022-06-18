@@ -1,14 +1,14 @@
 from common.actions import (restore, delete, withTrashed, trashList,
-                            allItems, filterRecords, countStatuses, searchRecords, addAttachment, deleteAttachments)
-from projects.api.serializers import ProjectNameListSerializer, AttachmentSerializer
+                            allItems, filterRecords, countStatuses,
+                            searchRecords, addAttachment, deleteAttachments, getAttachments)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.project.serializers import ProjectSerializer
+from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
-from common.permissions import checkCustomPermissions
 from common.custom import CustomPageNumberPagination
 from common.notification import sendNotification
-from projects.models import Project, Attachment
+from projects.models import Project
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -79,14 +79,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             'failedTasksTotal', 'status', 'failed',
             'cancelledTasksTotal', 'status', 'cancelled'
         ]
-        # custom permission checking for project_attachments
-        attachments_permission = checkCustomPermissions(
-            request, "project_attachments_v")
-        if attachments_permission:
-            attachments = Attachment.objects.filter(object_id=project.id)
-            data['attachments'] = AttachmentSerializer(
-                attachments, many=True, context={"request": request}).data
-
+        data = getAttachments(request, data, project.id,
+                              "project_attachments_v")
         data['statusTotals'] = countStatuses(Task, countables, project.id)
         return Response(data)
 

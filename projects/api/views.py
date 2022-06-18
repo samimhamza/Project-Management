@@ -1,8 +1,6 @@
 from common.permissions_scopes import (IncomePermissions,
                                        FocalPointPermissions, LocationPermissions, PaymentPermissions)
-from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments
-from projects.api.serializers import AttachmentSerializer
-from common.permissions import checkCustomPermissions
+from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -13,8 +11,7 @@ from projects.models import (
     Income,
     Payment,
     State,
-    Project,
-    Attachment
+    Project
 )
 from projects.api.serializers import (
     FocalPointSerializer,
@@ -99,14 +96,8 @@ class IncomeViewSet(viewsets.ModelViewSet):
                 deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
             serializer = self.get_serializer(queryset, many=True)
             for data in serializer.data:
-                # custom permission checking for expense_attachments
-                attachments_permission = checkCustomPermissions(
-                    request, "expense_attachments_v")
-                if attachments_permission:
-                    attachments = Attachment.objects.filter(
-                        object_id=data['id'])
-                    data['attachments'] = AttachmentSerializer(
-                        attachments, many=True, context={"request": request}).data
+                data = getAttachments(
+                    request, data, data['id'], 'income_attachments_v')
             return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -115,14 +106,8 @@ class IncomeViewSet(viewsets.ModelViewSet):
         income = self.get_object()
         serializer = self.get_serializer(income)
         data = serializer.data
-
-        # custom permission checking for project_attachments
-        attachments_permission = checkCustomPermissions(
-            request, "income_attachments_v")
-        if attachments_permission:
-            attachments = Attachment.objects.filter(object_id=income.id)
-            data['attachments'] = AttachmentSerializer(
-                attachments, many=True, context={"request": request}).data
+        data = getAttachments(
+            request, data, data['id'], 'income_attachments_v')
         return Response(data)
 
     def update(self, request, pk=None):
