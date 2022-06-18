@@ -97,20 +97,21 @@ class IncomeViewSet(viewsets.ModelViewSet):
         if request.GET.get("project_id"):
             queryset = Income.objects.filter(
                 deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-
-        # pusher_client = pusher.Pusher(
-        #     app_id='1419045',
-        #     key='237907cedac4eed704cd',
-        #     secret='2afd20009cf5404d0df6',
-        #     cluster='ap2',
-        #     ssl=True
-        # )
-        # pusher_client.trigger('my-channel', 'my-event', {'message': 'hello world Django'})
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(page, many=True)
+            for data in serializer.data:
+                # custom permission checking for expense_attachments
+                attachments_permission = checkCustomPermissions(
+                    request, "expense_attachments_v")
+                if attachments_permission:
+                    attachments = Attachment.objects.filter(
+                        object_id=data['id'])
+                    data['attachments'] = AttachmentSerializer(
+                        attachments, many=True, context={"request": request}).data
+            return self.get_paginated_response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         income = self.get_object()
