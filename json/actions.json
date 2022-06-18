@@ -168,9 +168,9 @@
 	},
 	{
 		"fields": {
-			"name": "tasks",
-			"codename": "ta",
-			"model": "Tasks"
+			"name": "project_tasks",
+			"codename": "pt",
+			"model": "Project Tasks"
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },

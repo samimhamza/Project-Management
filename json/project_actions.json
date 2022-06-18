@@ -14,60 +14,6 @@
 	},
 	{
 		"fields": {
-			"name": "users",
-			"codename": "u",
-			"model": "Users"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-	{
-		"fields": {
-			"name": "teams",
-			"codename": "t",
-			"model": "Teams"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-	{
-		"fields": {
-			"name": "projects",
-			"codename": "p",
-			"model": "Projects"
-		},
-		"sub_actions": [
-			{ "code": "dm", "name": "DeleteMember" },
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" },
-			{ "code": "e", "name": "Export" }
-		]
-	},
-	{
-		"fields": {
-			"name": "reminders",
-			"codename": "r",
-			"model": "Reminders and Notes"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-	{
-		"fields": {
 			"name": "project_focal_points",
 			"codename": "pf",
 			"model": "Project Focal Points"
@@ -118,30 +64,6 @@
 	},
 	{
 		"fields": {
-			"name": "task_comments",
-			"codename": "tc",
-			"model": "Task Comments"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "v", "name": "View" }
-		]
-	},
-	{
-		"fields": {
-			"name": "task_attachments",
-			"codename": "tat",
-			"model": "Task Attachments"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "do", "name": "Download" }
-		]
-	},
-	{
-		"fields": {
 			"name": "expense_attachments",
 			"codename": "ea",
 			"model": "Expense Attachments"
@@ -168,9 +90,9 @@
 	},
 	{
 		"fields": {
-			"name": "tasks",
-			"codename": "ta",
-			"model": "Tasks"
+			"name": "project_tasks",
+			"codename": "pt",
+			"model": "Project Tasks"
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -184,19 +106,6 @@
 			"name": "project_expenses",
 			"codename": "pe",
 			"model": "Project Expenses"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-	{
-		"fields": {
-			"name": "roles",
-			"codename": "ro",
-			"model": "Roles"
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
