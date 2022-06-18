@@ -102,6 +102,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                 task.dependencies = request.data.get("dependencies")
         if "users" in request.data:
             users = User.objects.filter(pk__in=request.data.get('users'))
+            UserTask.objects.filter(task=task).delete()
             for user in users:
                 userTask, created = UserTask.objects.get_or_create(
                     task=task, user=user)

@@ -45,6 +45,7 @@
 			"model": "Projects"
 		},
 		"sub_actions": [
+			{ "code": "dm", "name": "DeleteMember" },
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
