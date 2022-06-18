@@ -100,13 +100,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             project = Project.objects.only('id').get(pk=data['project'])
         else:
             project = None
-        expense_by = get_object_or_404(User, pk=data['expense_by'])
+        # expense_by = get_object_or_404(User, pk=data['expense_by'])
         new_Task = Expense.objects.create(
             category=category,
             title=data["title"],
             date=data["date"],
             project=project,
-            expense_by=expense_by,
+            # expense_by=expense_by,
             type=data["type"],
             created_by=creator,
             updated_by=creator,

@@ -14,8 +14,16 @@ from tasks.models import Task, Comment, UserTask
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
+from common.pusher import pusher_client
 from projects.models import Attachment
 from users.models import User
+
+
+def broadcastProgress(task_id, data):
+    pusher_client.trigger(
+        u'taskProgress.'+str(task_id), u'progress', {
+            "progress": data['progress'],
+        })
 
 
 def getNotificationData(data, request):
@@ -172,6 +180,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             userTask.save()
             serializer = ProgressSerializer(
                 userTask)
+            broadcastProgress(task.id, serializer.data)
             return Response(serializer.data)
         except:
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
