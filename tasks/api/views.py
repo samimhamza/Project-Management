@@ -16,10 +16,11 @@ from common.pusher import pusher_client
 from users.models import User
 
 
-def broadcastProgress(task_id, data):
+def broadcastProgress(task_id, data, user_id):
     pusher_client.trigger(
-        u'taskProgress.'+str(task_id), u'progress', {
+        u'task.'+str(task_id), u'progress', {
             "progress": data['progress'],
+            'user_id': user_id,
         })
 
 
@@ -171,7 +172,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             userTask.save()
             serializer = ProgressSerializer(
                 userTask)
-            broadcastProgress(task.id, serializer.data)
+            broadcastProgress(task.id, serializer.data, data['user_id'])
             return Response(serializer.data)
         except:
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
