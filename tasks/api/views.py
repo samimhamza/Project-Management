@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.pusher import pusher_client
-from tasks.models import Task, Comment
+from tasks.models import Task, Comment, UserTask
 from users.models import User
 
 
