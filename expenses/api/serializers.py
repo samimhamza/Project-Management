@@ -1,5 +1,5 @@
 from expenses.models import Category, Expense, ExpenseItem
-from users.api.serializers import LessFieldsUserSerializer
+from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 
 
@@ -18,7 +18,7 @@ class ExpenseItemSerializer(serializers.ModelSerializer):
 class ExpenseSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
     category = CategorySerializer()
-    expense_by = LessFieldsUserSerializer()
+    expense_by = UserWithProfileSerializer()
 
     def get_items(self, expense):
         qs = ExpenseItem.objects.filter(
