@@ -21,8 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/Nav.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/Nav.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskDependence.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskDependence.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/expense/ExpenseMainContent.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/expense/ExpenseMainContent.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,28 +52,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/project/tasks",
-    "nodejs_package_manager_path": "yarn",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/main&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\team" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\store" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\customComponents" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
     </key>
   </component>
@@ -137,7 +137,15 @@
       <workItem from="1655098295463" duration="3932000" />
       <workItem from="1655102576700" duration="4401000" />
       <workItem from="1655111044380" duration="10712000" />
-      <workItem from="1655177985138" duration="6228000" />
+      <workItem from="1655177985138" duration="11597000" />
+      <workItem from="1655190647038" duration="2891000" />
+      <workItem from="1655197501034" duration="12290000" />
+      <workItem from="1655264229326" duration="8321000" />
+      <workItem from="1655275612282" duration="4094000" />
+      <workItem from="1655283971055" duration="8741000" />
+      <workItem from="1655350598532" duration="15353000" />
+      <workItem from="1655370131764" duration="11160000" />
+      <workItem from="1655523331735" duration="8697000" />
     </task>
     <servers />
   </component>
@@ -189,6 +197,11 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskComponent.js</url>
           <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskUsersAvatar.js</url>
+          <line>18</line>
+          <option name="timeStamp" value="12" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
