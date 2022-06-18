@@ -109,9 +109,6 @@ class TaskViewSet(viewsets.ModelViewSet):
                 userTask.created_by = request.user
                 userTask.updated_by = request.user
                 userTask.save()
-            if len(request.data.get('users')) > 0:
-                users = User.objects.only('id').filter(
-                    pk__in=request.data.get('users'))
                 data = getNotificationData(
                     task, request)
                 sendNotification(request, users, data)

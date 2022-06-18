@@ -46,6 +46,7 @@ class Task(models.Model):
     a_start_date = models.DateField(blank=True, null=True)
     a_end_date = models.DateField(blank=True, null=True)
     pin = models.BooleanField(default=False)
+    progress = models.IntegerField(default=0)
 
     class Priority(models.TextChoices):
         critical = "critical"
