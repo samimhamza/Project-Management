@@ -1,8 +1,29 @@
 from tasks.api.serializers import LessFieldsTaskSerializer
 from .actions import allItems, countStatuses
-from tasks.models import Task
+from tasks.models import Task, UserTask
 from rest_framework.response import Response
 from projects.models import Project
+from common.notification import sendNotification
+
+
+def getAssignNotification(data, request):
+    data = {
+        'title': 'Task Assignment',
+        'description': ("Task " + str(data.name) + " has assigned to you by " +
+                        str(request.user.first_name) + " " + str(request.user.last_name)),
+        # 'instance_id': data.id,
+        'model_name': "projects/"+str(data.project.id) + '/tasks/'
+    }
+    return data
+
+
+def getRevokeNotification(data, request):
+    data = {
+        'title': 'Task Revokement',
+        'description': ("You have been revoked from task " + str(data.name) + " by " +
+                        str(request.user.first_name) + " " + str(request.user.last_name)),
+    }
+    return data
 
 
 def tasksResponse(self, serializer, project_id=None):
@@ -81,3 +102,33 @@ def excludedDependencies(serializerName, queryset, request):
         queryset = queryset.exclude(pk__in=task.dependencies)
     serializer = serializerName(queryset, many=True)
     return Response(serializer.data, status=200)
+
+
+def assignToUsers(request, task, users):
+    revoke(request, task, users)
+    notify_users = []
+    data = getAssignNotification(
+        task, request)
+    for user in users:
+        userTask, created = UserTask.objects.get_or_create(
+            task=task, user=user)
+        userTask.created_by = request.user
+        userTask.updated_by = request.user
+        userTask.save()
+        if created:
+            notify_users.append(user)
+    sendNotification(request, notify_users, data)
+
+
+def user(userTask):
+    return userTask.user
+
+
+def revoke(request, task, users):
+    deleted_task_users = UserTask.objects.filter(
+        task=task).exclude(user__in=users)
+    data = getRevokeNotification(
+        task, request)
+    deleted_users = list(map(user, deleted_task_users))
+    sendNotification(request, deleted_users, data)
+    deleted_task_users.delete()

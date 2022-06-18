@@ -1,18 +1,18 @@
 from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
-from common.tasks_actions import tasksOfProject, tasksResponse, checkAttributes, excludedDependencies
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
+from common.tasks_actions import (
+    tasksOfProject, tasksResponse, checkAttributes, excludedDependencies, assignToUsers)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from users.api.serializers import UserWithProfileSerializer
 from common.custom import CustomPageNumberPagination
 from tasks.api.serializers import ProgressSerializer
-from common.notification import sendNotification
-from tasks.models import Task, Comment, UserTask
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.pusher import pusher_client
+from tasks.models import Task, Comment
 from users.models import User
 
 
@@ -22,17 +22,6 @@ def broadcastProgress(task_id, data, user_id):
             "progress": data['progress'],
             'user_id': user_id,
         })
-
-
-def getNotificationData(data, request):
-    data = {
-        'title': 'Task Assignment',
-        'description': ("Task " + str(data.name) + " has assigned to you by " +
-                        str(request.user.first_name) + " " + str(request.user.last_name)),
-        # 'instance_id': data.id,
-        'model_name': "projects/"+str(data.project.id) + '/tasks/'
-    }
-    return data
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -102,16 +91,8 @@ class TaskViewSet(viewsets.ModelViewSet):
                 task.dependencies = request.data.get("dependencies")
         if "users" in request.data:
             users = User.objects.filter(pk__in=request.data.get('users'))
-            UserTask.objects.filter(task=task).delete()
-            for user in users:
-                userTask, created = UserTask.objects.get_or_create(
-                    task=task, user=user)
-                userTask.created_by = request.user
-                userTask.updated_by = request.user
-                userTask.save()
-                data = getNotificationData(
-                    task, request)
-                sendNotification(request, users, data)
+            assignToUsers(request, task, users)
+
         for key, value in request.data.items():
             if key != "users" and key != "dependencies" and key != "id":
                 setattr(task, key, value)
