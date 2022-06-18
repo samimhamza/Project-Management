@@ -41,3 +41,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             "updated_by",
             "deleted_at",
         ]
+
+
+class ProjectListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name"]

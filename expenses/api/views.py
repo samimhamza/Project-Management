@@ -14,7 +14,8 @@ from expenses.api.serializers import (
     ExpenseSerializer,
     ExpenseItemSerializer,
     CategorySerializer,
-    LessFieldExpenseSerializer
+    LessFieldExpenseSerializer,
+    ExpenseListSerializer
 )
 from users.models import User
 
@@ -72,7 +73,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             return allItems(LessFieldExpenseSerializer, queryset)
 
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = ExpenseListSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
