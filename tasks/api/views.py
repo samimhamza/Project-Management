@@ -101,8 +101,13 @@ class TaskViewSet(viewsets.ModelViewSet):
             else:
                 task.dependencies = request.data.get("dependencies")
         if "users" in request.data:
-            task.task_users.set(request.data.get(
-                'users'), created_by=request.user, updated_by=request.user)
+            users = User.objects.filter(pk__in=request.data.get('users'))
+            for user in users:
+                userTask, created = UserTask.objects.get_or_create(
+                    task=task, user=user)
+                userTask.created_by = request.user
+                userTask.updated_by = request.user
+                userTask.save()
             if len(request.data.get('users')) > 0:
                 users = User.objects.only('id').filter(
                     pk__in=request.data.get('users'))

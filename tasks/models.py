@@ -158,5 +158,8 @@ class UserTask(models.Model):
     def __str__(self):
         return self.description
 
+    class Meta:
+        unique_together = ('task', 'user',)
+
 
 # End of UserTask Table
