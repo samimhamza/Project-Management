@@ -73,15 +73,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
-
-        for data in serializer.data:
-            # custom permission checking for project_attachments
-            attachments_permission = checkCustomPermissions(
-                request, "expense_attachments_v")
-            if attachments_permission:
-                attachments = Attachment.objects.filter(object_id=data['id'])
-                data['attachments'] = AttachmentSerializer(
-                    attachments, many=True, context={"request": request}).data
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):

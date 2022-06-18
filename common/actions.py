@@ -3,6 +3,7 @@ from expenses.api.serializers import LessFieldExpenseSerializer
 from projects.api.serializers import AttachmentSerializer
 from .team_actions import get_leader_by_id, get_total_users
 from users.models import Team, Permission, Action, Role
+from common.permissions import checkCustomPermissions
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
@@ -139,6 +140,14 @@ def expensesOfProject(self, request):
         return allItems(LessFieldExpenseSerializer, queryset)
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
+    for data in serializer.data:
+        # custom permission checking for expense_attachments
+        attachments_permission = checkCustomPermissions(
+            request, "expense_attachments_v")
+        if attachments_permission:
+            attachments = Attachment.objects.filter(object_id=data['id'])
+            data['attachments'] = AttachmentSerializer(
+                attachments, many=True, context={"request": request}).data
     return self.get_paginated_response(serializer.data)
 
 
