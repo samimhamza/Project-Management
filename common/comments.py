@@ -9,11 +9,11 @@ from rest_framework import status
 
 def broadcastComment(item, data, update=False):
     try:
-        project_id = item.id
+        instance = item.id
     except:
-        project_id = item
+        instance = item
     pusher_client.trigger(
-        u'projectComment.'+str(project_id), u'comments', {
+        u'projectComment.'+str(instance), u'comments', {
             "id": data['id'],
             "body": data['body'],
             "created_at": data['created_at'],

@@ -226,4 +226,6 @@ class TaskCommentViewSet(viewsets.ModelViewSet):
         return updateComments(self, request, pk)
 
     def destroy(self, request, pk=None):
-        return delete(self, request, Comment)
+        response = delete(self, request, Comment)
+        broadcastDeleteComment(response.data)
+        return response
