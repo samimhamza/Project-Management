@@ -343,8 +343,10 @@ class ProjectRole(models.Model):
 
 class ProjectPermission(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64, unique=True)
-    code = models.CharField(max_length=32, unique=True)
+    action = models.ForeignKey(
+        "users.Action", on_delete=models.CASCADE, related_name="project_action")
+    sub_action = models.ForeignKey(
+        "users.SubAction", on_delete=models.CASCADE, related_name="project_sub_action")
     proles = models.ManyToManyField(
         ProjectRole, related_name="permissions_roles")
 
