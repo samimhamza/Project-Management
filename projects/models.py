@@ -1,9 +1,9 @@
-import uuid
-from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import RegexValidator
+from django.db import models
+import uuid
 
 
 class Attachment(models.Model):
@@ -313,3 +313,48 @@ class FocalPoint(models.Model):
 
     def __str__(self):
         return self.contact_name + " " + self.contact_last_name
+
+
+class ProjectRole(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64, unique=True)
+    projects = models.ManyToManyField(Project, related_name="projects_roles")
+    users = models.ManyToManyField(
+        'users.User', related_name="prole_users")
+    created_by = models.ForeignKey(
+        'users.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="prole_created_by",
+    )
+    updated_by = models.ForeignKey(
+        'users.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="prole_updated_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectPermission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64, unique=True)
+    code = models.CharField(max_length=32, unique=True)
+    proles = models.ManyToManyField(
+        ProjectRole, related_name="permissions_roles")
+
+
+# class ProjectUserPermissionList(models.Model):
+#     user = models.ForeignKey(
+#         "users.User", on_delete=models.CASCADE, related_name="project_user_permissions")
+#     project = models.ForeignKey(
+#         Project, on_delete=models.CASCADE, related_name="project_permissions")
+#     permissions_list = models.JSONField(blank=True, null=True)
+
+#     class Meta:
+#         unique_together = ('project', 'user',)
