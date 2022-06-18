@@ -8,11 +8,11 @@ from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
 from common.custom import CustomPageNumberPagination
 from common.notification import sendNotification
-from projects.models import Project
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from users.models import User, Team
+from projects.models import Project
 from tasks.models import Task
 
 
