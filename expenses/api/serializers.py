@@ -1,7 +1,7 @@
+from projects.api.project.serializers import ProjectListSerializer
 from expenses.models import Category, Expense, ExpenseItem
 from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
-from projects.api.project.serializers import ProjectListSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
