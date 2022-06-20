@@ -16,17 +16,38 @@ from projects.models import Project
 from tasks.models import Task
 
 
+def getAssignNotification(data, request):
+    obj = {
+        'title': 'Project Assignment',
+        'description': (str(data.name) + " Project has assigned to you by " +
+                        str(request.user.first_name) + " " + str(request.user.last_name)),
+        'instance_id': data.id,
+        'model_name': 'projects'
+    }
+    return obj
+
+
 def getNotificationData(project_data, new_project, request):
     team_users = User.objects.only('id').filter(
         teams__in=project_data["teams"])
+    obj = getAssignNotification(new_project, request)
+    return [team_users, obj]
+
+
+def getRevokeNotification(data, request):
     data = {
-        'title': 'Project Assignment',
-        'description': (str(new_project.name) + " Project has assigned to you by " +
+        'title': 'Project Revokement',
+        'description': ("You have been revoked from Project " + str(data.name) + " by " +
                         str(request.user.first_name) + " " + str(request.user.last_name)),
-        'instance_id': new_project.id,
-        'model_name': 'projects'
     }
-    return [team_users, data]
+    return data
+
+
+def notification(funcName, table, request, column, ids):
+    data = funcName(
+        table, request)
+    users = User.objects.filter(**{column: ids})
+    sendNotification(request, users, data)
 
 
 def shareTo(request, project_data, new_project):
@@ -119,21 +140,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         return delete(self, request, Project)
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Project, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, Project)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Project)
 
     # Custom Actions
-    @action(detail=True, methods=["get"])
+    @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         project = Project.objects.only('id').get(pk=pk)
         users = User.objects.filter(project_users=project)
@@ -147,22 +168,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = UserWithProfileSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=True, methods=["post"])
-    def add_users(self, request, pk=None):
-        try:
-            data = request.data
-            project = self.get_object()
-            users = User.objects.filter(pk__in=data['ids'])
-            for user in data['ids']:
-                project.users.add(user)
-            serializer = UserWithProfileSerializer(users, many=True)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-    @action(detail=True, methods=["get"])
+    @ action(detail=True, methods=["get"])
     def teams(self, request, pk=None):
         project = Project.objects.only('id').get(pk=pk)
         teams = Team.objects.filter(projects=project)
@@ -176,7 +182,24 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = LessFieldsTeamSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=True, methods=["post"])
+    @ action(detail=True, methods=["post"])
+    def add_users(self, request, pk=None):
+        try:
+            data = request.data
+            project = self.get_object()
+            users = User.objects.filter(pk__in=data['ids'])
+            for user in data['ids']:
+                project.users.add(user)
+            notification(getAssignNotification, project,
+                         request, 'pk__in', data['ids'])
+            serializer = UserWithProfileSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @ action(detail=True, methods=["post"])
     def add_teams(self, request, pk=None):
         try:
             data = request.data
@@ -184,6 +207,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             teams = Team.objects.filter(pk__in=data['ids'])
             for user in data['ids']:
                 project.teams.add(user)
+            notification(getAssignNotification,
+                         project, request, 'teams__in', data['ids'])
             serializer = LessFieldsTeamSerializer(teams, many=True)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
@@ -191,53 +216,57 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=["get"])
-    def excluded_users(self, request, pk=None):
-        users = User.objects.filter(
-            deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
-        serializer = UserWithProfileSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=["get"])
-    def excluded_teams(self, request, pk=None):
-        teams = Team.objects.filter(deleted_at__isnull=True).exclude(
-            projects__id=pk).order_by("-created_at")
-        serializer = LessFieldsTeamSerializer(teams, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=["delete"])
+    @ action(detail=True, methods=["delete"])
     def delete_users(self, request, pk=None):
         try:
             project = self.get_object()
             data = request.data
             for user in data['ids']:
                 project.users.remove(user)
+            notification(getRevokeNotification, project,
+                         request, 'pk__in', data['ids'])
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=["post"])
-    def add_attachments(self, request, pk=None):
-        return addAttachment(self, request)
-
-    @action(detail=True, methods=["delete"])
-    def delete_attachments(self, request, pk=None):
-        return deleteAttachments(self, request)
-
-    @action(detail=True, methods=["delete"])
+    @ action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
         try:
             project = self.get_object()
             data = request.data
             for team in data['ids']:
                 project.teams.remove(team)
+            notification(getRevokeNotification,
+                         project, request, 'teams__in', data['ids'])
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+    @ action(detail=True, methods=["post"])
+    def add_attachments(self, request, pk=None):
+        return addAttachment(self, request)
+
+    @ action(detail=True, methods=["delete"])
+    def delete_attachments(self, request, pk=None):
+        return deleteAttachments(self, request)
+
+    @ action(detail=True, methods=["get"])
+    def excluded_users(self, request, pk=None):
+        users = User.objects.filter(
+            deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
+        serializer = UserWithProfileSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @ action(detail=True, methods=["get"])
+    def excluded_teams(self, request, pk=None):
+        teams = Team.objects.filter(deleted_at__isnull=True).exclude(
+            projects__id=pk).order_by("-created_at")
+        serializer = LessFieldsTeamSerializer(teams, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         try:

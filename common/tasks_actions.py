@@ -7,14 +7,14 @@ from common.notification import sendNotification
 
 
 def getAssignNotification(data, request):
-    data = {
+    obj = {
         'title': 'Task Assignment',
         'description': ("Task " + str(data.name) + " has assigned to you by " +
                         str(request.user.first_name) + " " + str(request.user.last_name)),
         # 'instance_id': data.id,
         'model_name': "projects/"+str(data.project.id) + '/tasks/'
     }
-    return data
+    return obj
 
 
 def getRevokeNotification(data, request):
