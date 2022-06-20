@@ -318,7 +318,8 @@ class FocalPoint(models.Model):
 class ProjectRole(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
-    projects = models.ManyToManyField(Project, related_name="projects_roles")
+    project = models.ForeignKey(
+        Project, related_name="project_role", on_delete=models.CASCADE)
     users = models.ManyToManyField(
         'users.User', related_name="prole_users")
     created_by = models.ForeignKey(
@@ -341,22 +342,17 @@ class ProjectRole(models.Model):
         return self.name
 
 
-class ProjectPermission(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    action = models.ForeignKey(
-        "users.Action", on_delete=models.CASCADE, related_name="project_action")
-    sub_action = models.ForeignKey(
-        "users.SubAction", on_delete=models.CASCADE, related_name="project_sub_action")
-    proles = models.ManyToManyField(
-        ProjectRole, related_name="permissions_roles")
+# class ProjectPermission(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     action = models.ForeignKey(
+#         "users.Action", on_delete=models.CASCADE, related_name="project_action")
+#     sub_action = models.ForeignKey(
+#         "users.SubAction", on_delete=models.CASCADE, related_name="project_sub_action")
+#     proles = models.ManyToManyField(
+#         ProjectRole, related_name="permissions_roles")
 
 
-# class ProjectUserPermissionList(models.Model):
-#     user = models.ForeignKey(
-#         "users.User", on_delete=models.CASCADE, related_name="project_user_permissions")
-#     project = models.ForeignKey(
-#         Project, on_delete=models.CASCADE, related_name="project_permissions")
+# class RolePermissionList(models.Model):
+#     prole = models.ForeignKey(
+#         ProjectRole, on_delete=models.CASCADE, related_name="prole_permissions")
 #     permissions_list = models.JSONField(blank=True, null=True)
-
-#     class Meta:
-#         unique_together = ('project', 'user',)
