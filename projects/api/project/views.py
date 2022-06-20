@@ -1,3 +1,5 @@
+from common.project_actions import (
+    shareTo, notification, getAssignNotification, getRevokeNotification, broadcastProject, broadcastDeleteProject)
 from common.actions import (restore, delete, withTrashed, trashList,
                             allItems, filterRecords, countStatuses,
                             searchRecords, addAttachment, deleteAttachments, getAttachments)
@@ -7,62 +9,12 @@ from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
 from common.custom import CustomPageNumberPagination
-from common.notification import sendNotification
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from users.models import User, Team
 from projects.models import Project
 from tasks.models import Task
-
-
-def getAssignNotification(data, request):
-    obj = {
-        'title': 'Project Assignment',
-        'description': (str(data.name) + " Project has assigned to you by " +
-                        str(request.user.first_name) + " " + str(request.user.last_name)),
-        'instance_id': data.id,
-        'model_name': 'projects'
-    }
-    return obj
-
-
-def getNotificationData(project_data, new_project, request):
-    team_users = User.objects.only('id').filter(
-        teams__in=project_data["teams"])
-    obj = getAssignNotification(new_project, request)
-    return [team_users, obj]
-
-
-def getRevokeNotification(data, request):
-    data = {
-        'title': 'Project Revokement',
-        'description': ("You have been revoked from Project " + str(data.name) + " by " +
-                        str(request.user.first_name) + " " + str(request.user.last_name)),
-    }
-    return data
-
-
-def notification(funcName, table, request, column, ids):
-    data = funcName(
-        table, request)
-    users = User.objects.filter(**{column: ids})
-    sendNotification(request, users, data)
-
-
-def shareTo(request, project_data, new_project):
-    if project_data["share"] != "justMe":
-        users = User.objects.only('id').filter(pk__in=project_data["users"])
-        new_project.users.set(users)
-        teams = Team.objects.only('id').filter(pk__in=project_data["teams"])
-        new_project.teams.set(teams)
-    if project_data["share"] == "everyone":
-        users = User.objects.all()
-        new_project.users.set(users)
-    [team_users, data] = getNotificationData(
-        project_data, new_project, request)
-    sendNotification(request, users, data, team_users)
-    return new_project
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -119,6 +71,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         new_project.save()
         serializer = ProjectSerializer(
             new_project, context={"request": request})
+        broadcastProject(new_project, serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -135,10 +88,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project.save()
         serializer = ProjectSerializer(
             project, context={"request": request})
+        broadcastProject(project, serializer.data)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        return delete(self, request, Project)
+        response = delete(self, request, Project)
+        ids = []
+        for id in response.data['deleted_ids']:
+            ids.append(str(id))
+        broadcastDeleteProject({'deleted_ids': ids})
+        return response
 
     @ action(detail=False, methods=["get"])
     def all(self, request):
