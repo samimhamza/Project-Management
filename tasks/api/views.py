@@ -145,26 +145,26 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["put"])
     def progress(self, request, pk=None):
+        # try:
+        task = self.get_object()
+        data = request.data
         try:
-            task = self.get_object()
-            data = request.data
-            try:
-                user = User.objects.get(pk=data['user_id'])
-            except User.DoesNotExist:
-                return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-            try:
-                userTask = UserTask.objects.get(user=user, task=task)
-            except UserTask.DoesNotExist:
-                return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
-            userTask.progress = data['progress']
-            userTask.save()
-            taskProgress(task)
-            serializer = ProgressSerializer(
-                userTask)
-            broadcastProgress(task.id, serializer.data, data['user_id'])
-            return Response(serializer.data)
-        except:
-            return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            user = User.objects.get(pk=data['user_id'])
+        except User.DoesNotExist:
+            return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            userTask = UserTask.objects.get(user=user, task=task)
+        except UserTask.DoesNotExist:
+            return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
+        userTask.progress = data['progress']
+        userTask.save()
+        taskProgress(task)
+        serializer = ProgressSerializer(
+            userTask)
+        broadcastProgress(task.id, serializer.data, data['user_id'])
+        return Response(serializer.data)
+        # except:
+        #     return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_serializer_class(self):
         try:

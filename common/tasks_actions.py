@@ -8,12 +8,13 @@ from common.notification import sendNotification
 
 def taskProgress(task):
     totalProgress = 0
-    sub_task = Task.objects.filter(parent=task)
-    if len(sub_task) > 0:
-        for sub_task in task.sub_tasks:
-            for user in sub_task.users:
+    sub_tasks = Task.objects.filter(deleted_at__isnull=True, parent=task)
+    if len(sub_tasks) > 0:
+        for sub_task in sub_tasks:
+            users = UserTask.objects.filter(task=sub_task)
+            for user in users:
                 totalProgress += user.progress
-        totalProgress = totalProgress / len(task.sub_tasks)
+        totalProgress = totalProgress / len(sub_tasks)
     else:
         users = UserTask.objects.filter(task=task)
         for user in users:
