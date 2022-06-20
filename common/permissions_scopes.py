@@ -3,20 +3,20 @@ from .permissions import CustomPermissions
 
 class TaskPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'tasks_v',
-        'create': 'tasks_c',
-        'retrieve': "tasks_v",
-        'update': 'tasks_u',
-        'partial_update': 'tasks_u',
-        'destroy': 'tasks_d',
-        'restore': 'tasks_d',
-        'trashed': 'tasks_d',
-        'all': 'tasks_v',
-        'delete': 'tasks_u',
-        'excluded_users': 'tasks_u',
+        'list': 'project_tasks_v',
+        'create': 'project_tasks_c',
+        'retrieve': "project_tasks_v",
+        'update': 'project_tasks_u',
+        'partial_update': 'project_tasks_u',
+        'destroy': 'project_tasks_d',
+        'restore': 'project_tasks_d',
+        'trashed': 'project_tasks_d',
+        'all': 'project_tasks_v',
+        'delete': 'project_tasks_u',
+        'excluded_users': 'project_tasks_u',
         'add_attachments': 'task_attachments_c',
         'delete_attachments': 'task_attachments_d',
-        'progress': 'tasks_u'
+        'progress': 'project_tasks_u'
     }
 
 

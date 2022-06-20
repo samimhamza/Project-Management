@@ -3,22 +3,25 @@ from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
 from common.tasks_actions import (
-    tasksOfProject, tasksResponse, checkAttributes, excludedDependencies, assignToUsers)
+    tasksOfProject, tasksResponse, checkAttributes, excludedDependencies, assignToUsers, taskProgress)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from users.api.serializers import UserWithProfileSerializer
 from common.custom import CustomPageNumberPagination
 from tasks.api.serializers import ProgressSerializer
+from tasks.models import Task, Comment, UserTask
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.pusher import pusher_client
-from tasks.models import Task, Comment, UserTask
 from users.models import User
 
 
 def broadcastProgress(task_id, data, user_id):
     pusher_client.trigger(
         u'task.'+str(task_id), u'progress', {
+            "id": data['task']['id'],
+            "name": data['task']['name'],
+            "task_progress": data['task']['progress'],
             "progress": data['progress'],
             'user_id': user_id,
         })
@@ -94,7 +97,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             assignToUsers(request, task, users)
 
         for key, value in request.data.items():
-            if key != "users" and key != "dependencies" and key != "id":
+            if key != "users" and key != "dependencies" and key != "id" and key != "progress":
                 setattr(task, key, value)
         task.updated_by = request.user
         task.save()
@@ -145,10 +148,17 @@ class TaskViewSet(viewsets.ModelViewSet):
         try:
             task = self.get_object()
             data = request.data
-            user = User.objects.get(pk=data['user_id'])
-            userTask = UserTask.objects.get(user=user, task=task)
+            try:
+                user = User.objects.get(pk=data['user_id'])
+            except User.DoesNotExist:
+                return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                userTask = UserTask.objects.get(user=user, task=task)
+            except UserTask.DoesNotExist:
+                return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
             userTask.progress = data['progress']
             userTask.save()
+            taskProgress(task)
             serializer = ProgressSerializer(
                 userTask)
             broadcastProgress(task.id, serializer.data, data['user_id'])

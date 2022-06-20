@@ -5,6 +5,12 @@ from rest_framework import serializers
 from tasks.models import UserTask
 
 
+class LessFieldsTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ["id", "name", "progress"]
+
+
 class UserTaskSerializer(serializers.ModelSerializer):
     user = UserWithProfileSerializer()
 
@@ -14,9 +20,11 @@ class UserTaskSerializer(serializers.ModelSerializer):
 
 
 class ProgressSerializer(serializers.ModelSerializer):
+    task = LessFieldsTaskSerializer()
+
     class Meta:
         model = UserTask
-        fields = ["progress"]
+        fields = ["progress", "task"]
 
 
 def users(self, task):
@@ -28,15 +36,6 @@ def users(self, task):
         del data['user']
         data.update(user)
     return serializer.data
-
-
-class LessFieldsTaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = [
-            "id",
-            "name",
-        ]
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -58,6 +57,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "a_end_date",
             "parent",
             "priority",
+            "progress",
             "status",
             "type",
             "dependencies",
@@ -85,6 +85,7 @@ class SubTaskSerializer(serializers.ModelSerializer):
             "a_start_date",
             "a_end_date",
             "priority",
+            "progress",
             "status",
             "type",
             "users",
@@ -128,6 +129,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             "a_end_date",
             "parent",
             "priority",
+            "progress",
             "status",
             "type",
             "dependencies",
