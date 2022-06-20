@@ -1,12 +1,12 @@
 from tasks.api.serializers import LessFieldsTaskSerializer
-from .actions import allItems, countStatuses
-from tasks.models import Task, UserTask
-from rest_framework.response import Response
-from projects.models import Project
 from common.notification import sendNotification
+from .actions import allItems, countStatuses
+from rest_framework.response import Response
+from tasks.models import Task, UserTask
+from projects.models import Project
 
 
-def taskProgress(task):
+def updateProgress(task):
     totalProgress = 0
     sub_tasks = Task.objects.filter(deleted_at__isnull=True, parent=task)
     if len(sub_tasks) > 0:
@@ -22,6 +22,11 @@ def taskProgress(task):
         totalProgress = totalProgress / len(users)
     task.progress = int(totalProgress)
     task.save()
+
+
+def taskProgress(task):
+    updateProgress(task)
+    updateProgress(task.parent)
 
 
 def getAssignNotification(data, request):

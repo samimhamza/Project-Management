@@ -1,9 +1,10 @@
-import uuid
-from django.db import models
-from projects.models import Project, Attachment, Reason
-from django.contrib.contenttypes.fields import GenericRelation
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from projects.models import Project, Attachment, Reason
+from django.db import models
+import uuid
 
 
 class Comment(models.Model):
@@ -35,7 +36,7 @@ class Comment(models.Model):
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, null=True)
+        "self", on_delete=models.SET_NULL, null=True, related_name="child")
     project = models.ForeignKey(
         Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
     )
@@ -46,7 +47,10 @@ class Task(models.Model):
     a_start_date = models.DateField(blank=True, null=True)
     a_end_date = models.DateField(blank=True, null=True)
     pin = models.BooleanField(default=False)
-    progress = models.IntegerField(default=0)
+    progress = models.IntegerField(default=0, validators=[
+        MaxValueValidator(100),
+        MinValueValidator(0)
+    ])
 
     class Priority(models.TextChoices):
         critical = "critical"
@@ -131,7 +135,10 @@ class UserTask(models.Model):
     task = models.ForeignKey(
         Task, on_delete=models.SET_NULL, null=True, related_name="users"
     )
-    progress = models.IntegerField(default=0)
+    progress = models.IntegerField(default=0, validators=[
+        MaxValueValidator(100),
+        MinValueValidator(0)
+    ])
 
     class UserTaskTypes(models.TextChoices):
         assign = "assign"
