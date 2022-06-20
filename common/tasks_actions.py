@@ -11,9 +11,7 @@ def updateProgress(task):
     sub_tasks = Task.objects.filter(deleted_at__isnull=True, parent=task)
     if len(sub_tasks) > 0:
         for sub_task in sub_tasks:
-            users = UserTask.objects.filter(task=sub_task)
-            for user in users:
-                totalProgress += user.progress
+            totalProgress += sub_task.progress
         totalProgress = totalProgress / len(sub_tasks)
     else:
         users = UserTask.objects.filter(task=task)
@@ -26,7 +24,13 @@ def updateProgress(task):
 
 def taskProgress(task):
     updateProgress(task)
-    updateProgress(task.parent)
+    parent = task.parent
+    while True:
+        if parent:
+            updateProgress(parent)
+            parent = parent.parent
+        else:
+            break
 
 
 def getAssignNotification(data, request):
