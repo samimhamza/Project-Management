@@ -203,3 +203,14 @@ class StagePermissions(CustomPermissions):
         'partial_update': 'stages_u',
         'destroy': 'stages_d'
     }
+
+
+class ProjectCategoryPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'project_categories_v',
+        'create': 'project_categories_c',
+        'retrieve': "project_categories_v",
+        'update': 'project_categories_u',
+        'partial_update': 'project_categories_u',
+        'destroy': 'project_categories_d'
+    }

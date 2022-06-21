@@ -135,3 +135,9 @@ class StageListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stage
         fields = ["id", "name", "category"]
+
+
+class ProjectCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectCategory
+        fields = "__all__"
