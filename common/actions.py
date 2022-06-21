@@ -1,18 +1,33 @@
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from expenses.api.serializers import LessFieldExpenseSerializer
-from projects.api.serializers import AttachmentSerializer
 from .team_actions import get_leader_by_id, get_total_users
+from projects.api.serializers import AttachmentSerializer
 from users.models import Team, Permission, Action, Role
 from common.permissions import checkCustomPermissions
-from rest_framework.response import Response
-from rest_framework import status
-from django.db import transaction
 from projects.models import Project, Attachment
+from django.core.files.base import ContentFile
+from rest_framework.response import Response
 from expenses.models import Expense
-from django.db.models import Q
+from rest_framework import status
 from django.utils import timezone
+from django.db import transaction
+from django.db.models import Q
 import datetime
+import base64
+import uuid
 import os
+
+
+def convertBase64ToImage(base64file):
+    if(base64file and base64file != ""):
+
+        format, imgstr = base64file.split(';base64,')
+        ext = format.split('/')[-1]
+        name = str(uuid.uuid4())+'.' + ext
+        imageField = ContentFile(base64.b64decode(
+            imgstr), name)
+        return imageField
+    return ''
 
 
 def getAttachments(request, data, id, permission):

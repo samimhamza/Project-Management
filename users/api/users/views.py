@@ -1,14 +1,13 @@
 from common.actions import (withTrashed, trashList, restore, delete,
-                            allItems, filterRecords, dataWithPermissions, searchRecords)
+                            allItems, filterRecords, dataWithPermissions, searchRecords, convertBase64ToImage)
 from users.api.serializers import UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
 from common.custom import CustomPageNumberPagination
-from common.base64_image import convertBase64ToImage
-from rest_framework import viewsets, status
+from users.models import User, UserPermissionList
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from users.models import User, UserPermissionList
+from rest_framework import viewsets, status
 import os
 
 

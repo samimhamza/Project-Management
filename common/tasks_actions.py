@@ -19,6 +19,7 @@ def broadcastProgress(task_id, data, user_id):
     for obj in data:
         newData.append(obj)
     newData[0]['user_id'] = user_id
+    print('sssss', newData)
     pusher_client.trigger(
         u'task.'+str(task_id), u'progress', newData)
 

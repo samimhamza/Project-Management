@@ -1,6 +1,6 @@
+from .actions import allItems, filterRecords, convertBase64ToImage
 from tasks.api.serializers import CommentSerializer
 from projects.models import Project, Attachment
-from .actions import allItems, filterRecords
 from rest_framework.response import Response
 from common.pusher import pusher_client
 from tasks.models import Comment, Task
@@ -75,9 +75,10 @@ def createComments(self, request):
             content_object=commentable
         )
         if "attachment" in request.data:
+            imageField = convertBase64ToImage(data["profile"])
             Attachment.objects.create(
                 content_object=comment,
-                attachment=data['attachment']
+                attachment=imageField
             )
         serializer = CommentSerializer(
             comment, context={"request": request})
