@@ -75,11 +75,10 @@ def createComments(self, request):
             content_object=commentable
         )
         if "attachment" in request.data:
-            for attachment in data['attachment']:
-                Attachment.objects.create(
-                    content_object=comment,
-                    attachment=attachment['file'],
-                    name=attachment['file'])
+            Attachment.objects.create(
+                content_object=comment,
+                attachment=data['attachment']
+            )
         serializer = CommentSerializer(
             comment, context={"request": request})
         broadcastComment(commentable, serializer.data)

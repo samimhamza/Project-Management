@@ -1,9 +1,10 @@
-from tasks.api.serializers import TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer
+from tasks.api.serializers import (
+    TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, LessTaskSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
-from common.tasks_actions import (
-    tasksOfProject, tasksResponse, checkAttributes, excludedDependencies, assignToUsers, taskProgress)
+from common.tasks_actions import (tasksOfProject, tasksResponse, checkAttributes,
+                                  excludedDependencies, assignToUsers, taskProgress, prepareData, broadcastProgress)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from users.api.serializers import UserWithProfileSerializer
 from common.custom import CustomPageNumberPagination
@@ -12,19 +13,7 @@ from tasks.models import Task, Comment, UserTask
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
-from common.pusher import pusher_client
 from users.models import User
-
-
-def broadcastProgress(task_id, data, user_id):
-    pusher_client.trigger(
-        u'task.'+str(task_id), u'progress', {
-            "id": data['task']['id'],
-            "name": data['task']['name'],
-            "task_progress": data['task']['progress'],
-            "progress": data['progress'],
-            'user_id': user_id,
-        })
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -161,8 +150,9 @@ class TaskViewSet(viewsets.ModelViewSet):
         taskProgress(task)
         serializer = ProgressSerializer(
             userTask)
-        broadcastProgress(task.id, serializer.data, data['user_id'])
-        return Response(serializer.data)
+        serializerData = prepareData(serializer, task)
+        broadcastProgress(task.id, serializerData, data['user_id'])
+        return Response(serializerData)
         # except:
         #     return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

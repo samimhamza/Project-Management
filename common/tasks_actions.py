@@ -1,9 +1,46 @@
-from tasks.api.serializers import LessFieldsTaskSerializer
+from tasks.api.serializers import LessFieldsTaskSerializer, LessTaskSerializer
 from common.notification import sendNotification
 from .actions import allItems, countStatuses
 from rest_framework.response import Response
+from common.pusher import pusher_client
 from tasks.models import Task, UserTask
 from projects.models import Project
+
+
+def broadcastProgress(task_id, data, user_id):
+    # new = {
+    #     "id": data['task']['id'],
+    #     "name": data['task']['name'],
+    #     "task_progress": data['task']['progress'],
+    #     "progress": data['progress'],
+    #     'user_id': user_id,
+    # }
+    newData = []
+    for obj in data:
+        newData.append(obj)
+    newData[0]['user_id'] = user_id
+    pusher_client.trigger(
+        u'task.'+str(task_id), u'progress', newData)
+
+
+def prepareData(serializer, task):
+    data = [serializer.data]
+    newData = data[0]
+    del data[0]
+    data.append(
+        {
+            "id": newData['task']['id'],
+            "progress": newData['task']['progress'],
+            "user_progress": newData['progress'],
+        })
+    parent = task.parent
+    while True:
+        if parent:
+            data.append(LessTaskSerializer(parent).data)
+            parent = parent.parent
+        else:
+            break
+    return data
 
 
 def updateProgress(task):
@@ -82,7 +119,7 @@ def tasksOfProject(self, request):
     queryset = Task.objects.filter(
         deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
-        return allItems(LessFieldsTaskSerializer, queryset)
+        return allItems(LessFieldsTaskSerializer, LessTaskSerializer, queryset)
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return tasksResponse(self, serializer, project_id)
