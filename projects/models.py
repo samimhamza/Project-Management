@@ -11,7 +11,7 @@ class ProjectCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
     parent = models.ForeignKey(
-        "self", related_name="project_category", on_delete=models.SET_NULL, null=True)
+        "self", on_delete=models.SET_NULL, null=True, related_name="project_category",)
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
