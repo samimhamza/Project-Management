@@ -12,9 +12,10 @@ class LessFieldsTaskSerializer(serializers.ModelSerializer):
 
 
 class LessTaskSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Task
-        fields = ["id", "progress"]
+        fields = ["id", "progress", "project"]
 
 
 class UserTaskSerializer(serializers.ModelSerializer):

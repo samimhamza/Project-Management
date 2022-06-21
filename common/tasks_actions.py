@@ -8,18 +8,11 @@ from projects.models import Project
 
 
 def broadcastProgress(task_id, data, user_id):
-    # new = {
-    #     "id": data['task']['id'],
-    #     "name": data['task']['name'],
-    #     "task_progress": data['task']['progress'],
-    #     "progress": data['progress'],
-    #     'user_id': user_id,
-    # }
     newData = []
     for obj in data:
+        obj['project'] = str(obj['project'])
         newData.append(obj)
     newData[0]['user_id'] = user_id
-    print('sssss', newData)
     pusher_client.trigger(
         u'task.'+str(task_id), u'progress', newData)
 
@@ -33,6 +26,7 @@ def prepareData(serializer, task):
             "id": newData['task']['id'],
             "progress": newData['task']['progress'],
             "user_progress": newData['progress'],
+            "project": newData['task']['project'],
         })
     parent = task.parent
     while True:
