@@ -7,7 +7,10 @@ from .models import (
     Reason,
     Attachment,
     Country,
-    Location
+    Location,
+    Stage,
+    SubStage,
+    ProjectCategory
 )
 
 admin.site.register(Project)
@@ -18,3 +21,6 @@ admin.site.register(Country)
 admin.site.register(Attachment)
 admin.site.register(Reason)
 admin.site.register(FocalPoint)
+admin.site.register(Stage)
+admin.site.register(SubStage)
+admin.site.register(ProjectCategory)

@@ -192,3 +192,14 @@ class RolePermissions(CustomPermissions):
         'partial_update': 'roles_u',
         'destroy': 'roles_d'
     }
+
+
+class StagePermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'stages_v',
+        'create': 'stages_c',
+        'retrieve': "stages_v",
+        'update': 'stages_u',
+        'partial_update': 'stages_u',
+        'destroy': 'stages_d'
+    }

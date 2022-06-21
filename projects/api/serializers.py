@@ -7,7 +7,10 @@ from projects.models import (
     Payment,
     Project,
     Attachment,
-    State
+    State,
+    Stage,
+    SubStage,
+    ProjectCategory
 )
 from users.api.serializers import UserWithProfileSerializer
 
@@ -117,3 +120,18 @@ class AttachmentSerializer(serializers.ModelSerializer):
         model = Attachment
         fields = ["id", "name", "attachment",
                   "size", "description", "uploaded_by", "created_at"]
+
+
+class StageSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer()
+    updated_by = UserWithProfileSerializer()
+
+    class Meta:
+        model = Stage
+        fields = "__all__"
+
+
+class StageListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stage
+        fields = ["id", "name", "category"]

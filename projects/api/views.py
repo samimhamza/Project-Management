@@ -1,6 +1,7 @@
 from common.permissions_scopes import (IncomePermissions,
-                                       FocalPointPermissions, LocationPermissions, PaymentPermissions)
+                                       FocalPointPermissions, LocationPermissions, PaymentPermissions, StagePermissions)
 from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments
+from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -11,7 +12,10 @@ from projects.models import (
     Income,
     Payment,
     State,
-    Project
+    Project,
+    Stage,
+    SubStage,
+    ProjectCategory
 )
 from projects.api.serializers import (
     FocalPointSerializer,
@@ -21,8 +25,9 @@ from projects.api.serializers import (
     PaymentSerializer,
     CountryListSerializer,
     StateListSerializer,
-    StateSerializer
-
+    StateSerializer,
+    StageSerializer,
+    StageListSerializer
 )
 from rest_framework import generics
 
@@ -145,3 +150,20 @@ class FocalPointViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class StageViewSet(viewsets.ModelViewSet):
+    queryset = Stage.objects.all()
+    serializer_class = StageSerializer
+    permission_classes = (StagePermissions,)
+    pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(StageListSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)

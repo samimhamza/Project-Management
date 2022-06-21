@@ -6,7 +6,8 @@ from projects.api.views import (
     FocalPointViewSet,
     LocationCreateAPIView,
     CountryListAPIView,
-    StateListAPIView
+    StateListAPIView,
+    StageViewSet
 )
 from rest_framework.routers import DefaultRouter
 
@@ -15,6 +16,7 @@ router.register(r"projects", ProjectViewSet, basename="projects")
 router.register(r"payments", PaymentViewSet, basename="payments")
 router.register(r"focal_points", FocalPointViewSet, basename="focal_points")
 router.register(r"incomes", IncomeViewSet, basename="incomes")
+router.register(r"stages", StageViewSet, basename="stages")
 
 urlpatterns = [
     path('locations/', LocationCreateAPIView.as_view(), name='locations'),
