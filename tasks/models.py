@@ -36,7 +36,7 @@ class Comment(models.Model):
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, null=True, related_name="child")
+        "self", on_delete=models.SET_NULL, null=True)
     project = models.ForeignKey(
         Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
     )
