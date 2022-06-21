@@ -151,7 +151,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = ProgressSerializer(
             userTask)
         serializerData = prepareData(serializer, task)
-        broadcastProgress(task.id, serializerData, data['user_id'])
+        broadcastProgress(serializerData)
         return Response(serializerData)
         # except:
         #     return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

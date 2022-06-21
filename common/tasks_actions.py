@@ -1,4 +1,4 @@
-from tasks.api.serializers import LessFieldsTaskSerializer, LessTaskSerializer
+from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer
 from common.notification import sendNotification
 from .actions import allItems, countStatuses
 from rest_framework.response import Response
@@ -7,31 +7,31 @@ from tasks.models import Task, UserTask
 from projects.models import Project
 
 
-def broadcastProgress(task_id, data, user_id):
-    newData = []
-    for obj in data:
-        obj['project'] = str(obj['project'])
-        newData.append(obj)
-    newData[0]['user_id'] = user_id
+def broadcastProgress(data):
+    project_id = {"project_id": str(data['project_id'])}
+    data.update(project_id)
     pusher_client.trigger(
-        u'task.'+str(task_id), u'progress', newData)
+        u'tasks', u'progress', data)
 
 
 def prepareData(serializer, task):
-    data = [serializer.data]
-    newData = data[0]
-    del data[0]
-    data.append(
+    data = {"serializer_data": serializer.data}
+    newData = data["serializer_data"]
+    del data["serializer_data"]
+    project_id = {"project_id": newData['task']['project']}
+    data.update(project_id)
+    user_progress = {"user_progress": newData['progress']}
+    data.update(user_progress)
+    data['tasks'] = []
+    data['tasks'].append(
         {
             "id": newData['task']['id'],
-            "progress": newData['task']['progress'],
-            "user_progress": newData['progress'],
-            "project": newData['task']['project'],
+            "progress": newData['task']['progress']
         })
     parent = task.parent
     while True:
         if parent:
-            data.append(LessTaskSerializer(parent).data)
+            data['tasks'].append(ParentTaskSerializer(parent).data)
             parent = parent.parent
         else:
             break
@@ -114,7 +114,7 @@ def tasksOfProject(self, request):
     queryset = Task.objects.filter(
         deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
-        return allItems(LessFieldsTaskSerializer, LessTaskSerializer, queryset)
+        return allItems(LessFieldsTaskSerializer, queryset)
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return tasksResponse(self, serializer, project_id)

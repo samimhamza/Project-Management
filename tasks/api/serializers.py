@@ -18,6 +18,13 @@ class LessTaskSerializer(serializers.ModelSerializer):
         fields = ["id", "progress", "project"]
 
 
+class ParentTaskSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = ["id", "progress"]
+
+
 class UserTaskSerializer(serializers.ModelSerializer):
     user = UserWithProfileSerializer()
 
