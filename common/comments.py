@@ -75,7 +75,7 @@ def createComments(self, request):
             content_object=commentable
         )
         if "attachment" in request.data:
-            imageField = convertBase64ToImage(data["profile"])
+            imageField = convertBase64ToImage(data["attachment"])
             Attachment.objects.create(
                 content_object=comment,
                 attachment=imageField
