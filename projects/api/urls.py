@@ -7,7 +7,8 @@ from projects.api.views import (
     LocationCreateAPIView,
     CountryListAPIView,
     StateListAPIView,
-    StageViewSet
+    StageViewSet,
+    ProjectCategoryViewSet
 )
 from rest_framework.routers import DefaultRouter
 
@@ -17,6 +18,8 @@ router.register(r"payments", PaymentViewSet, basename="payments")
 router.register(r"focal_points", FocalPointViewSet, basename="focal_points")
 router.register(r"incomes", IncomeViewSet, basename="incomes")
 router.register(r"stages", StageViewSet, basename="stages")
+router.register(r"project_categories", ProjectCategoryViewSet,
+                basename="project_categories")
 
 urlpatterns = [
     path('locations/', LocationCreateAPIView.as_view(), name='locations'),
