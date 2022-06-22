@@ -220,6 +220,19 @@
 	},
 	{
 		"fields": {
+			"name": "sub_stages",
+			"codename": "sub",
+			"model": "sub_stages"
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "u", "name": "Update" }
+		]
+	},
+	{
+		"fields": {
 			"name": "project_categories",
 			"codename": "pc",
 			"model": "Project Category"

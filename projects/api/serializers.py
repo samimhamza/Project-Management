@@ -1,3 +1,4 @@
+from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 from projects.models import (
     Country,
@@ -7,12 +8,8 @@ from projects.models import (
     Payment,
     Project,
     Attachment,
-    State,
-    Stage,
-    SubStage,
-    ProjectCategory
+    State
 )
-from users.api.serializers import UserWithProfileSerializer
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -120,24 +117,3 @@ class AttachmentSerializer(serializers.ModelSerializer):
         model = Attachment
         fields = ["id", "name", "attachment",
                   "size", "description", "uploaded_by", "created_at"]
-
-
-class StageSerializer(serializers.ModelSerializer):
-    created_by = UserWithProfileSerializer()
-    updated_by = UserWithProfileSerializer()
-
-    class Meta:
-        model = Stage
-        fields = "__all__"
-
-
-class StageListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Stage
-        fields = ["id", "name", "category"]
-
-
-class ProjectCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectCategory
-        fields = "__all__"

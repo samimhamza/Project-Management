@@ -1,5 +1,8 @@
-from django.urls import path, include, re_path
+from .project_category.views import ProjectCategoryViewSet
+from .stage.views import StageViewSet, SubStageViewSet
 from projects.api.project.views import ProjectViewSet
+from rest_framework.routers import DefaultRouter
+from django.urls import path, include, re_path
 from projects.api.views import (
     IncomeViewSet,
     PaymentViewSet,
@@ -7,10 +10,7 @@ from projects.api.views import (
     LocationCreateAPIView,
     CountryListAPIView,
     StateListAPIView,
-    StageViewSet,
-    ProjectCategoryViewSet
 )
-from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r"projects", ProjectViewSet, basename="projects")
@@ -18,6 +18,7 @@ router.register(r"payments", PaymentViewSet, basename="payments")
 router.register(r"focal_points", FocalPointViewSet, basename="focal_points")
 router.register(r"incomes", IncomeViewSet, basename="incomes")
 router.register(r"stages", StageViewSet, basename="stages")
+router.register(r"sub_stages", SubStageViewSet, basename="sub_stages")
 router.register(r"project_categories", ProjectCategoryViewSet,
                 basename="project_categories")
 
