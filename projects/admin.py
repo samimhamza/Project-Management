@@ -10,7 +10,7 @@ from .models import (
     Location,
     Stage,
     SubStage,
-    ProjectCategory
+    Department
 )
 
 admin.site.register(Project)
@@ -23,4 +23,4 @@ admin.site.register(Reason)
 admin.site.register(FocalPoint)
 admin.site.register(Stage)
 admin.site.register(SubStage)
-admin.site.register(ProjectCategory)
+admin.site.register(Department)

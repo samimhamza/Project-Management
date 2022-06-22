@@ -1,4 +1,4 @@
-from .project_category.views import ProjectCategoryViewSet
+from .department.views import DepartmentViewSet
 from .stage.views import StageViewSet, SubStageViewSet
 from projects.api.project.views import ProjectViewSet
 from rest_framework.routers import DefaultRouter
@@ -19,8 +19,8 @@ router.register(r"focal_points", FocalPointViewSet, basename="focal_points")
 router.register(r"incomes", IncomeViewSet, basename="incomes")
 router.register(r"stages", StageViewSet, basename="stages")
 router.register(r"sub_stages", SubStageViewSet, basename="sub_stages")
-router.register(r"project_categories", ProjectCategoryViewSet,
-                basename="project_categories")
+router.register(r"departments", DepartmentViewSet,
+                basename="departments")
 
 urlpatterns = [
     path('locations/', LocationCreateAPIView.as_view(), name='locations'),

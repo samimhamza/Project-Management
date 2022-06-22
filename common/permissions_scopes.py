@@ -205,7 +205,7 @@ class StagePermissions(CustomPermissions):
     }
 
 
-class ProjectCategoryPermissions(CustomPermissions):
+class DepartmentPermissions(CustomPermissions):
     actions_scopes = {
         'list': 'project_categories_v',
         'create': 'project_categories_c',

@@ -7,22 +7,20 @@ from django.db import models
 import uuid
 
 
-class ProjectCategory(models.Model):
+class Department(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
-    parent = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, null=True, related_name="project_category")
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
         null=True,
-        related_name="project_category_created_by",
+        related_name="department_created_by",
     )
     updated_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
         null=True,
-        related_name="project_category_updated_by",
+        related_name="department_updated_by",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -133,7 +131,7 @@ class Project(models.Model):
     a_end_date = models.DateField(null=True, blank=True)
     banner = models.CharField(max_length=120, null=True, blank=True)
     category = models.ForeignKey(
-        ProjectCategory, related_name="projects_category", on_delete=models.SET_NULL, null=True)
+        Department, related_name="projects_category", on_delete=models.SET_NULL, null=True)
 
     class StatusChoices(models.TextChoices):
         pending = "pending"
@@ -393,8 +391,8 @@ class Stage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
     description = models.TextField()
-    category = models.ManyToManyField(
-        ProjectCategory, related_name="stage_categories")
+    department = models.ManyToManyField(
+        Department, related_name="department_stages")
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
