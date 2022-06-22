@@ -109,7 +109,7 @@ def delete(self, request, table, imageField=None):
         items = table.objects.filter(pk__in=data["ids"])
         for item in items:
             ids.append(item.id)
-            if getattr(item, 'deleted_at', False):
+            if getattr(table, 'deleted_at', False):
                 if item.deleted_at:
                     item.delete()
                 else:

@@ -1,14 +1,16 @@
+from common.actions import allItems, filterRecords, delete, allItems, restore, trashList, withTrashed
 from common.permissions_scopes import DepartmentPermissions
 from common.custom import CustomPageNumberPagination
-from common.actions import allItems, filterRecords
 from .serializers import DepartmentSerializer
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from projects.models import Department
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
-    queryset = Department.objects.all()
+    queryset = Department.objects.filter(
+        deleted_at__isnull=True).order_by('-created_at')
     serializer_class = DepartmentSerializer
     permission_classes = (DepartmentPermissions,)
     pagination_class = CustomPageNumberPagination
@@ -34,3 +36,31 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(
             new_category)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        project = self.get_object()
+        data = request.data
+        for key, value in data.items():
+            if key != "id":
+                setattr(project, key, value)
+        project.updated_by = request.user
+        project.save()
+        serializer = self.get_serializer(
+            project)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Department)
+
+    @ action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, Department, order_by="-created_at")
+
+    @ action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Department)
+
+    # for multi and single restore
+    @ action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Department)
