@@ -1,7 +1,7 @@
 from common.permissions_scopes import DepartmentPermissions
-from .serializers import DepartmentSerializer
 from common.custom import CustomPageNumberPagination
 from common.actions import allItems, filterRecords
+from .serializers import DepartmentSerializer
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from projects.models import Department
