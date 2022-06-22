@@ -130,8 +130,8 @@ class Project(models.Model):
     a_start_date = models.DateField(null=True, blank=True)
     a_end_date = models.DateField(null=True, blank=True)
     banner = models.CharField(max_length=120, null=True, blank=True)
-    category = models.ForeignKey(
-        Department, related_name="projects_category", on_delete=models.SET_NULL, null=True)
+    department = models.ForeignKey(
+        Department, related_name="department", on_delete=models.SET_NULL, null=True)
 
     class StatusChoices(models.TextChoices):
         pending = "pending"
