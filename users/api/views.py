@@ -27,7 +27,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
 
 
 class PermmissionListAPIView(generics.ListAPIView):
-    queryset = Action.objects.all()
+    queryset = Action.objects.all().order_by('order')
     serializer_class = ActionSerializer
     permission_classes = (IsAuthenticated,)
 

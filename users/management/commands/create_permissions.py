@@ -14,6 +14,7 @@ class Command(BaseCommand):
                 name=action['fields']['name'])
             action_obj.codename = action['fields']['codename']
             action_obj.model = action['fields']['model']
+            action_obj.order = action['fields']['order']
             action_obj.save()
             for sub_action in action['sub_actions']:
                 sub_action_obj, created = SubAction.objects.get_or_create(
