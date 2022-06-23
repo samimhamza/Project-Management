@@ -110,6 +110,7 @@ def delete(self, request, table, imageField=None):
                     item.delete()
                 else:
                     item.deleted_at = datetime.datetime.now(tz=timezone.utc)
+                    item.deleted_by = request.user
                     item.save()
             else:
                 if imageField:
@@ -124,6 +125,7 @@ def delete(self, request, table, imageField=None):
                 item.delete()
             else:
                 item.deleted_at = datetime.datetime.now(tz=timezone.utc)
+                item.deleted_by = request.user
                 item.save()
         else:
             if imageField:

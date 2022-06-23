@@ -1,5 +1,7 @@
-from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments, restore, withTrashed, trashList
-from common.permissions_scopes import IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions
+from common.actions import (delete, allItems, filterRecords, addAttachment,
+                            deleteAttachments, getAttachments, restore, withTrashed, trashList)
+from common.permissions_scopes import (
+    IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -13,7 +15,8 @@ from projects.api.serializers import (
     CountryListSerializer,
     StateListSerializer,
     StateSerializer,
-    FocalPointTrashedSerializer
+    FocalPointTrashedSerializer,
+    IncomeTrashedSerializer
 )
 from projects.models import (
     Country,
@@ -87,6 +90,9 @@ class IncomeViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = IncomeSerializer
     permission_classes = (IncomePermissions,)
+    serializer_action_classes = {
+        "trashed": IncomeTrashedSerializer
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -128,6 +134,25 @@ class IncomeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, Income, order_by="-created_at")
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Income)
+
+    # for multi and single restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Income)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
 
 class FocalPointViewSet(viewsets.ModelViewSet):

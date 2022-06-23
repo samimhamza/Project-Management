@@ -140,3 +140,26 @@ class FocalPointTrashedSerializer(serializers.ModelSerializer):
             "updated_by",
             "deleted_by"
         ]
+
+
+class IncomeTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return '{} {}'.format(obj.contact_name, obj.contact_last_name)
+
+    class Meta:
+        model = FocalPoint
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]

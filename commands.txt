@@ -1,5 +1,9 @@
-py manage.py loaddata ./seed/sub_actions.json 
-py manage.py dumpdata users.action > ./seed/actions.json
+py manage.py create_countries
 py manage.py create_permissions
-py manage.py create_permission_role Admin 
-py manage.py create_role_user Admin e7df5aa0-9f64-4056-8440-02368919cadf
+py manage.py create_role Admin 
+py manage.py create_role_user Admin user_id
+
+
+commands that are not used anymore:
+  py manage.py loaddata ./seed/sub_actions.json 
+  py manage.py dumpdata users.action > ./seed/actions.json
