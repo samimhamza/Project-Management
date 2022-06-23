@@ -1,11 +1,19 @@
+from projects.api.department.serializers import DepartmentListSerializer
 from users.api.serializers import UserWithProfileSerializer
-from projects.models import Stage, SubStage
+from projects.models import Stage, SubStage, Department
 from rest_framework import serializers
 
 
 class StageSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
+    departments = serializers.SerializerMethodField()
+
+    def get_departments(self, stage):
+        qs = Department.objects.filter(
+            deleted_at__isnull=True, department_stages=stage)
+        serializer = DepartmentListSerializer(instance=qs, many=True)
+        return serializer.data
 
     class Meta:
         model = Stage

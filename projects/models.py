@@ -391,7 +391,7 @@ class Stage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
     description = models.TextField()
-    department = models.ManyToManyField(
+    departments = models.ManyToManyField(
         Department, related_name="department_stages")
     created_by = models.ForeignKey(
         'users.User',
