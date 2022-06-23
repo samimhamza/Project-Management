@@ -16,7 +16,8 @@ from projects.api.serializers import (
     StateListSerializer,
     StateSerializer,
     FocalPointTrashedSerializer,
-    IncomeTrashedSerializer
+    IncomeTrashedSerializer,
+    PaymentTrashedSerializer
 )
 from projects.models import (
     Country,
@@ -83,6 +84,28 @@ class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
     permission_classes = (PaymentPermissions,)
+    serializer_action_classes = {
+        "trashed": PaymentTrashedSerializer
+    }
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, Income, order_by="-created_at")
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, Income)
+
+    # for multi and single restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, Income)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
 
 class IncomeViewSet(viewsets.ModelViewSet):

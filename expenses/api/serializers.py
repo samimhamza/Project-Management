@@ -53,3 +53,61 @@ class LessFieldExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = ["id", "title", "data"]
+
+
+class CategoryTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]
+
+
+class ExpenseTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+    name = serializers.CharField(source="title")
+
+    class Meta:
+        model = Expense
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]
+
+
+class ExpenseItemTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = ExpenseItem
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]

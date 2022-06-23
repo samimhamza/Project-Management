@@ -1,7 +1,7 @@
 from common.actions import (withTrashed, trashList, delete, restore, allItems,
                             filterRecords, expensesOfProject, addAttachment, deleteAttachments, getAttachments)
-from common.permissions_scopes import ExpensePermissions
 from expenses.models import Expense, ExpenseItem, Category
+from common.permissions_scopes import ExpensePermissions
 from common.custom import CustomPageNumberPagination
 from projects.models import Project
 from django.shortcuts import get_object_or_404
@@ -9,11 +9,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from expenses.api.serializers import (
-    ExpenseSerializer,
-    ExpenseItemSerializer,
     CategorySerializer,
+    CategoryTrashedSerializer,
+    ExpenseSerializer,
     LessFieldExpenseSerializer,
-    ExpenseListSerializer
+    ExpenseListSerializer,
+    ExpenseTrashedSerializer,
+    ExpenseItemSerializer,
+    ExpenseItemTrashedSerializer
 )
 from users.models import User
 
@@ -24,6 +27,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ExpensePermissions,)
+    serializer_action_classes = {
+        "trashed": CategoryTrashedSerializer
+    }
     queryset_actions = {
         "destroy": Category.objects.all(),
     }
@@ -44,6 +50,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def restore(self, request, pk=None):
         return restore(self, request, Category)
 
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
+
     def get_queryset(self):
         try:
             return self.queryset_actions[self.action]
@@ -57,6 +69,9 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ExpensePermissions,)
+    serializer_action_classes = {
+        "trashed": ExpenseTrashedSerializer
+    }
     queryset_actions = {
         "destroy": Expense.objects.all(),
     }
@@ -149,6 +164,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
 
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
+
     def get_queryset(self):
         try:
             return self.queryset_actions[self.action]
@@ -162,6 +183,9 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseItemSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ExpensePermissions,)
+    serializer_action_classes = {
+        "trashed": ExpenseItemTrashedSerializer
+    }
     queryset_actions = {
         "destroy": ExpenseItem.objects.all(),
     }
@@ -208,6 +232,12 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
     @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, ExpenseItem)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:
