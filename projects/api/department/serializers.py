@@ -1,4 +1,5 @@
 from users.api.serializers import UserWithProfileSerializer
+from projects.api.stage.serializers import StageSerializer
 from rest_framework import serializers
 from projects.models import Department
 
