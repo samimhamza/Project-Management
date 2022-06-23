@@ -102,7 +102,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         broadcastDeleteProject({'deleted_ids': ids})
         return response
 
-    @ action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Project, order_by="-created_at")
 

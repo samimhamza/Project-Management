@@ -136,7 +136,10 @@ class PaymentPermissions(CustomPermissions):
         'retrieve': "project_payments_v",
         'update': 'project_payments_u',
         'partial_update': 'project_payments_u',
-        'destroy': 'project_payments_d'
+        'destroy': 'project_payments_d',
+        'restore': 'project_payments_d',
+        'trashed': 'project_payments_d',
+        'all': 'project_payments_v',
     }
 
 
@@ -147,7 +150,10 @@ class FocalPointPermissions(CustomPermissions):
         'retrieve': "project_focal_points_v",
         'update': 'project_focal_points_u',
         'partial_update': 'project_focal_points_u',
-        'destroy': 'project_focal_points_d'
+        'destroy': 'project_focal_points_d',
+        'restore': 'project_focal_points_d',
+        'trashed': 'project_focal_points_d',
+        'all': 'project_focal_points_v',
     }
 
 
