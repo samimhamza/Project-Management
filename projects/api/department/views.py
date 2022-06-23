@@ -10,7 +10,7 @@ from projects.models import Department
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.filter(
-        deleted_at__isnull=True).order_by('-created_at')
+        deleted_at__isnull=True).order_by('-updated_at')
     serializer_class = DepartmentSerializer
     permission_classes = (DepartmentPermissions,)
     pagination_class = CustomPageNumberPagination

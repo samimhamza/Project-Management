@@ -1,16 +1,50 @@
 from users.api.serializers import UserWithProfileSerializer
-from projects.api.stage.serializers import StageSerializer
 from rest_framework import serializers
-from projects.models import Department
+from projects.models import Department, Stage, SubStage
+
+
+class SubStageListSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer()
+    updated_by = UserWithProfileSerializer()
+
+    class Meta:
+        model = SubStage
+        fields = ["id", "name", "description", "created_by",
+                  "updated_by", "created_at", "updated_at"]
+
+
+class StageListSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer()
+    updated_by = UserWithProfileSerializer()
+    sub_stages = serializers.SerializerMethodField()
+
+    def get_sub_stages(self, stage):
+        qs = SubStage.objects.filter(
+            deleted_at__isnull=True, stage=stage).order_by('-updated_at')
+        serializer = SubStageListSerializer(instance=qs, many=True)
+        return serializer.data
+
+    class Meta:
+        model = Stage
+        fields = ["id", "name", "description", "created_by",
+                  "updated_by", "created_at", "updated_at", "sub_stages"]
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
+    stages = serializers.SerializerMethodField()
+
+    def get_stages(self, department):
+        qs = Stage.objects.filter(
+            deleted_at__isnull=True, department=department).order_by('-updated_at')
+        serializer = StageListSerializer(instance=qs, many=True)
+        return serializer.data
 
     class Meta:
         model = Department
-        fields = "__all__"
+        fields = ["id", "name", "description", "created_by",
+                  "updated_by", "created_at", "updated_at", "stages"]
 
 
 class DepartmentListSerializer(serializers.ModelSerializer):

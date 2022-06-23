@@ -11,7 +11,8 @@ from projects.models import Department
 
 
 class StageViewSet(viewsets.ModelViewSet):
-    queryset = Stage.objects.all()
+    queryset = Stage.objects.filter(
+        deleted_at__isnull=True).order_by('-updated_at')
     serializer_class = StageSerializer
     permission_classes = (StagePermissions,)
     pagination_class = CustomPageNumberPagination
@@ -53,7 +54,8 @@ class StageViewSet(viewsets.ModelViewSet):
 
 
 class SubStageViewSet(viewsets.ModelViewSet):
-    queryset = SubStage.objects.all()
+    queryset = SubStage.objects.filter(
+        deleted_at__isnull=True).order_by('-updated_at')
     serializer_class = SubStageSerializer
     permission_classes = (SubStagePermissions,)
     pagination_class = CustomPageNumberPagination

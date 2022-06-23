@@ -435,7 +435,7 @@ class Stage(models.Model):
     name = models.CharField(max_length=124)
     description = models.TextField()
     department = models.ForeignKey(
-        Department, related_name="department_stage", on_delete=models.SET_NULL, null=True)
+        Department, related_name="stages", on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
@@ -468,7 +468,7 @@ class SubStage(models.Model):
     name = models.CharField(max_length=124)
     description = models.TextField()
     stage = models.ForeignKey(
-        Stage, related_name="sub_stage", on_delete=models.CASCADE)
+        Stage, related_name="sub_stages", on_delete=models.CASCADE)
     task = models.ManyToManyField(
         "tasks.Task", related_name="tasks")
     created_by = models.ForeignKey(
