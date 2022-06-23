@@ -1,5 +1,5 @@
+from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments, restore, withTrashed, trashList
 from common.permissions_scopes import IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions
-from common.actions import delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -12,7 +12,8 @@ from projects.api.serializers import (
     PaymentSerializer,
     CountryListSerializer,
     StateListSerializer,
-    StateSerializer
+    StateSerializer,
+    FocalPointTrashedSerializer
 )
 from projects.models import (
     Country,
@@ -133,6 +134,9 @@ class FocalPointViewSet(viewsets.ModelViewSet):
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
     permission_classes = (FocalPointPermissions,)
+    serializer_action_classes = {
+        "trashed": FocalPointTrashedSerializer
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -143,3 +147,22 @@ class FocalPointViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request):
+        return withTrashed(self, FocalPoint, order_by="-created_at")
+
+    @action(detail=False, methods=["get"])
+    def trashed(self, request):
+        return trashList(self, FocalPoint)
+
+    # for multi and single restore
+    @action(detail=False, methods=["get"])
+    def restore(self, request, pk=None):
+        return restore(self, request, FocalPoint)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
