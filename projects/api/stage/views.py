@@ -3,9 +3,11 @@ from .serializers import (StageSerializer, StageListSerializer, SubStageSerializ
 from common.actions import allItems, filterRecords, delete, trashList, withTrashed, restore
 from common.permissions_scopes import StagePermissions, SubStagePermissions
 from common.custom import CustomPageNumberPagination
+from rest_framework.response import Response
 from rest_framework.decorators import action
 from projects.models import Stage, SubStage
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from projects.models import Department
 
 
 class StageViewSet(viewsets.ModelViewSet):
@@ -68,6 +70,20 @@ class SubStageViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def create(self, request):
+        data = request.data
+        data["created_by"] = request.user
+        new_stage = Stage.objects.create(
+            name=data["name"],
+            description=data["description"],
+            created_by=data["created_by"],
+            updated_by=data["created_by"],
+        )
+        new_stage.departments.set(data["departments"])
+        new_stage.save()
+        serializer = self.get_serializer(new_stage)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         return delete(self, request, SubStage)
