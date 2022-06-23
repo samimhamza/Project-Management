@@ -41,7 +41,7 @@ class StageViewSet(viewsets.ModelViewSet):
         return trashList(self, Stage)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Stage)
 
@@ -110,7 +110,7 @@ class SubStageViewSet(viewsets.ModelViewSet):
         return trashList(self, SubStage)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, SubStage)
 

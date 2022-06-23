@@ -97,7 +97,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return trashList(self, Income)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Income)
 
@@ -167,7 +167,7 @@ class IncomeViewSet(viewsets.ModelViewSet):
         return trashList(self, Income)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Income)
 
@@ -205,7 +205,7 @@ class FocalPointViewSet(viewsets.ModelViewSet):
         return trashList(self, FocalPoint)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, FocalPoint)
 

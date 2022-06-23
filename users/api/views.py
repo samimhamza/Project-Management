@@ -147,7 +147,7 @@ class RoleViewSet(viewsets.ModelViewSet):
     def trashed(self, request):
         return trashList(self, Role)
 
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Role)
 

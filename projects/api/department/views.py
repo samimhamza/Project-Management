@@ -64,7 +64,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         return trashList(self, Department)
 
     # for multi and single restore
-    @ action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Department)
 

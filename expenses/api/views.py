@@ -46,7 +46,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return trashList(self, Category)
 
     # for multi restore
-    @ action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Category)
 
@@ -152,7 +152,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         return trashList(self, Expense)
 
     # for multi restore
-    @ action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Expense)
 
@@ -229,7 +229,7 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
         return trashList(self, ExpenseItem)
 
     # for multi restore
-    @ action(detail=False, methods=["get"])
+    @ action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, ExpenseItem)
 

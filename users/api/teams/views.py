@@ -112,7 +112,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         return trashList(self, Team)
 
     # for multi and single restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Team)
 

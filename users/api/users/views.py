@@ -112,7 +112,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
     # for multi restore
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, User)
 
