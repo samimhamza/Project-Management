@@ -30,6 +30,33 @@ class StageViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    def create(self, request):
+        data = request.data
+        data["created_by"] = request.user
+        new_stage = Stage.objects.create(
+            name=data["name"],
+            description=data["description"],
+            created_by=data["created_by"],
+            updated_by=data["created_by"],
+        )
+        new_stage.departments.set(data["departments"])
+        new_stage.save()
+        serializer = self.get_serializer(new_stage)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        stage = self.get_object()
+        data = request.data
+        if request.data.get("departments") is not None:
+            stage.departments.set(request.data.get("departments"))
+        for key, value in data.items():
+            if key != "departments" and key != "id":
+                setattr(stage, key, value)
+        stage.updated_by = request.user
+        stage.save()
+        serializer = self.get_serializer(stage)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
     def destroy(self, request, pk=None):
         return delete(self, request, Stage)
 
@@ -76,13 +103,12 @@ class SubStageViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
-        new_stage = Stage.objects.create(
+        new_stage = SubStage.objects.create(
             name=data["name"],
             description=data["description"],
             created_by=data["created_by"],
             updated_by=data["created_by"],
         )
-        new_stage.departments.set(data["departments"])
         new_stage.save()
         serializer = self.get_serializer(new_stage)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -90,10 +116,8 @@ class SubStageViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         stage = self.get_object()
         data = request.data
-        if request.data.get("departments") is not None:
-            stage.departments.set(request.data.get("departments"))
         for key, value in data.items():
-            if key != "departments" and key != "id":
+            if key != "id":
                 setattr(stage, key, value)
         stage.updated_by = request.user
         stage.save()
