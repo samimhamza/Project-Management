@@ -85,6 +85,19 @@ class SubStageViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(new_stage)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def update(self, request, pk=None):
+        stage = self.get_object()
+        data = request.data
+        if request.data.get("departments") is not None:
+            stage.departments.set(request.data.get("departments"))
+        for key, value in data.items():
+            if key != "departments" and key != "id":
+                setattr(stage, key, value)
+        stage.updated_by = request.user
+        stage.save()
+        serializer = self.get_serializer(stage)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
     def destroy(self, request, pk=None):
         return delete(self, request, SubStage)
 
