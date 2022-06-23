@@ -469,8 +469,6 @@ class SubStage(models.Model):
     description = models.TextField()
     stage = models.ForeignKey(
         Stage, related_name="sub_stages", on_delete=models.CASCADE)
-    task = models.ManyToManyField(
-        "tasks.Task", related_name="tasks")
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,

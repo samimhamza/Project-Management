@@ -82,6 +82,8 @@ class Task(models.Model):
     type = models.CharField(
         max_length=24, choices=Types.choices, default="independent")
     dependencies = models.JSONField(blank=True, null=True)
+    sub_stage = models.ForeignKey(
+        "projects.SubStage", related_name="%(class)s", on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
