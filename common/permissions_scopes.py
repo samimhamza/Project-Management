@@ -212,8 +212,8 @@ class StagePermissions(CustomPermissions):
         'partial_update': 'stages_u',
         'destroy': 'stages_d',
         'restore': 'stages_d',
-        'trashed': 'stage_d',
-        'all': 'stage_v'
+        'trashed': 'stages_d',
+        'all': 'stages_v'
     }
 
 
