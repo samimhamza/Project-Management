@@ -190,7 +190,10 @@ class RolePermissions(CustomPermissions):
         'retrieve': "roles_v",
         'update': 'roles_u',
         'partial_update': 'roles_u',
-        'destroy': 'roles_d'
+        'destroy': 'roles_d',
+        'restore': 'roles_d',
+        'trashed': 'roles_d',
+        'all': 'roles_v'
     }
 
 
@@ -201,18 +204,24 @@ class StagePermissions(CustomPermissions):
         'retrieve': "stages_v",
         'update': 'stages_u',
         'partial_update': 'stages_u',
-        'destroy': 'stages_d'
+        'destroy': 'stages_d',
+        'restore': 'stages_d',
+        'trashed': 'stage_d',
+        'all': 'stage_v'
     }
 
 
 class DepartmentPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'project_categories_v',
-        'create': 'project_categories_c',
-        'retrieve': "project_categories_v",
-        'update': 'project_categories_u',
-        'partial_update': 'project_categories_u',
-        'destroy': 'project_categories_d'
+        'list': 'departments_v',
+        'create': 'departments_c',
+        'retrieve': "departments_v",
+        'update': 'departments_u',
+        'partial_update': 'departments_u',
+        'destroy': 'departments_d',
+        'restore': 'departments_d',
+        'trashed': 'departments_d',
+        'all': 'departments_v'
     }
 
 
@@ -223,5 +232,8 @@ class SubStagePermissions(CustomPermissions):
         'retrieve': "sub_stages_v",
         'update': 'sub_stages_u',
         'partial_update': 'sub_stages_u',
-        'destroy': 'sub_stages_d'
+        'destroy': 'sub_stages_d',
+        'restore': 'sub_stages_d',
+        'trashed': 'sub_stages_d',
+        'all': 'sub_stages_v'
     }

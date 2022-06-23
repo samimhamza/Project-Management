@@ -1,23 +1,24 @@
-from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords, searchRecords
-from users.api.serializers import UserWithProfileSerializer
+from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from projects.api.serializers import ProjectNameListSerializer
-from rest_framework.response import Response
-from rest_framework.decorators import action
+from users.api.serializers import UserWithProfileSerializer
+from common.permissions_scopes import TeamPermissions
 from rest_framework.generics import get_object_or_404
 from common.custom import CustomPageNumberPagination
 from users.models import User, Team, TeamUser
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import viewsets, status
-from projects.models import Project
-from django.db import transaction
-from common.permissions_scopes import TeamPermissions
 from users.api.teams.serializers import (
     TeamListSerializer,
     TeamUserSerializer,
     TeamNamesSerializer,
     TeamRetieveSerializer,
-    ProjectTeamSerializer
+    ProjectTeamSerializer,
+    TeamTrashedSerializer
 )
+from projects.models import Project
+from django.db import transaction
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -30,6 +31,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         "retrieve": TeamRetieveSerializer,
         "update": TeamRetieveSerializer,
         "add_project": ProjectTeamSerializer,
+        "trashed": TeamTrashedSerializer
     }
     queryset_actions = {
         "destroy": Team.objects.all(),

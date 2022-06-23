@@ -1,6 +1,7 @@
-from users.api.serializers import UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer
 from common.actions import (withTrashed, trashList, restore, delete,
                             allItems, filterRecords, dataWithPermissions, searchRecords, convertBase64ToImage)
+from users.api.serializers import (
+    UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer)
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
 from common.custom import CustomPageNumberPagination

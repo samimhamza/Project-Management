@@ -1,4 +1,5 @@
-from .serializers import StageSerializer, StageListSerializer, SubStageSerializer, SubStageListSerializer
+from .serializers import (StageSerializer, StageListSerializer,
+                          SubStageSerializer, SubStageListSerializer, StageTrashedSerializer)
 from common.actions import allItems, filterRecords, delete, trashList, withTrashed, restore
 from common.permissions_scopes import StagePermissions, SubStagePermissions
 from common.custom import CustomPageNumberPagination
@@ -12,6 +13,9 @@ class StageViewSet(viewsets.ModelViewSet):
     serializer_class = StageSerializer
     permission_classes = (StagePermissions,)
     pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+        "trashed": StageTrashedSerializer
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -38,6 +42,12 @@ class StageViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Stage)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
 
 class SubStageViewSet(viewsets.ModelViewSet):

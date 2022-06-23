@@ -1,7 +1,7 @@
 from common.actions import allItems, filterRecords, delete, allItems, restore, trashList, withTrashed
+from .serializers import DepartmentSerializer, DepartmentTrashedSerializer
 from common.permissions_scopes import DepartmentPermissions
 from common.custom import CustomPageNumberPagination
-from .serializers import DepartmentSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -14,6 +14,9 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     serializer_class = DepartmentSerializer
     permission_classes = (DepartmentPermissions,)
     pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+        "trashed": DepartmentTrashedSerializer,
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -64,3 +67,9 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     @ action(detail=False, methods=["get"])
     def restore(self, request, pk=None):
         return restore(self, request, Department)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()

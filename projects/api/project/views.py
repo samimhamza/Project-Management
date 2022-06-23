@@ -3,8 +3,8 @@ from common.project_actions import (
 from common.actions import (restore, delete, withTrashed, trashList,
                             allItems, filterRecords, countStatuses,
                             searchRecords, addAttachment, deleteAttachments, getAttachments)
+from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
-from projects.api.project.serializers import ProjectSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
@@ -23,7 +23,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
-    serializer_action_classes = {}
+    serializer_action_classes = {
+        "trashed": ProjectTrashedSerializer,
+    }
     queryset_actions = {
         "destroy": Project.objects.all(),
         "trashed": Project.objects.all(),
