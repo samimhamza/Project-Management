@@ -37,7 +37,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return allItems(ProjectNameListSerializer, queryset)
 
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = self.get_serializer(
+            page, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
