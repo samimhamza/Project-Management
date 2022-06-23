@@ -1,6 +1,5 @@
-from unicodedata import name
-import uuid
 from django.db import models
+import uuid
 
 
 class Category(models.Model):
@@ -21,6 +20,13 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="category_deleted_by",
+    )
 
     def __str__(self):
         return self.name
@@ -65,6 +71,13 @@ class Expense(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="expense_deleted_by",
+    )
 
     def __str__(self):
         return self.title
@@ -81,6 +94,13 @@ class ExpenseItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="expense_item_deleted_by",
+    )
 
     def __str__(self):
         return self.name

@@ -1,7 +1,7 @@
-import uuid
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
+from django.db import models
+import uuid
 
 
 class User(AbstractUser):
@@ -27,6 +27,13 @@ class User(AbstractUser):
         related_name="user_updated_by",
     )
     deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="user_deleted_by",
+    )
 
     def __str__(self):
         return self.first_name + " " + self.last_name
@@ -53,6 +60,13 @@ class Team(models.Model):
     users = models.ManyToManyField(
         User, through="TeamUser", related_name="%(class)ss")
     deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="team_deleted_by",
+    )
 
     def __str__(self):
         return self.name
@@ -154,6 +168,13 @@ class Role(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="role_deleted_by",
+    )
 
     def __str__(self):
         return self.name
