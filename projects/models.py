@@ -10,6 +10,7 @@ import uuid
 class Department(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
+    description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
@@ -433,8 +434,8 @@ class Stage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
     description = models.TextField()
-    departments = models.ManyToManyField(
-        Department, related_name="department_stages")
+    department = models.ForeignKey(
+        Department, related_name="department_stages", on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
         'users.User',
         on_delete=models.SET_NULL,
