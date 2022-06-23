@@ -4,12 +4,6 @@ from users.models import (User,  Reminder, Holiday, Notification,
 from rest_framework import serializers
 
 
-class LessFieldsUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "first_name", "last_name", "email"]
-
-
 class UserWithProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -150,3 +144,45 @@ class RoleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = ["id", "name"]
+
+
+class RoleTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Role
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]
+
+
+class UserTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return '{} {}'.format(obj.first_name, obj.last_name)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]

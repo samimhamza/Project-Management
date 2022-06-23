@@ -1,6 +1,6 @@
+from users.api.serializers import UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer
 from common.actions import (withTrashed, trashList, restore, delete,
                             allItems, filterRecords, dataWithPermissions, searchRecords, convertBase64ToImage)
-from users.api.serializers import UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
 from common.custom import CustomPageNumberPagination
@@ -17,7 +17,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (UserPermissions,)
-
+    serializer_action_classes = {
+        "trashed": UserTrashedSerializer
+    }
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
     }
@@ -133,6 +135,12 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"error": "username already in use"}, status=400)
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

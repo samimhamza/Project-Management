@@ -1,5 +1,5 @@
 from tasks.api.serializers import (
-    TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, LessTaskSerializer)
+    TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
@@ -24,7 +24,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = (TaskPermissions,)
     serializer_action_classes = {
         "retrieve": TaskListSerializer,
-        "update": TaskListSerializer
+        "update": TaskListSerializer,
+        "trashed": TaskTrashedSerializer
     }
     queryset_actions = {
         "destroy": Task.objects.all(),

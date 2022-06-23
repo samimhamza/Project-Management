@@ -14,7 +14,8 @@ from users.api.serializers import (
     PermissionActionSerializer,
     RoleSerializer,
     RoleListSerializer,
-    UserNotificationSerializer
+    UserNotificationSerializer,
+    RoleTrashedSerializer
 )
 from rest_framework import generics
 
@@ -97,6 +98,9 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = (RolePermissions,)
+    serializer_action_classes = {
+        "trashed": RoleTrashedSerializer
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -152,3 +156,9 @@ class RoleViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = RoleSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()

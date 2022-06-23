@@ -5,6 +5,25 @@ from rest_framework import serializers
 from tasks.models import UserTask
 
 
+class TaskTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]
+
+
 class LessFieldsTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
