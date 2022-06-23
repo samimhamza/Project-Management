@@ -6,10 +6,11 @@ from projects.models import Department, Stage, SubStage
 class SubStageListSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
+    key = serializers.CharField(source="id")
 
     class Meta:
         model = SubStage
-        fields = ["id", "name", "description", "created_by",
+        fields = ["id", "key", "name", "description", "created_by",
                   "updated_by", "created_at", "updated_at"]
 
 
@@ -17,6 +18,7 @@ class StageListSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
     sub_stages = serializers.SerializerMethodField()
+    key = serializers.CharField(source="id")
 
     def get_sub_stages(self, stage):
         qs = SubStage.objects.filter(
@@ -26,7 +28,7 @@ class StageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stage
-        fields = ["id", "name", "description", "created_by",
+        fields = ["id", "key", "name", "description", "created_by",
                   "updated_by", "created_at", "updated_at", "sub_stages"]
 
 
