@@ -2,6 +2,18 @@ from django.db import models
 from projects.models import Country
 import uuid
 
+class Service(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    parent = models.ForeignKey("self",on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=128)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
+
 class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128)
@@ -13,12 +25,12 @@ class Client(models.Model):
         Country,
         on_delete=models.SET_NULL,
         null=True,
-        related_name="country",
+        related_name="client_country",
     )
     company_name = models.CharField(max_length=128, blank=True, null=True)
-    industry = models.CharField(max_length=True, blank=True, null=True)
+    industry = models.CharField(max_length=128, blank=True, null=True)
     service = models.ManyToManyField(
-        through="ClientService", related_name="%(class)ss"
+        Service, through="ClientService", related_name="%(class)ss"
     )
 
     class HearAboutUs(models.TextChoices):
@@ -65,7 +77,7 @@ class Client(models.Model):
         whatsapp = "whatsapp"
     
     prefer_com_way = models.CharField(
-        max_length=32, choices=- PreferComWay.choices, blank=True, null=True
+        max_length=32, choices= PreferComWay.choices, blank=True, null=True
     )
 
     is_requirement_ready = models.BooleanField(default=False)
@@ -83,7 +95,7 @@ class Client(models.Model):
         confirm = "confirm"
     
     status = models.CharField(
-        max_length=32, choices=statusChoices.choices, default="pending"
+        max_length=32,choices=statusChoices.choices, default="pending"
     )
 
     date = models.DateField(blank=True, null=True)
@@ -109,23 +121,10 @@ class Client(models.Model):
             return "No Name"
 
 
-class Service(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    parent = models.ForeignKey("self",on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=128)
-    description = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
-
-
 class ClientService(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    service = models.ForeignKey(Service,null=True,on_delete=models.SET_NULL, related_name='service')
-    client = models.ForeignKey(Client, null=True, on_delete=models.SET_NULL)
+    service = models.ForeignKey(Service,null=True,on_delete=models.SET_NULL, related_name='clientService_service')
+    client = models.ForeignKey(Client, null=True, on_delete=models.SET_NULL, related_name='clientService_client')
     details = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -182,7 +181,7 @@ class ClientProduct(models.Model):
     on_request_date = models.DateTimeField(blank=True, null=True)
     purchased_price = models.FloatField(max_length=255, null=True, blank=True)
     purchased_date = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True, blank=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     client = models.ForeignKey(Client, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
@@ -200,7 +199,7 @@ class Requirement(models.Model):
         reject = "reject"
         miss_info = "miss_info"
     
-    status = models.TextChoices(max_length=32,choices=statusChoices.choices, default="pending")
+    status = models.CharField(max_length=32 ,choices=statusChoices.choices, default="pending")
     goals_and_expectation = models.TextField(blank=True, null=True)
     budget = models.FloatField(max_length=255, blank=True, null=True)
     currency =models.CharField(max_length=32, blank=True, null=True)
