@@ -101,6 +101,9 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_action_classes = {
         "trashed": RoleTrashedSerializer
     }
+    queryset_actions = {
+        "destroy": Role.objects.all(),
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -108,7 +111,8 @@ class RoleViewSet(viewsets.ModelViewSet):
             return allItems(RoleListSerializer, queryset)
 
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = self.get_serializer(
+            page, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
 
     def create(self, request):
@@ -133,7 +137,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         role.updated_by = request.user
         addPermissionsToRole(request.data.get('permissions'), role)
         role.save()
-        serializer = RoleSerializer(role)
+        serializer = RoleSerializer(role, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
@@ -162,3 +166,9 @@ class RoleViewSet(viewsets.ModelViewSet):
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return super().get_serializer_class()
+
+    def get_queryset(self):
+        try:
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()

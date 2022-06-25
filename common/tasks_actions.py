@@ -19,7 +19,10 @@ def prepareData(serializer, task):
     newData = data["serializer_data"]
     del data["serializer_data"]
     project_id = {"project_id": newData['task']['project']}
+    project = Project.objects.get(pk=newData['task']['project'])
+    project_progress = {"project_progress": project.progress}
     data.update(project_id)
+    data.update(project_progress)
     user_progress = {"user_progress": newData['progress']}
     data.update(user_progress)
     data['tasks'] = []
@@ -63,6 +66,18 @@ def taskProgress(task):
             parent = parent.parent
         else:
             break
+
+
+def projectProgress(project):
+    project = Project.objects.get(pk=project.id)
+    tasks_progress = Task.objects.only('progress').filter(
+        project=project, parent__isnull=True).values('progress')
+    totalProgress = 0
+    for task in tasks_progress:
+        totalProgress += task['progress']
+    totalProgress = totalProgress / len(tasks_progress)
+    project.progress = int(totalProgress)
+    project.save()
 
 
 def getAssignNotification(data, request):

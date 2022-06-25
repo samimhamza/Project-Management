@@ -1,8 +1,8 @@
-from django.db.models import Q
-from users.api.serializers import PermissionSerializer
-from users.models import Role, Permission, UserPermissionList
 from users.models import UserPermissionList, Permission, Action, SubAction, Role
+from users.models import Role, Permission, UserPermissionList, User
+from users.api.serializers import PermissionSerializer
 from rest_framework import permissions
+from django.db.models import Q
 
 
 def checkScope(user, scope):
@@ -84,6 +84,9 @@ def addPermissionsToRole(permissions, role):
         for per in permissions_obj:
             permissions_list.append(per.id)
     role.permissions_roles.set(permissions_list)
+    users = User.objects.filter(roles_users=role)
+    for user in users:
+        addPermissionList(user, permissions_list)
 
 
 def checkCustomPermissions(request, value):

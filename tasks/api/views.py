@@ -4,7 +4,7 @@ from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions
 from common.actions import (withTrashed, trashList, delete, restore,
                             allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
 from common.tasks_actions import (tasksOfProject, tasksResponse, checkAttributes,
-                                  excludedDependencies, assignToUsers, taskProgress, prepareData, broadcastProgress)
+                                  excludedDependencies, assignToUsers, taskProgress, prepareData, broadcastProgress, projectProgress)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from users.api.serializers import UserWithProfileSerializer
 from common.custom import CustomPageNumberPagination
@@ -135,27 +135,30 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["put"])
     def progress(self, request, pk=None):
-        # try:
-        task = self.get_object()
-        data = request.data
         try:
-            user = User.objects.get(pk=data['user_id'])
-        except User.DoesNotExist:
-            return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            userTask = UserTask.objects.get(user=user, task=task)
-        except UserTask.DoesNotExist:
-            return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
-        userTask.progress = data['progress']
-        userTask.save()
-        taskProgress(task)
-        serializer = ProgressSerializer(
-            userTask)
-        serializerData = prepareData(serializer, task)
-        broadcastProgress(serializerData)
-        return Response(serializerData)
-        # except:
-        #     return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            task = self.get_object()
+            data = request.data
+            try:
+                user = User.objects.get(pk=data['user_id'])
+            except User.DoesNotExist:
+                return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                userTask = UserTask.objects.get(user=user, task=task)
+            except UserTask.DoesNotExist:
+                return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
+            if Task.objects.filter(parent=task).exists():
+                return Response({'error': "Task has Sub tasks, please remove sub tasks first!"}, status=status.HTTP_400_BAD_REQUEST)
+            userTask.progress = data['progress']
+            userTask.save()
+            taskProgress(task)
+            projectProgress(task.project)
+            serializer = ProgressSerializer(
+                userTask)
+            serializerData = prepareData(serializer, task)
+            broadcastProgress(serializerData)
+            return Response(serializerData)
+        except:
+            return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_serializer_class(self):
         try:
