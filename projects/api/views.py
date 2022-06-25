@@ -36,7 +36,7 @@ class CountryListAPIView(generics.ListAPIView):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=Country)
         if request.GET.get("items_per_page") == "-1":
             return allItems(CountryListSerializer, queryset)
         page = self.paginate_queryset(queryset)
@@ -50,7 +50,7 @@ class StateListAPIView(generics.ListAPIView):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=State)
         if request.GET.get("items_per_page") == "-1":
             return allItems(StateListSerializer, queryset)
         page = self.paginate_queryset(queryset)

@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=User)
         columns = ['username', 'first_name',
                    'last_name', 'email', 'phone', 'whatsapp']
         queryset = searchRecords(queryset, request, columns)

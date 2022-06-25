@@ -22,7 +22,7 @@ class StageViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=Stage)
         if request.GET.get("items_per_page") == "-1":
             return allItems(StageListSerializer, queryset)
 
@@ -92,7 +92,7 @@ class SubStageViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=SubStage)
         if request.GET.get("items_per_page") == "-1":
             return allItems(SubStageListSerializer, queryset)
 

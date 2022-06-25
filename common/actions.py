@@ -55,7 +55,7 @@ def countStatuses(table, countables, project_id=None):
     return totals
 
 
-def filterRecords(queryset, request, columns=[]):
+def filterRecords(queryset, request, **kwargs):
     data = request.query_params
     for key, value in data.lists():
         if len(value) == 1:
@@ -64,13 +64,17 @@ def filterRecords(queryset, request, columns=[]):
                 likeKey = value[6:]
                 queryset = queryset.filter(
                     **{'%s__icontains' % likeKey: value})
+                continue
             elif key.startswith('exact@@'):
                 exactKey = value[7:]
                 queryset = queryset.filter(**{exactKey: value})
+                continue
             elif "__" in key:
                 queryset = queryset.filter(**{key: value})
-        else:
-            queryset = queryset.filter(**{"%s__in" % key: value})
+                continue
+        if kwargs.get("table") is not None:
+            if getattr(kwargs.get("table"), key, False):
+                queryset = queryset.filter(**{"%s__in" % key: value})
     return queryset
 
 

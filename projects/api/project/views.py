@@ -34,7 +34,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=Project)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ProjectNameListSerializer, queryset)
 

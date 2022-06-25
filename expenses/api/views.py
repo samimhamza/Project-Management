@@ -78,7 +78,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=Expense)
         if request.GET.get("project_id"):
             return expensesOfProject(self, request)
 
@@ -192,7 +192,7 @@ class ExpenseItemViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request)
+        queryset = filterRecords(queryset, request, table=ExpenseItem)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ExpenseItemSerializer, queryset)
 
