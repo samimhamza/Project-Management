@@ -137,7 +137,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         role.updated_by = request.user
         addPermissionsToRole(request.data.get('permissions'), role)
         role.save()
-        serializer = RoleSerializer(role)
+        serializer = RoleSerializer(role, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):

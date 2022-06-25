@@ -129,14 +129,8 @@ class UserPermissionListSerializer(serializers.ModelSerializer):
 
 
 class RoleSerializer(serializers.ModelSerializer):
-    users = serializers.SerializerMethodField()
-
-    def get_users(self, role):
-        qs = User.objects.filter(
-            deleted_at__isnull=True, roles_users=role)
-        serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True,  context={"request": self.context['request']})
-        return serializer.data
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
 
     class Meta:
         model = Role
