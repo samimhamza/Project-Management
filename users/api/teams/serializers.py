@@ -19,7 +19,7 @@ class LessFieldsTeamSerializer(serializers.ModelSerializer):
         qs = User.objects.filter(
             deleted_at__isnull=True, teams=team)
         serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True)
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
         return serializer.data
 
     class Meta:

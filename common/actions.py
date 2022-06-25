@@ -152,8 +152,9 @@ def restore(self, request, table):
         )
 
 
-def allItems(serializerName, queryset):
-    serializer = serializerName(queryset, many=True)
+def allItems(serializerName, queryset, request=None):
+    serializer = serializerName(
+        queryset, many=True, context={"request": request})
     return Response(serializer.data, status=200)
 
 

@@ -22,6 +22,9 @@ class CustoUserModelSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = [
@@ -132,7 +135,7 @@ class RoleSerializer(serializers.ModelSerializer):
         qs = User.objects.filter(
             deleted_at__isnull=True, roles_users=role)
         serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True)
+            instance=qs, many=True, read_only=True,  context={"request": self.context['request']})
         return serializer.data
 
     class Meta:

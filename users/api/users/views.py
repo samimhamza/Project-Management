@@ -33,7 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
                    'last_name', 'email', 'phone', 'whatsapp']
         queryset = searchRecords(queryset, request, columns)
         if request.GET.get("items_per_page") == "-1":
-            return allItems(UserWithProfileSerializer, queryset)
+            return allItems(UserWithProfileSerializer, queryset, request)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
