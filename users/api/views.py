@@ -101,6 +101,9 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_action_classes = {
         "trashed": RoleTrashedSerializer
     }
+    queryset_actions = {
+        "destroy": Role.objects.all(),
+    }
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -162,3 +165,9 @@ class RoleViewSet(viewsets.ModelViewSet):
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return super().get_serializer_class()
+
+    def get_queryset(self):
+        try:
+            return self.queryset_actions[self.action]
+        except (KeyError, AttributeError):
+            return super().get_queryset()

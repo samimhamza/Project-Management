@@ -23,6 +23,7 @@ class UserViewSet(viewsets.ModelViewSet):
     }
     queryset_actions = {
         "check_uniqueness": User.objects.all(),
+        "destroy": User.objects.all()
     }
 
     def list(self, request):
