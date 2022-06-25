@@ -2,7 +2,7 @@ from common.project_actions import (
     shareTo, notification, getAssignNotification, getRevokeNotification, broadcastProject, broadcastDeleteProject)
 from common.actions import (restore, delete, withTrashed, trashList,
                             allItems, filterRecords, countStatuses,
-                            searchRecords, addAttachment, deleteAttachments, getAttachments)
+                            addAttachment, deleteAttachments, getAttachments)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import ProjectNameListSerializer
@@ -122,7 +122,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         users = User.objects.filter(project_users=project)
         if request.query_params.get('content'):
             columns = ['first_name', 'last_name', 'email']
-            users = searchRecords(users, request, columns)
+            users = filterRecords(users, request, columns)
             serializer = UserWithProfileSerializer(users, many=True)
             return Response(serializer.data)
 
@@ -136,7 +136,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         teams = Team.objects.filter(projects=project)
         if request.query_params.get('content'):
             columns = ['name']
-            teams = searchRecords(teams, request, columns)
+            teams = filterRecords(teams, request, columns)
             serializer = LessFieldsTeamSerializer(teams, many=True)
             return Response(serializer.data)
 

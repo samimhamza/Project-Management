@@ -55,24 +55,29 @@ def countStatuses(table, countables, project_id=None):
     return totals
 
 
-def filterRecords(queryset, request, **kwargs):
+def filterRecords(queryset, request, columns=[], **kwargs):
     data = request.query_params
+    if request.query_params.get('content'):
+        queries = Q()
+        for column in columns:
+            queries = queries | Q(
+                **{'%s__icontains' % column: request.query_params.get('content')})
+        queryset = queryset.filter(queries)
     for key, value in data.lists():
         if len(value) == 1:
             value = value[0]
             if key.startswith('like@@'):
-                likeKey = value[6:]
+                likeKey = key[6:]
                 queryset = queryset.filter(
                     **{'%s__icontains' % likeKey: value})
-                continue
             elif key.startswith('exact@@'):
-                exactKey = value[7:]
+                exactKey = key[7:]
                 queryset = queryset.filter(**{exactKey: value})
-                continue
             elif "__" in key:
                 queryset = queryset.filter(**{key: value})
-                continue
         if kwargs.get("table") is not None:
+            if isinstance(value, str):
+                value = [value]
             if getattr(kwargs.get("table"), key, False):
                 queryset = queryset.filter(**{"%s__in" % key: value})
     return queryset
@@ -196,17 +201,6 @@ def dataWithPermissions(self, field):
             action['actions'].append(subAction['sub_action'])
     data['permissions'] = actionSerializer.data
     return Response(data, status=status.HTTP_200_OK)
-
-
-def searchRecords(queryset, request, columns=[]):
-    # search for different columns in one function
-    if request.query_params.get('content'):
-        queries = Q()
-        for column in columns:
-            queries = queries | Q(
-                **{'%s__icontains' % column: request.query_params.get('content')})
-        queryset = queryset.filter(queries)
-    return queryset
 
 
 def addAttachment(self, request):
