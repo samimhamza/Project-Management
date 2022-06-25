@@ -60,13 +60,13 @@ def filterRecords(queryset, request, columns=[]):
     for key, value in data.lists():
         if len(value) == 1:
             value = value[0]
-            if value.startswith('like@@'):
-                likeValue = value[6:]
+            if key.startswith('like@@'):
+                likeKey = value[6:]
                 queryset = queryset.filter(
-                    **{'%s__icontains' % key: likeValue})
-            elif value.startswith('exact@@'):
-                exactValue = value[7:]
-                queryset = queryset.filter(**{key: exactValue})
+                    **{'%s__icontains' % likeKey: value})
+            elif key.startswith('exact@@'):
+                exactKey = value[7:]
+                queryset = queryset.filter(**{exactKey: value})
             elif "__" in key:
                 queryset = queryset.filter(**{key: value})
         else:

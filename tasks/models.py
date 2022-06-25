@@ -42,10 +42,10 @@ class Task(models.Model):
     )
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, null=True)
-    p_start_date = models.DateField(blank=True, null=True)
-    p_end_date = models.DateField(blank=True, null=True)
-    a_start_date = models.DateField(blank=True, null=True)
-    a_end_date = models.DateField(blank=True, null=True)
+    p_start_date = models.DateTimeField(blank=True, null=True)
+    p_end_date = models.DateTimeField(blank=True, null=True)
+    a_start_date = models.DateTimeField(blank=True, null=True)
+    a_end_date = models.DateTimeField(blank=True, null=True)
     pin = models.BooleanField(default=False)
     progress = models.IntegerField(default=0, validators=[
         MaxValueValidator(100),
