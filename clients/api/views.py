@@ -1,5 +1,5 @@
 import queue
-from backend.clients.api.serializers import ProductSerializer, ServiceSerializer
+from clients.api.serializers import ProductSerializer, ServiceSerializer
 from clients.api.serializers import ClientSerializer, ClientServiceSerializer, ClientProductSerializer, ClientProduct, ClientService, FeatureSerializer, RequirementSerializer, PricePlanSerializer
 from clients.models import Client, ClientService, ClientProduct, Service, Product, PricePlan, Feature, Requirement;
 from rest_framework import viewsets, status
