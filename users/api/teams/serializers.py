@@ -1,7 +1,7 @@
 from users.api.serializers import UserWithProfileSerializer
 from projects.api.serializers import ProjectNameListSerializer
-from rest_framework import serializers
 from users.models import Team, TeamUser, User
+from rest_framework import serializers
 
 
 class TeamUserSerializer(serializers.ModelSerializer):
