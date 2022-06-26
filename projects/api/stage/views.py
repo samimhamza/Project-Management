@@ -33,13 +33,19 @@ class StageViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
+        try:
+            depratment = Department.objects.only(
+                'id').get(pk=data["department"])
+        except Department.DoesNotExist:
+            return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+
         new_stage = Stage.objects.create(
             name=data["name"],
             description=data["description"],
             created_by=data["created_by"],
             updated_by=data["created_by"],
+            department=depratment
         )
-        new_stage.departments.set(data["departments"])
         new_stage.save()
         serializer = self.get_serializer(new_stage)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -47,10 +53,8 @@ class StageViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         stage = self.get_object()
         data = request.data
-        if request.data.get("departments") is not None:
-            stage.departments.set(request.data.get("departments"))
         for key, value in data.items():
-            if key != "departments" and key != "id":
+            if key != "id":
                 setattr(stage, key, value)
         stage.updated_by = request.user
         stage.save()
