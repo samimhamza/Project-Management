@@ -243,3 +243,57 @@ class SubStagePermissions(CustomPermissions):
         'trashed': 'sub_stages_d',
         'all': 'sub_stages_v'
     }
+
+
+class ClientPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'client_v',
+        'create': 'client_c',
+        'retrieve': "client_v",
+        'update': 'client_u',
+        'partial_update': 'client_u',
+        'destroy': 'client_d',
+        'restore': 'client_d',
+        'trashed': 'client_d',
+        'all': 'client_v'
+    }
+
+
+class ProductPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'product_v',
+        'create': 'product_c',
+        'retrieve': "product_v",
+        'update': 'product_u',
+        'partial_update': 'product_u',
+        'destroy': 'product_d',
+        'restore': 'product_d',
+        'trashed': 'product_d',
+        'all': 'product_v'
+    }
+
+class ServicePermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'service_v',
+        'create': 'service_c',
+        'retrieve': "service_v",
+        'update': 'service_u',
+        'partial_update': 'service_u',
+        'destroy': 'service_d',
+        'restore': 'service_d',
+        'trashed': 'service_d',
+        'all': 'service_v'
+    }
+
+class RequirementPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'requirement_v',
+        'create': 'requirement_c',
+        'retrieve': "requirement_v",
+        'update': 'requirement_u',
+        'partial_update': 'requirement_u',
+        'destroy': 'requirement_d',
+        'restore': 'requirement_d',
+        'trashed': 'requirement_d',
+        'all': 'requirement_v'
+    }

@@ -7,6 +7,28 @@ class Service(models.Model):
     parent = models.ForeignKey("self",on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="service_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="service_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="service_deleted_by",
+    )
 
     def __str__(self):
         if self.name:
@@ -113,6 +135,14 @@ class Client(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="client_deleted_by",
+    )
 
     def __str__(self):
         if self.name:
@@ -142,6 +172,28 @@ class Product(models.Model):
     photo = models.ImageField(
         upload_to="products", blank=True, null=True
     )
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="product_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="product_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="product_deleted_by",
+    )
 
     def __str__(self):
         if self.name:
@@ -154,6 +206,28 @@ class Feature(models.Model):
     name = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="feature_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="feature_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="feature_deleted_by",
+    )
 
     def __str__(self):
         if self.name:
@@ -165,7 +239,29 @@ class PricePlan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     plan_name = models.CharField(max_length=128, null=True, blank=True)
     plan_price = models.FloatField(max_length=120, null=True, blank=True)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="price_plan_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="price_plan_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     feature = models.ForeignKey(Feature, null=True, on_delete=models.SET_NULL)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="price_plan_deleted_by",
+    )
 
     def __str__(self):
         if self.plan_name:
@@ -215,6 +311,28 @@ class Requirement(models.Model):
     restrictions = models.TextField(blank=True, null=True)
     confidentiality = models.TextField(blank=True, null=True)
     how_many_people_use_this = models.IntegerField(blank=True, null=True)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="requirement_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="requirement_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="requirement_deleted_by",
+    )
 
     def __str__(self):
         if self.goals_and_expectation:
