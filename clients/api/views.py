@@ -21,6 +21,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(page, many=True)
         for client in serializer.data:
             services = []
+            products = []
             for service in client['services']:
                 service_obj = service['service']
                 del service['service']
@@ -28,6 +29,27 @@ class ClientViewSet(viewsets.ModelViewSet):
                 service_obj.update(client_service)
                 services.append(service_obj)
             client['services'] = services
+
+            for clientfeature in client['features']:
+                feature = clientfeature['feature']
+                del clientfeature['feature']
+                feature.update(clientfeature)
+                product = feature['product']
+                del feature['product']
+                hasProduct = False       
+                for x in products:
+                    if x["id"] == product["id"]:
+                        hasProduct = True
+                        x["features"].append(feature)
+                        break
+                if hasProduct == False:
+                    product["features"] = []
+                    product["features"].append(feature)
+                    products.append(product)
+
+            del client['features']
+            client['products'] = []
+            client['products'] = products
         return self.get_paginated_response(serializer.data)
 
 

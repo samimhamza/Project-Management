@@ -1,3 +1,5 @@
+from itertools import product
+from pyexpat import features
 from clients.models import (Client, ClientService, ClientProduct,
                             Service, Product, PricePlan, Feature, Requirement)
 from rest_framework import serializers
@@ -11,25 +13,35 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
+    features = serializers.SerializerMethodField()
 
     def get_services(self, client):
         qs = ClientService.objects.filter(client=client)
         serializer = ClientServiceListSerializer(instance=qs, many=True)
         return serializer.data
 
+    def get_features(self, client):
+        qs = ClientProduct.objects.filter(client=client)
+        serializers = ClientProductCustomSerializer(instance=qs, many=True)
+        return serializers.data
+
     class Meta:
         model = Client
         fields = "__all__"
 
 
+
+class ServiceCustomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ["name","description"]
+
 class ClientServiceListSerializer(serializers.ModelSerializer):
-    service = ServiceSerializer()
+    service = ServiceCustomSerializer()
 
     class Meta:
         model = ClientService
         fields = ["service", "details"]
-
-
 class ClientServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientService
@@ -41,22 +53,29 @@ class ClientProductSerializer(serializers.ModelSerializer):
         model = ClientProduct
         fields = "__all__"
 
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
 
 
+class FeatureSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    class Meta:
+        model = Feature
+        fields = "__all__"
+class ClientProductCustomSerializer(serializers.ModelSerializer):
+    feature = FeatureSerializer()
+    class Meta:
+        model = ClientProduct
+        exclude = ('id','client', )
+        # fields = ["plan","on_request_price","on_request_date","purchased_price","purchased_date","end_date","feature"]
+
+
+
 class PricePlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = PricePlan
-        fields = "__all__"
-
-
-class FeatureSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feature
         fields = "__all__"
 
 
