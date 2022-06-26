@@ -38,8 +38,8 @@ class StageViewSet(viewsets.ModelViewSet):
             description=data["description"],
             created_by=data["created_by"],
             updated_by=data["created_by"],
+            department=data["department"]
         )
-        new_stage.departments.set(data["departments"])
         new_stage.save()
         serializer = self.get_serializer(new_stage)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -47,10 +47,8 @@ class StageViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         stage = self.get_object()
         data = request.data
-        if request.data.get("departments") is not None:
-            stage.departments.set(request.data.get("departments"))
         for key, value in data.items():
-            if key != "departments" and key != "id":
+            if key != "id":
                 setattr(stage, key, value)
         stage.updated_by = request.user
         stage.save()

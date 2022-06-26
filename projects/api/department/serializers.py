@@ -52,7 +52,8 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class DepartmentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ["id", "name"]
+        fields = ["id", "name", "description", "created_by",
+                  "updated_by", "created_at", "updated_at", ]
 
 
 class DepartmentTrashedSerializer(serializers.ModelSerializer):
