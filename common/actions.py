@@ -80,6 +80,12 @@ def filterRecords(queryset, request, columns=[], **kwargs):
                 value = [value]
             if getattr(kwargs.get("table"), key, False):
                 queryset = queryset.filter(**{"%s__in" % key: value})
+            elif key.startswith('range@@'):
+                exactKey = key[7:]
+                startDate = datetime.datetime.strptime(value[0], '%Y-%m-%d')
+                endDate = datetime.datetime.strptime(value[1], '%Y-%m-%d')
+                queryset = queryset.filter(**{"%s__range" % exactKey: [datetime.datetime.combine(
+                    startDate, datetime.time.min), datetime.datetime.combine(endDate, datetime.time.max)]})
     return queryset
 
 
