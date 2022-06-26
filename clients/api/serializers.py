@@ -15,8 +15,6 @@ class ClientSerializer(serializers.ModelSerializer):
     def get_services(self, client):
         qs = ClientService.objects.filter(client=client)
         serializer = ClientServiceListSerializer(instance=qs, many=True)
-        # qs = Service.objects.filter(clients=client)
-        # serializer = ServiceSerializer(instance=qs, many=True)
         return serializer.data
 
     class Meta:
@@ -29,7 +27,7 @@ class ClientServiceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientService
-        fields = "__all__"
+        fields = ["service", "details"]
 
 
 class ClientServiceSerializer(serializers.ModelSerializer):

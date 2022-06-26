@@ -5,6 +5,7 @@ from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from common.permissions_scopes import ClientPermissions
+from clients.models import Service
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -18,13 +19,16 @@ class ClientViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
-        # data = serializer.data
-        # for client in data:
-        #     services = client['services']
-        #     print(services['service'])
-        #     service = client['services']['service']
-        #     del client['services']['service']
-        #     client['services'].update(service)
+        for client in serializer.data:
+            services = []
+            for service in client['services']:
+                service_obj = service['service']
+                del service['service']
+                client_service = service
+                service_obj.update(client_service)
+                services.append(service_obj)
+            client['services'] = services
+
         return self.get_paginated_response(serializer.data)
 
 
