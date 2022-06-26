@@ -1,10 +1,11 @@
+from itertools import product
 from django.db import models
 from projects.models import Country
 import uuid
 
 class Service(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    parent = models.ForeignKey("self",on_delete=models.SET_NULL, null=True)
+    parent = models.ForeignKey("self",on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
@@ -36,6 +37,77 @@ class Service(models.Model):
         else:
             return "No Name"
 
+class Product(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, null=True, blank=True)
+    developed_by = models.CharField(max_length=128, blank=True ,null=True)
+    details = models.TextField(blank=True, null=True)
+    photo = models.ImageField(
+        upload_to="products", blank=True, null=True
+    )
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="product_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="product_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="product_deleted_by",
+    )
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
+
+class Feature(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="feature_created_by"
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="feature_updated_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    deleted_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="feature_deleted_by",
+    )
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return "No Name"
+
 class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128)
@@ -51,8 +123,11 @@ class Client(models.Model):
     )
     company_name = models.CharField(max_length=128, blank=True, null=True)
     industry = models.CharField(max_length=128, blank=True, null=True)
-    service = models.ManyToManyField(
+    services = models.ManyToManyField(
         Service, through="ClientService", related_name="%(class)ss"
+    )
+    features = models.ManyToManyField(
+        Feature, through="ClientProduct", related_name="%(class)ss"
     )
 
     class HearAboutUs(models.TextChoices):
@@ -164,76 +239,6 @@ class ClientService(models.Model):
             return "No Details"
 
 
-class Product(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128, null=True, blank=True)
-    developed_by = models.CharField(max_length=128, blank=True ,null=True)
-    details = models.TextField(blank=True, null=True)
-    photo = models.ImageField(
-        upload_to="products", blank=True, null=True
-    )
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="product_created_by"
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="product_updated_by"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="product_deleted_by",
-    )
-
-    def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
-
-class Feature(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="feature_created_by"
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="feature_updated_by"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="feature_deleted_by",
-    )
-
-    def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
 
 class PricePlan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

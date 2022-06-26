@@ -247,53 +247,53 @@ class SubStagePermissions(CustomPermissions):
 
 class ClientPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'client_v',
-        'create': 'client_c',
-        'retrieve': "client_v",
-        'update': 'client_u',
-        'partial_update': 'client_u',
-        'destroy': 'client_d',
-        'restore': 'client_d',
-        'trashed': 'client_d',
-        'all': 'client_v'
+        'list': 'clients_v',
+        'create': 'clients_c',
+        'retrieve': "clients_v",
+        'update': 'clients_u',
+        'partial_update': 'clients_u',
+        'destroy': 'clients_d',
+        'restore': 'clients_d',
+        'trashed': 'clients_d',
+        'all': 'clients_v'
     }
 
 
 class ProductPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'product_v',
-        'create': 'product_c',
-        'retrieve': "product_v",
-        'update': 'product_u',
-        'partial_update': 'product_u',
-        'destroy': 'product_d',
-        'restore': 'product_d',
-        'trashed': 'product_d',
-        'all': 'product_v'
+        'list': 'products_v',
+        'create': 'products_c',
+        'retrieve': "products_v",
+        'update': 'products_u',
+        'partial_update': 'products_u',
+        'destroy': 'products_d',
+        'restore': 'products_d',
+        'trashed': 'products_d',
+        'all': 'products_v'
     }
 
 class ServicePermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'service_v',
-        'create': 'service_c',
-        'retrieve': "service_v",
-        'update': 'service_u',
-        'partial_update': 'service_u',
-        'destroy': 'service_d',
-        'restore': 'service_d',
-        'trashed': 'service_d',
-        'all': 'service_v'
+        'list': 'services_v',
+        'create': 'services_c',
+        'retrieve': "services_v",
+        'update': 'services_u',
+        'partial_update': 'services_u',
+        'destroy': 'services_d',
+        'restore': 'services_d',
+        'trashed': 'services_d',
+        'all': 'services_v'
     }
 
 class RequirementPermissions(CustomPermissions):
     actions_scopes = {
-        'list': 'requirement_v',
-        'create': 'requirement_c',
-        'retrieve': "requirement_v",
-        'update': 'requirement_u',
-        'partial_update': 'requirement_u',
-        'destroy': 'requirement_d',
-        'restore': 'requirement_d',
-        'trashed': 'requirement_d',
-        'all': 'requirement_v'
+        'list': 'requirements_v',
+        'create': 'requirements_c',
+        'retrieve': "requirements_v",
+        'update': 'requirements_u',
+        'partial_update': 'requirements_u',
+        'destroy': 'requirements_d',
+        'restore': 'requirements_d',
+        'trashed': 'requirements_d',
+        'all': 'requirements_v'
     }

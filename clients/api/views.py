@@ -4,18 +4,33 @@ from clients.api.serializers import ProductSerializer, ServiceSerializer
 from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from common.permissions_scopes import ClientPermissions
 
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.filter(
     deleted_at__isnull=True).order_by("-created_at")
-    pagination_class = CustomPageNumberPagination
     serializer_class = ClientSerializer
+    pagination_class = CustomPageNumberPagination
+    permission_classes = (ClientPermissions,)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        data = serializer.data
+        for client in data:
+            services = client['services']
+            print(services['service'])
+        #     service = client['services']['service']
+        #     del client['services']['service']
+        #     client['services'].update(service)
+        return self.get_paginated_response(serializer.data)
 
 class ClientServiceViewSet(viewsets.ModelViewSet):
     queryset = ClientService.objects.all()
     serializer_class = ClientServiceSerializer
-   
-
+    
+    
 class ClientProductViewSet(viewsets.ModelViewSet):
     queryset = ClientProduct.objects.all()
     serializer_class = ClientProductSerializer
