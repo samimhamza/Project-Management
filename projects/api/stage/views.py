@@ -107,25 +107,40 @@ class SubStageViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
+        try:
+            stage = Stage.objects.only(
+                'id').get(pk=data["stage"])
+        except Stage.DoesNotExist:
+            return Response({"error": "Stage does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+
         new_stage = SubStage.objects.create(
             name=data["name"],
             description=data["description"],
             created_by=data["created_by"],
             updated_by=data["created_by"],
+            stage=stage
         )
         new_stage.save()
         serializer = self.get_serializer(new_stage)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
-        stage = self.get_object()
+        subStage = self.get_object()
         data = request.data
+        if "stage" in data:
+            try:
+                parent = Stage.objects.only(
+                    'id').get(pk=data["stage"])
+                subStage.stage = parent
+            except Stage.DoesNotExist:
+                return Response({"error": "Stage does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+
         for key, value in data.items():
             if key != "id":
-                setattr(stage, key, value)
-        stage.updated_by = request.user
-        stage.save()
-        serializer = self.get_serializer(stage)
+                setattr(subStage, key, value)
+        subStage.updated_by = request.user
+        subStage.save()
+        serializer = self.get_serializer(subStage)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
