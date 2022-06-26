@@ -28,7 +28,6 @@ class ClientViewSet(viewsets.ModelViewSet):
                 service_obj.update(client_service)
                 services.append(service_obj)
             client['services'] = services
-
         return self.get_paginated_response(serializer.data)
 
 
