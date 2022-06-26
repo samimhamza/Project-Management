@@ -33,12 +33,18 @@ class StageViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
+        try:
+            depratment = Department.objects.only(
+                'id').get(pk=data["department"])
+        except Department.DoesNotExist:
+            return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+
         new_stage = Stage.objects.create(
             name=data["name"],
             description=data["description"],
             created_by=data["created_by"],
             updated_by=data["created_by"],
-            department=data["department"]
+            department=depratment
         )
         new_stage.save()
         serializer = self.get_serializer(new_stage)
