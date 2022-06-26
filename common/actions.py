@@ -66,26 +66,29 @@ def filterRecords(queryset, request, columns=[], **kwargs):
     for key, value in data.lists():
         if len(value) == 1:
             value = value[0]
-            if key.startswith('like@@'):
-                likeKey = key[6:]
+            if value.startswith('like@@'):
+                likeValue = value[6:]
                 queryset = queryset.filter(
-                    **{'%s__icontains' % likeKey: value})
-            elif key.startswith('exact@@'):
-                exactKey = key[7:]
-                queryset = queryset.filter(**{exactKey: value})
+                    **{'%s__icontains' % key: likeValue})
+            elif value.startswith('exact@@'):
+                exactValue = value[7:]
+                queryset = queryset.filter(**{key: exactValue})
             elif "__" in key:
                 queryset = queryset.filter(**{key: value})
         if kwargs.get("table") is not None:
             if isinstance(value, str):
                 value = [value]
-            if getattr(kwargs.get("table"), key, False):
-                queryset = queryset.filter(**{"%s__in" % key: value})
-            elif key.startswith('range@@'):
-                exactKey = key[7:]
-                startDate = datetime.datetime.strptime(value[0], '%Y-%m-%d')
-                endDate = datetime.datetime.strptime(value[1], '%Y-%m-%d')
-                queryset = queryset.filter(**{"%s__range" % exactKey: [datetime.datetime.combine(
+            if value[0].startswith('range@@'):
+                startValue = value[0][7:]
+                endValue = value[1][7:]
+                print(startValue, endValue)
+                startDate = datetime.datetime.strptime(startValue, '%Y-%m-%d')
+                endDate = datetime.datetime.strptime(endValue, '%Y-%m-%d')
+                queryset = queryset.filter(**{"%s__range" % key: [datetime.datetime.combine(
                     startDate, datetime.time.min), datetime.datetime.combine(endDate, datetime.time.max)]})
+            # elif getattr(kwargs.get("table"), key, False):
+            #     queryset = queryset.filter(**{"%s__in" % key: value})
+
     return queryset
 
 
