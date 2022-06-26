@@ -87,7 +87,6 @@ def filterRecords(queryset, request, columns=[], **kwargs):
             if value[0].startswith('range@@'):
                 startValue = value[0][7:]
                 endValue = value[1][7:]
-                print(startValue, endValue)
                 startDate = datetime.datetime.strptime(startValue, '%Y-%m-%d')
                 endDate = datetime.datetime.strptime(endValue, '%Y-%m-%d')
                 queryset = queryset.filter(**{"%s__range" % key: [datetime.datetime.combine(
