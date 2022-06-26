@@ -70,11 +70,17 @@ def filterRecords(queryset, request, columns=[], **kwargs):
                 likeValue = value[6:]
                 queryset = queryset.filter(
                     **{'%s__icontains' % key: likeValue})
+                continue
+
             elif value.startswith('exact@@'):
                 exactValue = value[7:]
                 queryset = queryset.filter(**{key: exactValue})
+                continue
+
             elif "__" in key:
                 queryset = queryset.filter(**{key: value})
+                continue
+
         if kwargs.get("table") is not None:
             if isinstance(value, str):
                 value = [value]
@@ -86,8 +92,10 @@ def filterRecords(queryset, request, columns=[], **kwargs):
                 endDate = datetime.datetime.strptime(endValue, '%Y-%m-%d')
                 queryset = queryset.filter(**{"%s__range" % key: [datetime.datetime.combine(
                     startDate, datetime.time.min), datetime.datetime.combine(endDate, datetime.time.max)]})
-            # elif getattr(kwargs.get("table"), key, False):
-            #     queryset = queryset.filter(**{"%s__in" % key: value})
+                continue
+
+            elif getattr(kwargs.get("table"), key, False):
+                queryset = queryset.filter(**{"%s__in" % key: value})
 
     return queryset
 
