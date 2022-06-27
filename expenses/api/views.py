@@ -126,15 +126,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         expense = self.get_object()
         data = request.data
-        if request.data.get("title"):
-            expense.title = request.data.get("title")
-        if request.data.get("body"):
-            expense.body = request.data.get("body")
-        if request.data.get("date"):
-            expense.date = request.data.get("date")
-        if request.data.get("category"):
+        if "category" in data:
             category = Category.objects.only('id').get(pk=data['category'])
             expense.category = category
+        for key, value in request.data.items():
+            if key != "category" and key != "id":
+                setattr(expense, key, value)
         expense.updated_by = request.user
         expense.save()
         serializer = ExpenseSerializer(expense)
