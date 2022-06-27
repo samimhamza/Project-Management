@@ -247,3 +247,41 @@ def deleteAttachments(self, request):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+def clientProductsFormatter(clientData):
+        products = []
+        for clientfeature in clientData['features']:
+            feature = clientfeature['feature']
+            del clientfeature['feature']
+            feature.update(clientfeature)
+            product = feature['product']
+            del feature['product']
+            hasProduct = False       
+            for x in products:
+                if x["id"] == product["id"]:
+                    hasProduct = True
+                    x["features"].append(feature)
+                    break
+            if hasProduct == False:
+                product["features"] = []
+                product["features"].append(feature)
+                products.append(product)
+
+        del clientData['features']
+        clientData['products'] = []
+        clientData['products'] = products
+        return clientData
+
+
+
+def clientServicesFormatter(clientData):
+    services = []
+    for service in clientData['services']:
+        service_obj = service['service']
+        del service['service']
+        client_service = service
+        service_obj.update(client_service)
+        services.append(service_obj)
+    clientData['services'] = services
+    return clientData

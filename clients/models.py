@@ -291,7 +291,7 @@ class ClientProduct(models.Model):
 
 class Requirement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
-    client = models.ForeignKey(Client,null=True, on_delete=models.SET_NULL)
+    client = models.OneToOneField(Client, on_delete=models.CASCADE)
 
     class statusChoices(models.TextChoices):
         pending = "pending"

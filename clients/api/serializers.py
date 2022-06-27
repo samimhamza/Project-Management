@@ -1,5 +1,4 @@
-from itertools import product
-from pyexpat import features
+from dataclasses import field
 from clients.models import (Client, ClientService, ClientProduct,
                             Service, Product, PricePlan, Feature, Requirement)
 from rest_framework import serializers
@@ -12,8 +11,15 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = "__all__"
+
+
+class ClientDetailedSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
     features = serializers.SerializerMethodField()
+    requirement = serializers.SerializerMethodField()
 
     def get_services(self, client):
         qs = ClientService.objects.filter(client=client)
@@ -25,6 +31,10 @@ class ClientSerializer(serializers.ModelSerializer):
         serializers = ClientProductCustomSerializer(instance=qs, many=True)
         return serializers.data
 
+    def get_requirement(self, client):
+        qs = Requirement.objects.get(client=client)
+        serializers = RequirementSerializer(instance=qs)
+        return serializers.data
     class Meta:
         model = Client
         fields = "__all__"
@@ -41,7 +51,7 @@ class ClientServiceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientService
-        fields = ["service", "details"]
+        fields = ["id","service", "details"]
 class ClientServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientService
