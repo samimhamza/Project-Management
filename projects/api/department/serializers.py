@@ -23,7 +23,8 @@ class StageListSerializer(serializers.ModelSerializer):
     def get_sub_stages(self, stage):
         qs = SubStage.objects.filter(
             deleted_at__isnull=True, stage=stage).order_by('-updated_at')
-        serializer = SubStageListSerializer(instance=qs, many=True)
+        serializer = SubStageListSerializer(instance=qs, many=True, context={
+                                            "request": self.context['request']})
         return serializer.data
 
     class Meta:
@@ -40,7 +41,8 @@ class DepartmentSerializer(serializers.ModelSerializer):
     def get_stages(self, department):
         qs = Stage.objects.filter(
             deleted_at__isnull=True, department=department).order_by('-updated_at')
-        serializer = StageListSerializer(instance=qs, many=True)
+        serializer = StageListSerializer(instance=qs, many=True, context={
+                                         "request": self.context['request']})
         return serializer.data
 
     class Meta:

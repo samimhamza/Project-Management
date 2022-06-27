@@ -167,6 +167,7 @@ def restore(self, request, table):
             items = table.objects.filter(pk__in=data["ids"])
             for item in items:
                 item.deleted_at = None
+                item.deleted_by = None
                 item.save()
             page = self.paginate_queryset(items)
             serializer = self.get_serializer(page, many=True)
