@@ -8,12 +8,13 @@ from rest_framework.decorators import action
 from projects.models import Stage, SubStage
 from rest_framework import viewsets, status
 from projects.models import Department
+from projects.api.department.serializers import StageListSerializer, SubStageListSerializer
 
 
 class StageViewSet(viewsets.ModelViewSet):
     queryset = Stage.objects.filter(
         deleted_at__isnull=True).order_by('-updated_at')
-    serializer_class = StageSerializer
+    serializer_class = StageListSerializer
     permission_classes = (StagePermissions,)
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -93,7 +94,7 @@ class StageViewSet(viewsets.ModelViewSet):
 class SubStageViewSet(viewsets.ModelViewSet):
     queryset = SubStage.objects.filter(
         deleted_at__isnull=True).order_by('-updated_at')
-    serializer_class = SubStageSerializer
+    serializer_class = SubStageListSerializer
     permission_classes = (SubStagePermissions,)
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
