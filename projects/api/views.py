@@ -142,10 +142,15 @@ class IncomeViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
+        try:
+            project = Project.objects.get(pk=data["project"])
+        except Project.DoesNotExist:
+            return Response({"error": "Project does not exist"}, status=status.HTTP_400_BAD_REQUEST)
         income = Income.objects.create(
             title=data["title"],
             type=data["type"],
             amount=data["amount"],
+            project=project,
             created_by=data["created_by"],
             updated_by=data["created_by"],
         )
