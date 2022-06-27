@@ -1,6 +1,7 @@
-from .serializers import (StageSerializer, StageListSerializer, SubStageSerializer,
-                          SubStageListSerializer, StageTrashedSerializer, SubStageTrashedSerializer)
+from .serializers import (StageListSerializer, SubStageListSerializer,
+                          StageTrashedSerializer, SubStageTrashedSerializer)
 from common.actions import allItems, filterRecords, delete, trashList, withTrashed, restore
+from projects.api.department.serializers import StageListSerializer, SubStageListSerializer
 from common.permissions_scopes import StagePermissions, SubStagePermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
@@ -8,7 +9,6 @@ from rest_framework.decorators import action
 from projects.models import Stage, SubStage
 from rest_framework import viewsets, status
 from projects.models import Department
-from projects.api.department.serializers import StageListSerializer, SubStageListSerializer
 
 
 class StageViewSet(viewsets.ModelViewSet):
@@ -94,7 +94,7 @@ class StageViewSet(viewsets.ModelViewSet):
 class SubStageViewSet(viewsets.ModelViewSet):
     queryset = SubStage.objects.filter(
         deleted_at__isnull=True).order_by('-updated_at')
-    serializer_class = SubStageListSerializer
+    serializer_class = StageListSerializer
     permission_classes = (SubStagePermissions,)
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
