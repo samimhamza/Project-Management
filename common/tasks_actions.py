@@ -114,20 +114,20 @@ def tasksResponse(self, serializer, project_id=None):
     return Response(data)
 
 
-def tasksAccordingToStatus(self, request, project_id):
-    queryset = Task.objects.filter(
-        deleted_at__isnull=True, project=request.GET.get("project_id"), status=request.GET.get('status')).order_by("-created_at")
+def tasksAccordingToStatus(self, request, queryset, project_id):
+    queryset = queryset.filter(status=request.GET.get(
+        'status')).order_by("-created_at")
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return tasksResponse(self, serializer, project_id)
 
 
-def tasksOfProject(self, request):
+def tasksOfProject(self, request, queryset):
     project_id = request.GET.get("project_id")
+    queryset = queryset.filter(project=request.GET.get(
+        "project_id")).order_by("-created_at")
     if request.GET.get('status'):
-        return tasksAccordingToStatus(self, request, project_id)
-    queryset = Task.objects.filter(
-        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+        return tasksAccordingToStatus(self, request, queryset, project_id)
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
     page = self.paginate_queryset(queryset)

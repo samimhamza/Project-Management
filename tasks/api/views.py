@@ -35,7 +35,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request, table=Task)
         if request.GET.get("project_id"):
-            return tasksOfProject(self, request)
+            return tasksOfProject(self, request, queryset)
         if request.GET.get("items_per_page") == "-1":
             if request.GET.get("excluded_dependencies"):
                 return excludedDependencies(LessFieldsTaskSerializer, queryset, request)

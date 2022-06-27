@@ -72,11 +72,9 @@ def users(self, task):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    # users = serializers.SerializerMethodField()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
     parent = LessFieldsTaskSerializer()
-
-    # def get_users(self, task):
-    #     return users(self, task)
 
     class Meta:
         model = Task
@@ -97,7 +95,11 @@ class TaskSerializer(serializers.ModelSerializer):
             "users",
             "deleted_at",
             "project",
-            "pin"
+            "pin",
+            "created_at",
+            "updated_at",
+            "created_by",
+            "updated_by",
         ]
 
 
@@ -169,7 +171,11 @@ class TaskListSerializer(serializers.ModelSerializer):
             "sub_tasks",
             "users",
             "deleted_at",
-            "project"
+            "project",
+            "created_at",
+            "updated_at",
+            "created_by",
+            "updated_by",
         ]
 
 
