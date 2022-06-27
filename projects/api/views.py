@@ -90,16 +90,16 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        return withTrashed(self, Income, order_by="-created_at")
+        return withTrashed(self, Payment, order_by="-created_at")
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        return trashList(self, Income)
+        return trashList(self, Payment)
 
     # for multi and single restore
     @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
-        return restore(self, request, Income)
+        return restore(self, request, Payment)
 
     def get_serializer_class(self):
         try:
@@ -119,9 +119,10 @@ class IncomeViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request, table=Income)
         if request.GET.get("project_id"):
-            queryset = Income.objects.filter(
-                deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+            queryset = queryset.filter(project=request.GET.get(
+                "project_id")).order_by("-created_at")
             serializer = self.get_serializer(queryset, many=True)
             for data in serializer.data:
                 data = getAttachments(
