@@ -1,4 +1,4 @@
-from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions
+from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions, filterRecords
 from common.permissions_scopes import HolidayPermissions, ReminderPermissions, RolePermissions
 from users.models import Reminder, Holiday, Action, Permission, Role, UserNotification
 from common.custom import CustomPageNumberPagination
@@ -107,6 +107,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request,  table=Role)
         if request.GET.get("items_per_page") == "-1":
             return allItems(RoleListSerializer, queryset)
 
