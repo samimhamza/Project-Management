@@ -139,6 +139,21 @@ class IncomeViewSet(viewsets.ModelViewSet):
             request, data, data['id'], 'income_attachments_v')
         return Response(data)
 
+    def create(self, request):
+        data = request.data
+        data["created_by"] = request.user
+        income = Income.objects.create(
+            title=data["title"],
+            type=data["type"],
+            amount=data["amount"],
+            created_by=data["created_by"],
+            updated_by=data["created_by"],
+        )
+        income.save()
+        serializer = self.get_serializer(
+            income)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def update(self, request, pk=None):
         income = self.get_object()
         for key, value in request.data.items():

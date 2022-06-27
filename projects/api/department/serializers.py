@@ -18,7 +18,6 @@ class StageListSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
     sub_stages = serializers.SerializerMethodField()
-    key = serializers.CharField(source="id")
 
     def get_sub_stages(self, stage):
         qs = SubStage.objects.filter(
@@ -29,7 +28,7 @@ class StageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stage
-        fields = ["id", "key", "name", "description", "created_by",
+        fields = ["id", "department", "name", "description", "created_by",
                   "updated_by", "created_at", "updated_at", "sub_stages"]
 
 
