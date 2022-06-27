@@ -38,7 +38,6 @@ class StageViewSet(viewsets.ModelViewSet):
                 'id').get(pk=data["department"])
         except Department.DoesNotExist:
             return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-
         new_stage = Stage.objects.create(
             name=data["name"],
             description=data["description"],
@@ -53,12 +52,13 @@ class StageViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         stage = self.get_object()
         data = request.data
-        try:
-            depratment = Department.objects.only(
-                'id').get(pk=data["department"])
-        except Department.DoesNotExist:
-            return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-        stage.department = depratment
+        if "department" in data:
+            try:
+                depratment = Department.objects.only(
+                    'id').get(pk=data["department"])
+            except Department.DoesNotExist:
+                return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+            stage.department = depratment
         for key, value in data.items():
             if key != "id":
                 setattr(stage, key, value)
