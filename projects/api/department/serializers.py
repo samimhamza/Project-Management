@@ -3,14 +3,21 @@ from rest_framework import serializers
 from projects.models import Department, Stage, SubStage
 
 
+class StageDepartmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Stage
+        fields = ["id", "department"]
+
+
 class SubStageListSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer()
     updated_by = UserWithProfileSerializer()
-    key = serializers.CharField(source="id")
+    stage = StageDepartmentSerializer()
 
     class Meta:
         model = SubStage
-        fields = ["id", "key", "name", "description", "created_by",
+        fields = ["id", "stage", "name", "description", "created_by",
                   "updated_by", "created_at", "updated_at"]
 
 
@@ -64,6 +71,44 @@ class DepartmentTrashedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]
+
+
+class StageTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Stage
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "created_by",
+            "updated_by",
+            "deleted_by"
+        ]
+
+
+class SubStageTrashedSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = SubStage
         fields = [
             "id",
             "name",
