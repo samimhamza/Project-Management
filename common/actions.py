@@ -184,17 +184,16 @@ def allItems(serializerName, queryset, request=None):
     return Response(serializer.data, status=200)
 
 
-def expensesOfProject(self, request):
-    queryset = Expense.objects.filter(
-        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+def expensesOfProject(self, request, queryset):
+    queryset = queryset.filter(project=request.GET.get(
+        "project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldExpenseSerializer, queryset)
-    page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
+    serializer = self.get_serializer(queryset, many=True)
     for data in serializer.data:
         data = getAttachments(
             request, data, data['id'], "expense_attachments_v")
-    return self.get_paginated_response(serializer.data)
+    return Response(serializer.data)
 
 
 def dataWithPermissions(self, field):
@@ -251,29 +250,28 @@ def deleteAttachments(self, request):
 
 
 def clientProductsFormatter(clientData):
-        products = []
-        for clientfeature in clientData['features']:
-            feature = clientfeature['feature']
-            del clientfeature['feature']
-            feature.update(clientfeature)
-            product = feature['product']
-            del feature['product']
-            hasProduct = False       
-            for x in products:
-                if x["id"] == product["id"]:
-                    hasProduct = True
-                    x["features"].append(feature)
-                    break
-            if hasProduct == False:
-                product["features"] = []
-                product["features"].append(feature)
-                products.append(product)
+    products = []
+    for clientfeature in clientData['features']:
+        feature = clientfeature['feature']
+        del clientfeature['feature']
+        feature.update(clientfeature)
+        product = feature['product']
+        del feature['product']
+        hasProduct = False
+        for x in products:
+            if x["id"] == product["id"]:
+                hasProduct = True
+                x["features"].append(feature)
+                break
+        if hasProduct == False:
+            product["features"] = []
+            product["features"].append(feature)
+            products.append(product)
 
-        del clientData['features']
-        clientData['products'] = []
-        clientData['products'] = products
-        return clientData
-
+    del clientData['features']
+    clientData['products'] = []
+    clientData['products'] = products
+    return clientData
 
 
 def clientServicesFormatter(clientData):

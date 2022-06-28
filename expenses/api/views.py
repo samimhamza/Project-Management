@@ -90,14 +90,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request, table=Expense)
         if request.GET.get("project_id"):
-            return expensesOfProject(self, request)
+            return expensesOfProject(self, request, queryset)
 
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldExpenseSerializer, queryset)
 
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         expense = self.get_object()
