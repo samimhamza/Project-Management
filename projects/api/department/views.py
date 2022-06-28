@@ -32,6 +32,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         data["created_by"] = request.user
         new_category = Department.objects.create(
             name=data["name"],
+            description=data["description"],
             created_by=data["created_by"],
             updated_by=data["created_by"],
         )
