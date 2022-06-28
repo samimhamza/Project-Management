@@ -10,31 +10,41 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CategoryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
+
+
 class ExpenseItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseItem
         fields = "__all__"
 
 
+# class ExpenseSerializer(serializers.ModelSerializer):
+#     items = serializers.SerializerMethodField()
+#     category = CategorySerializer()
+#     created_by = UserWithProfileSerializer(read_only=True)
+#     updated_by = UserWithProfileSerializer(read_only=True)
+#     expense_by = UserWithProfileSerializer()
+
+#     def get_items(self, expense):
+#         qs = ExpenseItem.objects.filter(
+#             deleted_at__isnull=True, expense=expense)
+#         serializer = ExpenseItemSerializer(instance=qs, many=True)
+#         return serializer.data
+
+#     class Meta:
+#         model = Expense
+#         fields = "__all__"
+
+
 class ExpenseSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
     category = CategorySerializer()
-    expense_by = UserWithProfileSerializer()
-
-    def get_items(self, expense):
-        qs = ExpenseItem.objects.filter(
-            deleted_at__isnull=True, expense=expense)
-        serializer = ExpenseItemSerializer(instance=qs, many=True)
-        return serializer.data
-
-    class Meta:
-        model = Expense
-        fields = "__all__"
-
-
-class ExpenseListSerializer(serializers.ModelSerializer):
-    items = serializers.SerializerMethodField()
-    category = CategorySerializer()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
     expense_by = UserWithProfileSerializer()
     project = ProjectListSerializer()
 
