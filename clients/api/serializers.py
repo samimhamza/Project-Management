@@ -1,4 +1,5 @@
 from dataclasses import field
+from pyexpat import features
 from clients.models import (Client, ClientService, ClientProduct,
                             Service, Product, PricePlan, Feature, Requirement)
 from rest_framework import serializers
@@ -64,6 +65,12 @@ class ClientProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProductSerializer(serializers.ModelSerializer):
+    features = serializers.SerializerMethodField()
+
+    def get_features(self, product):
+        qs = Feature.objects.filter(product=product)
+        serializers = FeatureCustomSerializer(instance=qs, many=True)
+        return serializers.data
     class Meta:
         model = Product
         fields = "__all__"
@@ -71,6 +78,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class FeatureSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+    class Meta:
+        model = Feature
+        fields = "__all__"
+
+class FeatureCustomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
         fields = "__all__"
