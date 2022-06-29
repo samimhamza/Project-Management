@@ -20,8 +20,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/ClientModal.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/InfoStep.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/PersonalSlideContent.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/ProductStep.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/PublicSlideContent.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/ServiceStep.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/clients/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/project/expense/ExpenseMainContent.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/project/expense/ExpenseMainContent.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/SideNav.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/SideNav.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/Profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/Profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/UserInfoSlide.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/UserInfoSlide.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/copy.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/copy.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,30 +62,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/main&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/clients",
+    "nodejs_package_manager_path": "yarn",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\clients" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\team" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project" />
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\store" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\trash" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages\trashes" />
       <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -145,7 +156,37 @@
       <workItem from="1655283971055" duration="8741000" />
       <workItem from="1655350598532" duration="15353000" />
       <workItem from="1655370131764" duration="11160000" />
-      <workItem from="1655523331735" duration="8697000" />
+      <workItem from="1655523331735" duration="14615000" />
+      <workItem from="1655543292725" duration="9555000" />
+      <workItem from="1655610045996" duration="14424000" />
+      <workItem from="1655629660794" duration="4475000" />
+      <workItem from="1655634289384" duration="72000" />
+      <workItem from="1655634696911" duration="2380000" />
+      <workItem from="1655695978255" duration="8090000" />
+      <workItem from="1655707759105" duration="1094000" />
+      <workItem from="1655709820919" duration="1087000" />
+      <workItem from="1655717595378" duration="10473000" />
+      <workItem from="1655782339008" duration="1072000" />
+      <workItem from="1655784013941" duration="8422000" />
+      <workItem from="1655793750137" duration="14557000" />
+      <workItem from="1655869923991" duration="14045000" />
+      <workItem from="1655886583075" duration="7740000" />
+      <workItem from="1655895742732" duration="3157000" />
+      <workItem from="1655899284251" duration="1453000" />
+      <workItem from="1655955600612" duration="12570000" />
+      <workItem from="1655974922627" duration="10953000" />
+      <workItem from="1656128626648" duration="13198000" />
+      <workItem from="1656147915459" duration="6878000" />
+      <workItem from="1656214663605" duration="1471000" />
+      <workItem from="1656217369016" duration="7397000" />
+      <workItem from="1656226972402" duration="3137000" />
+      <workItem from="1656234181973" duration="5882000" />
+      <workItem from="1656240146559" duration="6185000" />
+      <workItem from="1656300996550" duration="13880000" />
+      <workItem from="1656320928718" duration="11411000" />
+      <workItem from="1656387640093" duration="12695000" />
+      <workItem from="1656407350101" duration="8146000" />
+      <workItem from="1656474007248" duration="6714000" />
     </task>
     <servers />
   </component>
@@ -200,8 +241,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskUsersAvatar.js</url>
-          <line>18</line>
+          <line>20</line>
           <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/trash/TrashDropdown.js</url>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/customComponents/AddAndRemoveItems.js</url>
+          <line>38</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

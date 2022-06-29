@@ -78,6 +78,13 @@ class Feature(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    class Types(models.TextChoices):
+        main = "main" 
+        additional = "additional" 
+
+    type = models.CharField(
+        max_length=24, choices=Types.choices, default="main"
+    )
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
     created_by = models.ForeignKey(
         "users.User",
