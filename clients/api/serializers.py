@@ -83,6 +83,12 @@ class FeatureSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class FeatureCustomSerializer(serializers.ModelSerializer):
+    price_plan = serializers.SerializerMethodField()
+
+    def get_price_plan(self, feature):
+        qs = PricePlan.objects.filter(feature=feature)
+        serializers = PricePlanSerializer(instance=qs, many=True)
+        return serializers.data
     class Meta:
         model = Feature
         fields = "__all__"
