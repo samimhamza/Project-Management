@@ -3,9 +3,11 @@ from django.db import models
 from projects.models import Country
 import uuid
 
+
 class Service(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    parent = models.ForeignKey("self",on_delete=models.SET_NULL, null=True, blank=True)
+    parent = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
@@ -37,10 +39,11 @@ class Service(models.Model):
         else:
             return "No Name"
 
+
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128, null=True, blank=True)
-    developed_by = models.CharField(max_length=128, blank=True ,null=True)
+    developed_by = models.CharField(max_length=128, blank=True, null=True)
     details = models.TextField(blank=True, null=True)
     photo = models.ImageField(
         upload_to="products", blank=True, null=True
@@ -73,6 +76,7 @@ class Product(models.Model):
             return self.name
         else:
             return "No Name"
+
 
 class Feature(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -114,6 +118,7 @@ class Feature(models.Model):
             return self.name
         else:
             return "No Name"
+
 
 class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -160,8 +165,8 @@ class Client(models.Model):
     )
 
     class LeadType(models.TextChoices):
-        manual= "manual"
-        website= "website"
+        manual = "manual"
+        website = "website"
         facebook = "facebook"
         instagram = "instagram"
         twitter = "twitter"
@@ -179,9 +184,9 @@ class Client(models.Model):
         email = "email"
         phone = "phone"
         whatsapp = "whatsapp"
-    
+
     prefer_com_way = models.CharField(
-        max_length=32, choices= PreferComWay.choices, blank=True, null=True
+        max_length=32, choices=PreferComWay.choices, blank=True, null=True
     )
 
     is_requirement_ready = models.BooleanField(default=False)
@@ -197,9 +202,9 @@ class Client(models.Model):
         check_and_come_back = "check_and_come_back"
         understood_wrong = "understood_wrong"
         confirm = "confirm"
-    
+
     status = models.CharField(
-        max_length=32,choices=statusChoices.choices, default="pending"
+        max_length=32, choices=statusChoices.choices, default="pending"
     )
 
     date = models.DateField(blank=True, null=True)
@@ -235,8 +240,10 @@ class Client(models.Model):
 
 class ClientService(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    service = models.ForeignKey(Service,null=True,on_delete=models.SET_NULL, related_name='clientService_service')
-    client = models.ForeignKey(Client, null=True, on_delete=models.SET_NULL, related_name='clientService_client')
+    service = models.ForeignKey(
+        Service, null=True, on_delete=models.SET_NULL, related_name='clientService_service')
+    client = models.ForeignKey(
+        Client, null=True, on_delete=models.SET_NULL, related_name='clientService_client')
     details = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -244,7 +251,6 @@ class ClientService(models.Model):
             return self.details
         else:
             return "No Details"
-
 
 
 class PricePlan(models.Model):
@@ -281,6 +287,7 @@ class PricePlan(models.Model):
         else:
             return "No Name"
 
+
 class ClientProduct(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     feature = models.ForeignKey(Feature, null=True, on_delete=models.SET_NULL)
@@ -297,7 +304,7 @@ class ClientProduct(models.Model):
 
 
 class Requirement(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client = models.OneToOneField(Client, on_delete=models.CASCADE)
 
     class statusChoices(models.TextChoices):
@@ -306,13 +313,15 @@ class Requirement(models.Model):
         confirm = "confirm"
         reject = "reject"
         miss_info = "miss_info"
-    
-    status = models.CharField(max_length=32 ,choices=statusChoices.choices, default="pending")
+
+    status = models.CharField(
+        max_length=32, choices=statusChoices.choices, default="pending")
     goals_and_expectation = models.TextField(blank=True, null=True)
     budget = models.FloatField(max_length=255, blank=True, null=True)
-    currency =models.CharField(max_length=32, blank=True, null=True)
+    currency = models.CharField(max_length=32, blank=True, null=True)
     project_timeline = models.CharField(max_length=255, blank=True, null=True)
-    frequently_of_receive_progress_report = models.TextField(blank=True, null=True)
+    frequently_of_receive_progress_report = models.TextField(
+        blank=True, null=True)
     what_are_we_delivering = models.TextField(blank=True, null=True)
     what_are_we_not_delivering = models.TextField(blank=True, null=True)
     target_audience = models.TextField(blank=True, null=True)
@@ -351,6 +360,3 @@ class Requirement(models.Model):
             return self.goals_and_expectation
         else:
             return "No Goal"
-    
-
-

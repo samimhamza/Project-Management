@@ -433,7 +433,7 @@ class ProjectRole(models.Model):
 class Stage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     department = models.ForeignKey(
         Department, related_name="stages", on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
@@ -466,7 +466,7 @@ class Stage(models.Model):
 class SubStage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=124)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     stage = models.ForeignKey(
         Stage, related_name="sub_stages", on_delete=models.CASCADE)
     created_by = models.ForeignKey(

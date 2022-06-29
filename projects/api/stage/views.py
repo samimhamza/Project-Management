@@ -1,7 +1,6 @@
-from .serializers import (StageListSerializer, SubStageListSerializer,
-                          StageTrashedSerializer, SubStageTrashedSerializer)
+from projects.api.department.serializers import (
+    StageListSerializer, SubStageListSerializer, StageTrashedSerializer, SubStageTrashedSerializer)
 from common.actions import allItems, filterRecords, delete, trashList, withTrashed, restore
-from projects.api.department.serializers import StageListSerializer, SubStageListSerializer
 from common.permissions_scopes import StagePermissions, SubStagePermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
@@ -39,9 +38,13 @@ class StageViewSet(viewsets.ModelViewSet):
                 'id').get(pk=data["department"])
         except Department.DoesNotExist:
             return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        if "description" in data:
+            description = data["description"]
+        else:
+            description = None
         new_stage = Stage.objects.create(
             name=data["name"],
-            description=data["description"],
+            description=description,
             created_by=data["created_by"],
             updated_by=data["created_by"],
             department=depratment
@@ -94,7 +97,7 @@ class StageViewSet(viewsets.ModelViewSet):
 class SubStageViewSet(viewsets.ModelViewSet):
     queryset = SubStage.objects.filter(
         deleted_at__isnull=True).order_by('-updated_at')
-    serializer_class = StageListSerializer
+    serializer_class = SubStageListSerializer
     permission_classes = (SubStagePermissions,)
     pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
@@ -119,10 +122,13 @@ class SubStageViewSet(viewsets.ModelViewSet):
                 'id').get(pk=data["stage"])
         except Stage.DoesNotExist:
             return Response({"error": "Stage does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-
+        if "description" in data:
+            description = data["description"]
+        else:
+            description = None
         new_stage = SubStage.objects.create(
             name=data["name"],
-            description=data["description"],
+            description=description,
             created_by=data["created_by"],
             updated_by=data["created_by"],
             stage=stage
