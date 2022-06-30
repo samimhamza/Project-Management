@@ -96,7 +96,7 @@ class TeamPermissions(CustomPermissions):
         'add_users': 'teams_c',
         'excluded_users': 'users_v',
         'excluded_projects': 'projects_v',
-        'add_project': 'team_projects_c',
+        'add_project': 'teams_u',
         'delete_user': 'teams_d'
     }
 
@@ -272,6 +272,7 @@ class ProductPermissions(CustomPermissions):
         'all': 'products_v'
     }
 
+
 class ServicePermissions(CustomPermissions):
     actions_scopes = {
         'list': 'services_v',
@@ -284,6 +285,7 @@ class ServicePermissions(CustomPermissions):
         'trashed': 'services_d',
         'all': 'services_v'
     }
+
 
 class RequirementPermissions(CustomPermissions):
     actions_scopes = {

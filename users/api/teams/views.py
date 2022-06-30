@@ -164,11 +164,11 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def add_project(self, request, pk=None):
         try:
+            data = request.data
             team = self.get_object()
             team.projects.set(data["ids"])
             serializer = self.get_serializer(team)
-            data = request.data
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
