@@ -44,7 +44,7 @@ class TeamViewSet(viewsets.ModelViewSet):
                 deleted_at__isnull=True).order_by("-created_at")
         )
         columns = ['name']
-        queryset = filterRecords(queryset, request, columns)
+        queryset = filterRecords(queryset, request, columns, table=Team)
         if request.GET.get("items_per_page") == "-1":
             return allItems(TeamNamesSerializer, queryset)
 
@@ -164,10 +164,10 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def add_project(self, request, pk=None):
         try:
-            data = request.data
             team = self.get_object()
             team.projects.set(data["ids"])
             serializer = self.get_serializer(team)
+            data = request.data
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(
