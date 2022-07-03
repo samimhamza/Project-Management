@@ -2,6 +2,7 @@ from common.actions import (delete, allItems, filterRecords, addAttachment,
                             deleteAttachments, getAttachments, restore, withTrashed, trashList)
 from common.permissions_scopes import (
     IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions)
+from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -113,6 +114,7 @@ class IncomeViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = IncomeSerializer
     permission_classes = (IncomePermissions,)
+    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "trashed": IncomeTrashedSerializer
     }
@@ -123,13 +125,15 @@ class IncomeViewSet(viewsets.ModelViewSet):
         if request.GET.get("project_id"):
             queryset = queryset.filter(project=request.GET.get(
                 "project_id")).order_by("-created_at")
-            serializer = self.get_serializer(queryset, many=True)
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(page, many=True)
             for data in serializer.data:
                 data = getAttachments(
                     request, data, data['id'], 'income_attachments_v')
-            return Response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            return self.get_paginated_response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         income = self.get_object()

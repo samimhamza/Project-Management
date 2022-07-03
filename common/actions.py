@@ -189,11 +189,12 @@ def expensesOfProject(self, request, queryset):
         "project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldExpenseSerializer, queryset)
-    serializer = self.get_serializer(queryset, many=True)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
     for data in serializer.data:
         data = getAttachments(
             request, data, data['id'], "expense_attachments_v")
-    return Response(serializer.data)
+    return self.get_paginated_response(serializer.data)
 
 
 def dataWithPermissions(self, field):
