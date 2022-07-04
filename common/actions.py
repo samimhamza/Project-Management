@@ -1,3 +1,4 @@
+from tkinter import N
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from expenses.api.serializers import LessFieldExpenseSerializer
 from .team_actions import get_leader_by_id, get_total_users
@@ -7,6 +8,7 @@ from common.permissions import checkCustomPermissions
 from projects.models import Project, Attachment
 from django.core.files.base import ContentFile
 from rest_framework.response import Response
+from expenses.models import Expense
 from rest_framework import status
 from django.utils import timezone
 from django.db import transaction
@@ -184,10 +186,25 @@ def allItems(serializerName, queryset, request=None):
 
 
 def expensesOfProject(self, request, queryset):
-    if request.GET.get("type"):
-        queryset = queryset.filter(type=request.GET.get("type"))
+    actualCount = None
+    estimateCount = None
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
+    if request.GET.get("type"):
+        queryset = queryset.filter(type=request.GET.get("type"))
+        if request.GET.get("type") == "actual":
+            actualCount = queryset.count()
+        else:
+            estimateCount = queryset.count()
+
+    if actualCount is None:
+        actualCount = Expense.objects.filter(
+            project=request.GET.get("project_id"), type="actual").count()
+
+    if estimateCount is None:
+        estimateCount = Expense.objects.filter(
+            project=request.GET.get("project_id"), type="estimate").count()
+
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldExpenseSerializer, queryset)
     page = self.paginate_queryset(queryset)
@@ -195,7 +212,10 @@ def expensesOfProject(self, request, queryset):
     for data in serializer.data:
         data = getAttachments(
             request, data, data['id'], "expense_attachments_v")
-    return self.get_paginated_response(serializer.data)
+    data = self.get_paginated_response(serializer.data).data
+    data['actualCount'] = actualCount
+    data['estimateCount'] = estimateCount
+    return Response(data)
 
 
 def dataWithPermissions(self, field):
