@@ -154,6 +154,7 @@ class IncomeViewSet(viewsets.ModelViewSet):
             title=data["title"],
             type=data["type"],
             amount=data["amount"],
+            date=data["date"],
             project=project,
             created_by=data["created_by"],
             updated_by=data["created_by"],
