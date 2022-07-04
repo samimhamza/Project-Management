@@ -248,6 +248,7 @@ class Income(models.Model):
     description = models.TextField(blank=True, null=True)
     amount = models.DecimalField(
         max_digits=19, decimal_places=2, blank=True, null=True)
+    date = models.DateField()
 
     class Types(models.TextChoices):
         initial_cost = "initial_cost"
@@ -293,6 +294,7 @@ class Payment(models.Model):
         Income, on_delete=models.SET_NULL, null=True, related_name='payments')
     source = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=19, decimal_places=2)
+    date = models.DateField()
 
     class PaymentMethods(models.TextChoices):
         cash = "cash"
