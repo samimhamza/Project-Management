@@ -185,6 +185,8 @@ def allItems(serializerName, queryset, request=None):
 
 
 def expensesOfProject(self, request, queryset):
+    if request.GET.get("type"):
+        queryset = queryset.filter(type=request.GET.get("type"))
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
