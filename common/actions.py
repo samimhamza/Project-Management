@@ -7,7 +7,6 @@ from common.permissions import checkCustomPermissions
 from projects.models import Project, Attachment
 from django.core.files.base import ContentFile
 from rest_framework.response import Response
-from expenses.models import Expense
 from rest_framework import status
 from django.utils import timezone
 from django.db import transaction
