@@ -1,3 +1,5 @@
+from msilib.schema import ServiceInstall
+from turtle import pen
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer
 from common.notification import sendNotification
 from .actions import allItems, countStatuses
@@ -122,6 +124,21 @@ def tasksAccordingToStatus(self, request, queryset, project_id):
     return tasksResponse(self, serializer, project_id)
 
 
+def taskThumbnail(self, request, queryset):
+    pending = queryset.filter(status='pending')
+    in_progress = queryset.filter(status='in_progress')
+    completed = queryset.filter(status='completed')
+    merged = pending.union(in_progress, completed)
+
+    page1 = self.paginate_queryset(merged)
+    # page2 = self.paginate_queryset(in_progress)
+    # page3 = self.paginate_queryset(completed)
+    serializer1 = self.get_serializer(page1, many=True)
+    # serializer2 = self.get_serializer(page2, many=True)
+    # serializer3 = self.get_serializer(page3, many=True)
+    return self.get_paginated_response(serializer1.data)
+
+
 def tasksOfProject(self, request, queryset):
     project_id = request.GET.get("project_id")
     queryset = queryset.filter(project=request.GET.get(
@@ -130,6 +147,8 @@ def tasksOfProject(self, request, queryset):
         return tasksAccordingToStatus(self, request, queryset, project_id)
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
+    if request.GET.get('thumbnail'):
+        return taskThumbnail(self, request, queryset)
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return tasksResponse(self, serializer, project_id)
