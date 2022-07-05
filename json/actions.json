@@ -289,5 +289,33 @@
 			{ "code": "v", "name": "View" },
 			{ "code": "u", "name": "Update" }
 		]
+	},
+	{
+		"fields": {
+			"name": "products",
+			"codename": "pr",
+			"model": "Products",
+			"order": 22
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "u", "name": "Update" }
+		]
+	},
+	{
+		"fields": {
+			"name": "services",
+			"codename": "se",
+			"model": "Services",
+			"order": 23
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "u", "name": "Update" }
+		]
 	}
 ]
