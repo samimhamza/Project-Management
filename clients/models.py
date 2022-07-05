@@ -34,15 +34,12 @@ class Service(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128, null=True, blank=True)
+    name = models.CharField(max_length=128)
     developed_by = models.CharField(max_length=128, blank=True, null=True)
     details = models.TextField(blank=True, null=True)
     photo = models.ImageField(
@@ -72,19 +69,17 @@ class Product(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class Feature(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128, null=True, blank=True)
+    name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
+
     class Types(models.TextChoices):
-        main = "main" 
-        additional = "additional" 
+        main = "main"
+        additional = "additional"
 
     type = models.CharField(
         max_length=24, choices=Types.choices, default="main"
@@ -114,15 +109,12 @@ class Feature(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=32, blank=True, null=True)
@@ -232,10 +224,7 @@ class Client(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class ClientService(models.Model):
@@ -247,15 +236,12 @@ class ClientService(models.Model):
     details = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        if self.details:
-            return self.details
-        else:
-            return "No Details"
+        return self.client.first_name
 
 
 class PricePlan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    plan_name = models.CharField(max_length=128, null=True, blank=True)
+    plan_name = models.CharField(max_length=128)
     plan_price = models.FloatField(max_length=120, null=True, blank=True)
     created_by = models.ForeignKey(
         "users.User",
@@ -282,10 +268,7 @@ class PricePlan(models.Model):
     )
 
     def __str__(self):
-        if self.plan_name:
-            return self.plan_name
-        else:
-            return "No Name"
+        return self.plan_name
 
 
 class ClientProduct(models.Model):
@@ -300,7 +283,10 @@ class ClientProduct(models.Model):
     client = models.ForeignKey(Client, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return "No Name"
+        if self.client:
+            return self.client.first_name
+        else:
+            return "No Client"
 
 
 class Requirement(models.Model):
