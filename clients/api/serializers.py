@@ -1,7 +1,5 @@
-from dataclasses import field
-from pyexpat import features
-from clients.models import (Client, ClientService, ClientProduct,
-                            Service, Product, PricePlan, Feature, Requirement)
+from clients.models import (
+    ClientService, ClientProduct, Service, Product, PricePlan, Feature, Requirement)
 from rest_framework import serializers
 
 
@@ -11,48 +9,20 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = "__all__"
-
-
-class ClientDetailedSerializer(serializers.ModelSerializer):
-    services = serializers.SerializerMethodField()
-    features = serializers.SerializerMethodField()
-    requirement = serializers.SerializerMethodField()
-
-    def get_services(self, client):
-        qs = ClientService.objects.filter(client=client)
-        serializer = ClientServiceListSerializer(instance=qs, many=True)
-        return serializer.data
-
-    def get_features(self, client):
-        qs = ClientProduct.objects.filter(client=client)
-        serializers = ClientProductCustomSerializer(instance=qs, many=True)
-        return serializers.data
-
-    def get_requirement(self, client):
-        qs = Requirement.objects.get(client=client)
-        serializers = RequirementSerializer(instance=qs)
-        return serializers.data
-    class Meta:
-        model = Client
-        fields = "__all__"
-
-
-
 class ServiceCustomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ["name","description"]
+        fields = ["name", "description"]
+
 
 class ClientServiceListSerializer(serializers.ModelSerializer):
     service = ServiceCustomSerializer()
 
     class Meta:
         model = ClientService
-        fields = ["id","service", "details"]
+        fields = ["id", "service", "details"]
+
+
 class ClientServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientService
@@ -64,6 +34,7 @@ class ClientProductSerializer(serializers.ModelSerializer):
         model = ClientProduct
         fields = "__all__"
 
+
 class ProductSerializer(serializers.ModelSerializer):
     features = serializers.SerializerMethodField()
 
@@ -71,6 +42,7 @@ class ProductSerializer(serializers.ModelSerializer):
         qs = Feature.objects.filter(product=product)
         serializers = FeatureCustomSerializer(instance=qs, many=True)
         return serializers.data
+
     class Meta:
         model = Product
         fields = "__all__"
@@ -78,9 +50,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class FeatureSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+
     class Meta:
         model = Feature
         fields = "__all__"
+
 
 class FeatureCustomSerializer(serializers.ModelSerializer):
     price_plan = serializers.SerializerMethodField()
@@ -89,16 +63,19 @@ class FeatureCustomSerializer(serializers.ModelSerializer):
         qs = PricePlan.objects.filter(feature=feature)
         serializers = PricePlanSerializer(instance=qs, many=True)
         return serializers.data
+
     class Meta:
         model = Feature
         fields = "__all__"
+
+
 class ClientProductCustomSerializer(serializers.ModelSerializer):
     feature = FeatureSerializer()
+
     class Meta:
         model = ClientProduct
-        exclude = ('id','client', )
+        exclude = ('id', 'client', )
         # fields = ["plan","on_request_price","on_request_date","purchased_price","purchased_date","end_date","feature"]
-
 
 
 class PricePlanSerializer(serializers.ModelSerializer):
