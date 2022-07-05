@@ -158,6 +158,8 @@ def delete(self, request, table, imageField=None):
                 if os.path.isfile('media/'+str(getattr(table, imageField))):
                     os.remove('media/'+str(getattr(table, imageField)))
             item.delete()
+    if len(ids) == 0:
+        return Response({'detail': "Invalid Id"}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'deleted_ids': ids}, status=status.HTTP_204_NO_CONTENT)
 
 
