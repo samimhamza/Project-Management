@@ -1,3 +1,4 @@
+from datetime import datetime
 from common.actions import (delete, allItems, filterRecords, addAttachment,
                             deleteAttachments, getAttachments, restore, withTrashed, trashList)
 from common.permissions_scopes import (
@@ -99,7 +100,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         income = Payment.objects.create(
             source=data["source"],
             amount=data["amount"],
-            date=data['date'],
+            date=datetime.now().date(),
             income=income,
             created_by=data["created_by"],
             updated_by=data["created_by"],
