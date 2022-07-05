@@ -3,11 +3,13 @@ from clients.api.serializers import (
 from clients.models import (Client, ClientService, ClientFeature, Requirement)
 from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
+from projects.api.serializers import CountryListSerializer
 
 
 class ClientSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
+    country = CountryListSerializer()
 
     class Meta:
         model = Client
