@@ -1,5 +1,3 @@
-from msilib.schema import ServiceInstall
-from turtle import pen
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer
 from common.notification import sendNotification
 from .actions import allItems, countStatuses
@@ -7,6 +5,7 @@ from rest_framework.response import Response
 from common.pusher import pusher_client
 from tasks.models import Task, UserTask
 from projects.models import Project
+import math
 
 
 def broadcastProgress(data):
@@ -125,18 +124,36 @@ def tasksAccordingToStatus(self, request, queryset, project_id):
 
 
 def taskThumbnail(self, request, queryset):
-    pending = queryset.filter(status='pending')
-    in_progress = queryset.filter(status='in_progress')
-    completed = queryset.filter(status='completed')
-    merged = pending.union(in_progress, completed)
-
-    page1 = self.paginate_queryset(merged)
-    # page2 = self.paginate_queryset(in_progress)
-    # page3 = self.paginate_queryset(completed)
-    serializer1 = self.get_serializer(page1, many=True)
-    # serializer2 = self.get_serializer(page2, many=True)
-    # serializer3 = self.get_serializer(page3, many=True)
-    return self.get_paginated_response(serializer1.data)
+    items_per_page = request.GET.get(
+        "items_per_page") if request.GET.get("items_per_page") else 10
+    page = request.GET.get(
+        "page") if request.GET.get("page") else 1
+    page = int(page)
+    items_per_page = int(items_per_page)
+    pending = queryset.filter(status='pending')[
+        0 if page == 1 else ((page-1) * items_per_page): page * items_per_page]
+    in_progress = queryset.filter(status='in_progress')[
+        0 if page == 1 else ((page-1) * items_per_page): page * items_per_page]
+    completed = queryset.filter(status='completed')[
+        0 if page == 1 else ((page-1) * items_per_page): page * items_per_page]
+    if pending.count() == 0 and in_progress.count() == 0 and completed.count() == 0:
+        return Response(
+            {
+                "detail": "Invalid  page"
+            }
+        )
+    serializer1 = self.get_serializer(pending, many=True)
+    serializer2 = self.get_serializer(in_progress, many=True)
+    serializer3 = self.get_serializer(completed, many=True)
+    return Response(
+        {
+            "count": queryset.count(),
+            "total_pages": math.ceil(queryset.count() / items_per_page),
+            "total": int(request.GET.get("items_per_page")) if request.GET.get("items_per_page") else 10,
+            "current_page": int(request.GET.get("page")) if request.GET.get("page") else 1,
+            "results": {'pending': serializer1.data, 'in_progress': serializer2.data, 'completed': serializer3.data}
+        }
+    )
 
 
 def tasksOfProject(self, request, queryset):
