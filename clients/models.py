@@ -284,7 +284,9 @@ class ClientFeature(models.Model):
 
     def __str__(self):
         if self.client:
-            return self.client.first_name + " " + (self.feature.name if self.feature else "") + " " + self.plan if self.plan else ""
+            return self.client.first_name + " " \
+                + (self.feature.name if self.feature else "") + \
+                " " + self.plan if self.plan else ""
         else:
             return "No Client"
 
