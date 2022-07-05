@@ -122,12 +122,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         users = User.objects.filter(project_users=project)
         if request.query_params.get('content'):
             columns = ['first_name', 'last_name', 'email']
-            users = filterRecords(users, request, columns)
-            serializer = UserWithProfileSerializer(users, many=True)
+            users = filterRecords(users, request, columns, table=User)
+            serializer = UserWithProfileSerializer(
+                users, many=True,  context={"request": request})
             return Response(serializer.data)
 
         page = self.paginate_queryset(users)
-        serializer = UserWithProfileSerializer(page, many=True)
+        serializer = UserWithProfileSerializer(
+            page, many=True,  context={"request": request})
         return self.get_paginated_response(serializer.data)
 
     @ action(detail=True, methods=["get"])
@@ -136,12 +138,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         teams = Team.objects.filter(projects=project)
         if request.query_params.get('content'):
             columns = ['name']
-            teams = filterRecords(teams, request, columns)
-            serializer = LessFieldsTeamSerializer(teams, many=True)
+            teams = filterRecords(teams, request, columns, table=Team)
+            serializer = LessFieldsTeamSerializer(
+                teams, many=True, context={"request": request})
             return Response(serializer.data)
-
         page = self.paginate_queryset(teams)
-        serializer = LessFieldsTeamSerializer(page, many=True)
+        serializer = LessFieldsTeamSerializer(
+            page, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
 
     @ action(detail=True, methods=["post"])
@@ -154,7 +157,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 project.users.add(user)
             notification(getAssignNotification, project,
                          request, 'pk__in', data['ids'])
-            serializer = UserWithProfileSerializer(users, many=True)
+            serializer = UserWithProfileSerializer(
+                users, many=True, context={"request": request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(
@@ -171,7 +175,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 project.teams.add(user)
             notification(getAssignNotification,
                          project, request, 'teams__in', data['ids'])
-            serializer = LessFieldsTeamSerializer(teams, many=True)
+            serializer = LessFieldsTeamSerializer(
+                teams, many=True, context={"request": request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(
@@ -220,14 +225,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def excluded_users(self, request, pk=None):
         users = User.objects.filter(
             deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
-        serializer = UserWithProfileSerializer(users, many=True)
+        serializer = UserWithProfileSerializer(
+            users, many=True,  context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @ action(detail=True, methods=["get"])
     def excluded_teams(self, request, pk=None):
         teams = Team.objects.filter(deleted_at__isnull=True).exclude(
             projects__id=pk).order_by("-created_at")
-        serializer = LessFieldsTeamSerializer(teams, many=True)
+        serializer = LessFieldsTeamSerializer(
+            teams, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
