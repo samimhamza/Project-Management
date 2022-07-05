@@ -1,5 +1,6 @@
 from clients.models import (
     ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
+from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 
 
@@ -37,6 +38,8 @@ class ClientFeatureSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     features = serializers.SerializerMethodField()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
 
     def get_features(self, product):
         qs = Feature.objects.filter(product=product)
