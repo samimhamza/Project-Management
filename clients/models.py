@@ -119,6 +119,8 @@ class Client(models.Model):
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=32, blank=True, null=True)
     whatsapp = models.CharField(max_length=64, blank=True, null=True)
+    profile = models.ImageField(
+        upload_to="client_profiles", blank=True, null=True)
     country = models.ForeignKey(
         Country,
         on_delete=models.SET_NULL,

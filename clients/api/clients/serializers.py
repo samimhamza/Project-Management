@@ -1,10 +1,14 @@
 from clients.api.serializers import (
     ClientServiceListSerializer, ClientFeatureCustomSerializer, RequirementSerializer)
 from clients.models import (Client, ClientService, ClientFeature, Requirement)
+from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 
 
 class ClientSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = Client
         fields = "__all__"
@@ -14,6 +18,8 @@ class ClientDetailedSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
     features = serializers.SerializerMethodField()
     requirement = serializers.SerializerMethodField()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
 
     def get_services(self, client):
         qs = ClientService.objects.filter(client=client)

@@ -23,15 +23,6 @@ class ClientViewSet(viewsets.ModelViewSet):
         "destroy": Client.objects.all(),
     }
 
-    # def list(self, request):
-    #     queryset = self.get_queryset()
-    #     page = self.paginate_queryset(queryset)
-    #     serializer = self.get_serializer(page, many=True)
-    #     for client in serializer.data:
-    #         clientServicesFormatter(client)
-    #         clientFeaturesFormatter(client)
-    #     return self.get_paginated_response(serializer.data)
-
     def retrieve(self, request, pk=None):
         client = self.get_object()
         serailizer = self.get_serializer(client)
