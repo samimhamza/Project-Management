@@ -31,18 +31,6 @@ class ServiceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.filter(
-        deleted_at__isnull=True).order_by("-created_at")
-    serializer_class = ProductSerializer
-    pagination_class = CustomPageNumberPagination
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-
 class PricePlanViewSet(viewsets.ModelViewSet):
     queryset = PricePlan.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
@@ -52,6 +40,19 @@ class PricePlanViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.filter(
+        deleted_at__isnull=True).order_by("-created_at")
+    serializer_class = ProductSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class FeatureViewSet(viewsets.ModelViewSet):
