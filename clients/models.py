@@ -131,7 +131,7 @@ class Client(models.Model):
         Service, through="ClientService", related_name="%(class)ss"
     )
     features = models.ManyToManyField(
-        Feature, through="ClientProduct", related_name="%(class)ss"
+        Feature, through="ClientFeature", related_name="%(class)ss"
     )
 
     class HearAboutUs(models.TextChoices):
@@ -224,7 +224,7 @@ class Client(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.first_name
 
 
 class ClientService(models.Model):
@@ -271,7 +271,7 @@ class PricePlan(models.Model):
         return self.plan_name
 
 
-class ClientProduct(models.Model):
+class ClientFeature(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     feature = models.ForeignKey(Feature, null=True, on_delete=models.SET_NULL)
     plan = models.CharField(max_length=32, blank=True, null=True)

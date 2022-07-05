@@ -1,6 +1,6 @@
 from clients.api.serializers import (
-    ClientServiceListSerializer, ClientProductCustomSerializer, RequirementSerializer)
-from clients.models import (Client, ClientService, ClientProduct, Requirement)
+    ClientServiceListSerializer, ClientFeatureCustomSerializer, RequirementSerializer)
+from clients.models import (Client, ClientService, ClientFeature, Requirement)
 from rest_framework import serializers
 
 
@@ -21,8 +21,8 @@ class ClientDetailedSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_features(self, client):
-        qs = ClientProduct.objects.filter(client=client)
-        serializers = ClientProductCustomSerializer(instance=qs, many=True)
+        qs = ClientFeature.objects.filter(client=client)
+        serializers = ClientFeatureCustomSerializer(instance=qs, many=True)
         return serializers.data
 
     def get_requirement(self, client):

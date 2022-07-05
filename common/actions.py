@@ -273,7 +273,7 @@ def deleteAttachments(self, request):
         )
 
 
-def clientProductsFormatter(clientData):
+def clientFeaturesFormatter(clientData):
     products = []
     for clientfeature in clientData['features']:
         feature = clientfeature['feature']

@@ -1,5 +1,5 @@
 from clients.models import (
-    ClientService, ClientProduct, Service, Product, PricePlan, Feature, Requirement)
+    ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
 from rest_framework import serializers
 
 
@@ -29,9 +29,9 @@ class ClientServiceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ClientProductSerializer(serializers.ModelSerializer):
+class ClientFeatureSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ClientProduct
+        model = ClientFeature
         fields = "__all__"
 
 
@@ -69,11 +69,11 @@ class FeatureCustomSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ClientProductCustomSerializer(serializers.ModelSerializer):
+class ClientFeatureCustomSerializer(serializers.ModelSerializer):
     feature = FeatureSerializer()
 
     class Meta:
-        model = ClientProduct
+        model = ClientFeature
         exclude = ('id', 'client', )
         # fields = ["plan","on_request_price","on_request_date","purchased_price","purchased_date","end_date","feature"]
 

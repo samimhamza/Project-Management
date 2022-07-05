@@ -1,6 +1,6 @@
 from multiprocessing.connection import Client
 from common.actions import (withTrashed, trashList, delete,
-                            restore, clientProductsFormatter, clientServicesFormatter)
+                            restore, clientFeaturesFormatter, clientServicesFormatter)
 from .serializers import ClientSerializer, ClientDetailedSerializer
 from common.permissions_scopes import ClientPermissions
 from common.custom import CustomPageNumberPagination
@@ -29,7 +29,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     #     serializer = self.get_serializer(page, many=True)
     #     for client in serializer.data:
     #         clientServicesFormatter(client)
-    #         clientProductsFormatter(client)
+    #         clientFeaturesFormatter(client)
     #     return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
@@ -37,7 +37,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         serailizer = self.get_serializer(client)
         clientData = serailizer.data
         clientServicesFormatter(clientData)
-        clientProductsFormatter(clientData)
+        clientFeaturesFormatter(clientData)
         return Response(clientData)
 
     # def update(self, request, pk=None):

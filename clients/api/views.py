@@ -1,9 +1,9 @@
 
-from clients.api.serializers import (ClientServiceSerializer, ClientProductSerializer,
-                                     ClientProduct, ClientService, FeatureSerializer,
+from clients.api.serializers import (ClientServiceSerializer, ClientFeatureSerializer,
+                                     ClientFeature, ClientService, FeatureSerializer,
                                      RequirementSerializer, PricePlanSerializer)
 from clients.models import (
-    ClientService, ClientProduct, Service, Product, PricePlan, Feature, Requirement)
+    ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
 from clients.api.serializers import ProductSerializer, ServiceSerializer
 from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
@@ -15,9 +15,9 @@ class ClientServiceViewSet(viewsets.ModelViewSet):
     serializer_class = ClientServiceSerializer
 
 
-class ClientProductViewSet(viewsets.ModelViewSet):
-    queryset = ClientProduct.objects.all()
-    serializer_class = ClientProductSerializer
+class ClientFeatureViewSet(viewsets.ModelViewSet):
+    queryset = ClientFeature.objects.all()
+    serializer_class = ClientFeatureSerializer
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
