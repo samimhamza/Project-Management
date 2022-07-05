@@ -89,6 +89,26 @@ class PaymentViewSet(viewsets.ModelViewSet):
         "trashed": PaymentTrashedSerializer
     }
 
+    def create(self, request):
+        data = request.data
+        data["created_by"] = request.user
+        try:
+            income = Income.objects.get(pk=data["income"])
+        except Income.DoesNotExist:
+            return Response({"error": "Income does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        income = Payment.objects.create(
+            source=data["source"],
+            amount=data["amount"],
+            date=data['date'],
+            income=income,
+            created_by=data["created_by"],
+            updated_by=data["created_by"],
+        )
+        income.save()
+        serializer = self.get_serializer(
+            income)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     @action(detail=False, methods=["get"])
     def all(self, request):
         return withTrashed(self, Payment, order_by="-created_at")
