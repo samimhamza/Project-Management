@@ -1,13 +1,22 @@
+from asyncore import read
 from clients.models import (
     ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
 from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 
 
+class ServiceListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Service
+        fields = ["id", "name"]
+
+
 class ServiceSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
     deleted_by = UserWithProfileSerializer(read_only=True)
+    parent = ServiceListSerializer(read_only=True)
 
     class Meta:
         model = Service
