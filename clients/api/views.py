@@ -1,12 +1,9 @@
-
-from clients.api.serializers import (ClientFeatureSerializer, ClientFeature, ClientService, FeatureSerializer,
-                                     RequirementSerializer, PricePlanSerializer, ProductSerializer)
-from clients.api.services.serializers import ServiceSerializer, ServiceListSerializer
-from clients.models import (
-    ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
+from clients.models import ClientFeature,  PricePlan, Feature, Requirement, ClientService
+from clients.api.serializers import (
+    ClientFeatureSerializer, ClientFeature, RequirementSerializer, PricePlanSerializer)
 from clients.api.clients.serializers import ClientServiceSerializer
+from clients.api.products.serializers import FeatureSerializer
 from common.custom import CustomPageNumberPagination
-from common.actions import filterRecords, allItems
 from rest_framework.response import Response
 from rest_framework import viewsets
 
@@ -21,23 +18,6 @@ class ClientFeatureViewSet(viewsets.ModelViewSet):
     serializer_class = ClientFeatureSerializer
 
 
-class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.filter(
-        deleted_at__isnull=True).order_by("-created_at")
-    serializer_class = ServiceSerializer
-    pagination_class = CustomPageNumberPagination
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Service)
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(ServiceListSerializer, queryset)
-
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-
 class PricePlanViewSet(viewsets.ModelViewSet):
     queryset = PricePlan.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
@@ -47,19 +27,6 @@ class PricePlanViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.filter(
-        deleted_at__isnull=True).order_by("-created_at")
-    serializer_class = ProductSerializer
-    pagination_class = CustomPageNumberPagination
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
 
 
 class FeatureViewSet(viewsets.ModelViewSet):

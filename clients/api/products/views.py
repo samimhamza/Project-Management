@@ -1,22 +1,21 @@
-from .serializers import ServiceSerializer, ServiceListSerializer
+from .serializers import ProductSerializer, ProductListSerializer
 from common.custom import CustomPageNumberPagination
 from common.actions import filterRecords, allItems
-from rest_framework.response import Response
 from rest_framework import viewsets
-from clients.models import Service
+from clients.models import Product
 
 
-class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.filter(
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
-    serializer_class = ServiceSerializer
+    serializer_class = ProductSerializer
     pagination_class = CustomPageNumberPagination
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Service)
+        queryset = filterRecords(queryset, request, table=Product)
         if request.GET.get("items_per_page") == "-1":
-            return allItems(ServiceListSerializer, queryset)
+            return allItems(ProductListSerializer, queryset)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)

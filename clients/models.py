@@ -1,6 +1,5 @@
-from itertools import product
-from django.db import models
 from projects.models import Country
+from django.db import models
 import uuid
 
 

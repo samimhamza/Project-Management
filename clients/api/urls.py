@@ -1,7 +1,9 @@
-from clients.api.views import (ClientServiceViewSet, ClientFeatureViewSet, ServiceViewSet,
-                               ProductViewSet, PricePlanViewSet, FeatureViewSet, RequirementViewSet)
-from clients.api.clients.views import ClientViewSet
+from clients.api.views import (ClientServiceViewSet, ClientFeatureViewSet,
+                               PricePlanViewSet, FeatureViewSet, RequirementViewSet)
 from rest_framework.routers import DefaultRouter
+from .services.views import ServiceViewSet
+from .products.views import ProductViewSet
+from .clients.views import ClientViewSet
 
 router = DefaultRouter()
 router.register(r"clients", ClientViewSet, basename="clients")
