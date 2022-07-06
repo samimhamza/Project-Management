@@ -66,9 +66,13 @@ class TeamViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
+        if "description" in data:
+            description = data["description"]
+        else:
+            description = ""
         new_team = Team.objects.create(
             name=data["name"],
-            description=data["description"],
+            description=description,
             created_by=data["created_by"],
             updated_by=data["created_by"],
         )
