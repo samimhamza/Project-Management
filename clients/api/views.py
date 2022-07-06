@@ -1,11 +1,12 @@
 
-from clients.api.serializers import (ClientServiceSerializer, ClientFeatureSerializer,
-                                     ClientFeature, ClientService, FeatureSerializer,
-                                     RequirementSerializer, PricePlanSerializer)
+from clients.api.serializers import (ClientFeatureSerializer, ClientFeature, ClientService, FeatureSerializer,
+                                     RequirementSerializer, PricePlanSerializer, ProductSerializer)
+from clients.api.services.serializers import ServiceSerializer, ServiceListSerializer
 from clients.models import (
     ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
-from clients.api.serializers import ProductSerializer, ServiceSerializer
+from clients.api.clients.serializers import ClientServiceSerializer
 from common.custom import CustomPageNumberPagination
+from common.actions import filterRecords, allItems
 from rest_framework.response import Response
 from rest_framework import viewsets
 
@@ -25,6 +26,16 @@ class ServiceViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ServiceSerializer
     pagination_class = CustomPageNumberPagination
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request, table=Service)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(ServiceListSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class PricePlanViewSet(viewsets.ModelViewSet):

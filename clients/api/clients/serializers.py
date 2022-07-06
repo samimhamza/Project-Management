@@ -1,9 +1,17 @@
-from clients.api.serializers import (
-    ClientServiceListSerializer, ClientFeatureCustomSerializer, RequirementSerializer)
+from clients.api.serializers import ClientFeatureCustomSerializer, RequirementSerializer
 from clients.models import (Client, ClientService, ClientFeature, Requirement)
+from clients.api.services.serializers import ServiceCustomSerializer
 from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 from projects.api.serializers import CountryListSerializer
+
+
+class ClientServiceListSerializer(serializers.ModelSerializer):
+    service = ServiceCustomSerializer()
+
+    class Meta:
+        model = ClientService
+        fields = ["id", "service", "details"]
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -42,4 +50,11 @@ class ClientDetailedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
+        fields = "__all__"
+
+
+class ClientServiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ClientService
         fields = "__all__"

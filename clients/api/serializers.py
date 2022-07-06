@@ -1,47 +1,7 @@
-from asyncore import read
 from clients.models import (
     ClientService, ClientFeature, Service, Product, PricePlan, Feature, Requirement)
 from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
-
-
-class ServiceListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Service
-        fields = ["id", "name"]
-
-
-class ServiceSerializer(serializers.ModelSerializer):
-    created_by = UserWithProfileSerializer(read_only=True)
-    updated_by = UserWithProfileSerializer(read_only=True)
-    deleted_by = UserWithProfileSerializer(read_only=True)
-    parent = ServiceListSerializer(read_only=True)
-
-    class Meta:
-        model = Service
-        fields = "__all__"
-
-
-class ServiceCustomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Service
-        fields = ["name", "description"]
-
-
-class ClientServiceListSerializer(serializers.ModelSerializer):
-    service = ServiceCustomSerializer()
-
-    class Meta:
-        model = ClientService
-        fields = ["id", "service", "details"]
-
-
-class ClientServiceSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ClientService
-        fields = "__all__"
 
 
 class ClientFeatureSerializer(serializers.ModelSerializer):
