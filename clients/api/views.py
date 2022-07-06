@@ -24,11 +24,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ServiceSerializer
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    pagination_class = CustomPageNumberPagination
 
 
 class PricePlanViewSet(viewsets.ModelViewSet):

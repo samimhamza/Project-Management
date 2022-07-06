@@ -5,6 +5,10 @@ from rest_framework import serializers
 
 
 class ServiceSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = Service
         fields = "__all__"
@@ -25,12 +29,14 @@ class ClientServiceListSerializer(serializers.ModelSerializer):
 
 
 class ClientServiceSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = ClientService
         fields = "__all__"
 
 
 class ClientFeatureSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = ClientFeature
         fields = "__all__"
@@ -40,6 +46,7 @@ class ProductSerializer(serializers.ModelSerializer):
     features = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_features(self, product):
         qs = Feature.objects.filter(product=product)
@@ -53,6 +60,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class FeatureSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
 
     class Meta:
         model = Feature
@@ -61,6 +71,9 @@ class FeatureSerializer(serializers.ModelSerializer):
 
 class FeatureCustomSerializer(serializers.ModelSerializer):
     price_plan = serializers.SerializerMethodField()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_price_plan(self, feature):
         qs = PricePlan.objects.filter(feature=feature)
@@ -77,17 +90,25 @@ class ClientFeatureCustomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientFeature
-        exclude = ('id', 'client', )
+        exclude = ['id', 'client']
         # fields = ["plan","on_request_price","on_request_date","purchased_price","purchased_date","end_date","feature"]
 
 
 class PricePlanSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = PricePlan
         fields = "__all__"
 
 
 class RequirementSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = Requirement
         fields = "__all__"

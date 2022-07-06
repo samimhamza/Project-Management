@@ -9,6 +9,7 @@ from projects.api.serializers import CountryListSerializer
 class ClientSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
     country = CountryListSerializer()
 
     class Meta:
@@ -22,6 +23,7 @@ class ClientDetailedSerializer(serializers.ModelSerializer):
     requirement = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_services(self, client):
         qs = ClientService.objects.filter(client=client)
