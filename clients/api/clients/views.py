@@ -1,7 +1,6 @@
-from multiprocessing.connection import Client
 from common.actions import (withTrashed, trashList, delete,
-                            restore, clientFeaturesFormatter, clientServicesFormatter)
-from .serializers import ClientSerializer, ClientDetailedSerializer
+                            restore, clientFeaturesFormatter, clientServicesFormatter, filterRecords, allItems)
+from .serializers import ClientSerializer, ClientDetailedSerializer, ClientListSerializer
 from common.permissions_scopes import ClientPermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
@@ -22,6 +21,16 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset_actions = {
         "destroy": Client.objects.all(),
     }
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = filterRecords(queryset, request, table=Client)
+        if request.GET.get("items_per_page") == "-1":
+            return allItems(ClientListSerializer, queryset)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         client = self.get_object()

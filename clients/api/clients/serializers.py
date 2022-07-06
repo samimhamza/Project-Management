@@ -24,6 +24,13 @@ class ClientFeatureCustomSerializer(serializers.ModelSerializer):
         # fields = ["plan","on_request_price","on_request_date","purchased_price","purchased_date","end_date","feature"]
 
 
+class ClientListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Client
+        fields = ["id", "first_name", "last_name", "profile"]
+
+
 class ClientSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
