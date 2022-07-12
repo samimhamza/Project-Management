@@ -55,9 +55,18 @@ class ClientViewSet(viewsets.ModelViewSet):
     def all(self, request):
         return withTrashed(self, Client, order_by="-created_at")
 
-    @ action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"])
     def trashed(self, request):
         return trashList(self, Client)
+
+    @action(detail=False, methods=["post"])
+    def check_uniqueness(self, request):
+        if request.data.get("email"):
+            try:
+                Client.objects.get(email=request.data.get("email"))
+                return Response({"error": "email already in use"}, status=400)
+            except Client.DoesNotExist:
+                return Response({"success": "email is available"}, status=200)
 
     # for multi restore
     @ action(detail=False, methods=["put"])

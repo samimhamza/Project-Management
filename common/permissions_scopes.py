@@ -255,7 +255,8 @@ class ClientPermissions(CustomPermissions):
         'destroy': 'clients_d',
         'restore': 'clients_d',
         'trashed': 'clients_d',
-        'all': 'clients_v'
+        'all': 'clients_v',
+        'check_uniqueness': 'clients_u'
     }
 
 
