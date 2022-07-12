@@ -2,10 +2,11 @@ from common.actions import (withTrashed, trashList, restore, delete,
                             allItems, filterRecords, dataWithPermissions, convertBase64ToImage)
 from users.api.serializers import (
     UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer)
+from users.api.teams.serializers import TeamListSerializer, TeamUserSerializer
 from common.permissions import addPermissionsToUser, addRolesToUser
+from users.models import User, UserPermissionList, TeamUser, Team
 from common.permissions_scopes import UserPermissions
 from common.custom import CustomPageNumberPagination
-from users.models import User, UserPermissionList
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -116,6 +117,20 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, User)
+
+    @action(detail=True, methods=["get"])
+    def teams(self, request, pk=None):
+        user = self.get_object()
+        teams = Team.objects.filter(deleted_at__isnull=True, users=user)
+        page = self.paginate_queryset(teams)
+        serializer = TeamListSerializer(page, many=True)
+        data = serializer.data
+        for team in data:
+            team_user = TeamUser.objects.get(user=user, team=team['id'])
+            team_user_serializer = TeamUserSerializer(team_user)
+            team['is_leader'] = team_user_serializer.data['is_leader']
+            team['position'] = team_user_serializer.data['position']
+        return self.get_paginated_response(data)
 
     @action(detail=False, methods=["get"])
     def auth_user(self, request, pk=None):

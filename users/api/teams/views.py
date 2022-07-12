@@ -125,10 +125,12 @@ class TeamViewSet(viewsets.ModelViewSet):
         team = self.get_object()
         users = User.objects.filter(deleted_at__isnull=True, teams=team)
         page = self.paginate_queryset(users)
-        serializer = UserWithProfileSerializer(page, many=True)
+        serializer = UserWithProfileSerializer(
+            page, many=True, context={"request": request})
         for user in serializer.data:
             team_user = TeamUser.objects.get(user=user['id'], team=team)
-            team_user_serializer = TeamUserSerializer(team_user)
+            team_user_serializer = TeamUserSerializer(
+                team_user)
             user['is_leader'] = team_user_serializer.data['is_leader']
             user['position'] = team_user_serializer.data['position']
         return self.get_paginated_response(serializer.data)

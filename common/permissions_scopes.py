@@ -77,7 +77,8 @@ class UserPermissions(CustomPermissions):
         'restore': 'users_d',
         'trashed': 'users_d',
         'all': 'users_v',
-        'check_uniqueness': 'users_c'
+        'check_uniqueness': 'users_c',
+        'teams': 'users_v'
     }
 
 
