@@ -124,13 +124,12 @@ class UserViewSet(viewsets.ModelViewSet):
         teams = Team.objects.filter(deleted_at__isnull=True, users=user)
         page = self.paginate_queryset(teams)
         serializer = TeamListSerializer(page, many=True)
-        data = serializer.data
-        for team in data:
+        for team in serializer.data:
             team_user = TeamUser.objects.get(user=user, team=team['id'])
             team_user_serializer = TeamUserSerializer(team_user)
             team['is_leader'] = team_user_serializer.data['is_leader']
             team['position'] = team_user_serializer.data['position']
-        return self.get_paginated_response(data)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def auth_user(self, request, pk=None):
