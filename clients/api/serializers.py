@@ -11,12 +11,12 @@ class ClientFeatureSerializer(serializers.ModelSerializer):
 
 
 class FeatureCustomSerializer(serializers.ModelSerializer):
-    price_plan = serializers.SerializerMethodField()
+    price_plans = serializers.SerializerMethodField()
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
     deleted_by = UserWithProfileSerializer(read_only=True)
 
-    def get_price_plan(self, feature):
+    def get_price_plans(self, feature):
         qs = PricePlan.objects.filter(feature=feature)
         serializers = PricePlanSerializer(instance=qs, many=True)
         return serializers.data

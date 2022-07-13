@@ -1,3 +1,4 @@
+import re
 from projects.models import Country
 from django.db import models
 import uuid
@@ -258,7 +259,8 @@ class PricePlan(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    feature = models.ForeignKey(Feature, null=True, on_delete=models.SET_NULL)
+    feature = models.ForeignKey(
+        Feature, null=True, on_delete=models.SET_NULL, related_name="price_plans")
     deleted_at = models.DateTimeField(blank=True, null=True)
     deleted_by = models.ForeignKey(
         "users.User",
