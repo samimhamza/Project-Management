@@ -17,7 +17,7 @@ class FeatureCustomSerializer(serializers.ModelSerializer):
     deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_price_plans(self, feature):
-        qs = PricePlan.objects.filter(feature=feature)
+        qs = PricePlan.objects.filter(deleted_at__isnull=True, feature=feature)
         serializers = PricePlanSerializer(instance=qs, many=True)
         return serializers.data
 
@@ -34,6 +34,25 @@ class PricePlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = PricePlan
         fields = "__all__"
+
+
+class PricePlanListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PricePlan
+        fields = ["id", "plan_name", "plan_price"]
+
+
+class FeatureListSerializer(serializers.ModelSerializer):
+    price_plans = serializers.SerializerMethodField()
+
+    def get_price_plans(self, feature):
+        qs = PricePlan.objects.filter(deleted_at__isnull=True, feature=feature)
+        serializers = PricePlanListSerializer(instance=qs, many=True)
+        return serializers.data
+
+    class Meta:
+        model = Feature
+        fields = ["id", "name", "type", "price_plans"]
 
 
 class RequirementSerializer(serializers.ModelSerializer):

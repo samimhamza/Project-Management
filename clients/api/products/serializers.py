@@ -1,14 +1,20 @@
 from users.api.serializers import UserWithProfileSerializer
-from clients.api.serializers import FeatureCustomSerializer
+from clients.api.serializers import FeatureCustomSerializer, FeatureListSerializer
 from clients.models import Feature, Product
 from rest_framework import serializers
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    features = serializers.SerializerMethodField()
+
+    def get_features(self, product):
+        qs = Feature.objects.filter(deleted_at__isnull=True, product=product)
+        serializers = FeatureListSerializer(instance=qs, many=True)
+        return serializers.data
 
     class Meta:
         model = Product
-        fields = ["id", "name", "deleted_by", "photo"]
+        fields = ["id", "name", "photo", "features"]
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -18,7 +24,7 @@ class ProductSerializer(serializers.ModelSerializer):
     deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_features(self, product):
-        qs = Feature.objects.filter(product=product)
+        qs = Feature.objects.filter(deleted_at__isnull=True, product=product)
         serializers = FeatureCustomSerializer(instance=qs, many=True)
         return serializers.data
 

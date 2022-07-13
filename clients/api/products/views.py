@@ -2,6 +2,7 @@ from multiprocessing import context
 from .serializers import ProductSerializer, ProductListSerializer
 from common.custom import CustomPageNumberPagination
 from common.actions import filterRecords, allItems
+from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from clients.models import Product
@@ -17,6 +18,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request, table=Product)
         if request.GET.get("items_per_page") == "-1":
+            if request.GET.get("lessData"):
+                serializer = ProductListSerializer(
+                    queryset, many=True, context={"request": request})
+                return Response(serializer.data, status=200)
             return allItems(self.get_serializer, queryset, request)
 
         page = self.paginate_queryset(queryset)
