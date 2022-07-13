@@ -1,3 +1,4 @@
+from multiprocessing import context
 from .serializers import ProductSerializer, ProductListSerializer
 from common.custom import CustomPageNumberPagination
 from common.actions import filterRecords, allItems
@@ -15,8 +16,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request, table=Product)
         if request.GET.get("items_per_page") == "-1":
-            return allItems(ProductListSerializer, queryset)
+            return allItems(self.get_serializer, queryset, request)
 
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = self.get_serializer(
+            page, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
