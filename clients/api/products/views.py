@@ -2,6 +2,7 @@ from multiprocessing import context
 from .serializers import ProductSerializer, ProductListSerializer
 from common.custom import CustomPageNumberPagination
 from common.actions import filterRecords, allItems
+from rest_framework.decorators import action
 from rest_framework import viewsets
 from clients.models import Product
 
