@@ -54,9 +54,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         product = self.get_object()
         if "photo" in request.data:
             imageField = convertBase64ToImage(request.data["photo"])
-            product.photo = imageField
             if os.path.isfile('media/'+str(product.photo)):
                 os.remove('media/'+str(product.photo))
+            product.photo = imageField
+
         for key, value in request.data.items():
             if key != "photo":
                 setattr(product, key, value)
