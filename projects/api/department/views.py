@@ -1,19 +1,18 @@
-from common.actions import allItems, filterRecords, delete, allItems, restore, trashList, withTrashed
 from .serializers import DepartmentSerializer, DepartmentTrashedSerializer
+from common.actions import allItems, filterRecords, allItems
 from common.permissions_scopes import DepartmentPermissions
-from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from common.Repository import Repository
 from projects.models import Department
+from rest_framework import status
 
 
-class DepartmentViewSet(viewsets.ModelViewSet):
+class DepartmentViewSet(Repository):
+    model = Department
     queryset = Department.objects.filter(
         deleted_at__isnull=True).order_by('-updated_at')
     serializer_class = DepartmentSerializer
     permission_classes = (DepartmentPermissions,)
-    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "trashed": DepartmentTrashedSerializer,
     }
@@ -56,25 +55,3 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(
             project)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-    def destroy(self, request, pk=None):
-        return delete(self, request, Department)
-
-    @ action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Department, order_by="-created_at")
-
-    @ action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Department)
-
-    # for multi and single restore
-    @ action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Department)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()

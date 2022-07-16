@@ -3,22 +3,24 @@ from clients.api.serializers import (
     ClientFeatureSerializer, ClientFeature, RequirementSerializer, PricePlanSerializer)
 from clients.api.clients.serializers import ClientServiceSerializer
 from clients.api.products.serializers import FeatureSerializer
-from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
-from rest_framework import viewsets
+from common.Repository import Repository
 
 
-class ClientServiceViewSet(viewsets.ModelViewSet):
+class ClientServiceViewSet(Repository):
+    model = ClientService
     queryset = ClientService.objects.all()
     serializer_class = ClientServiceSerializer
 
 
-class ClientFeatureViewSet(viewsets.ModelViewSet):
+class ClientFeatureViewSet(Repository):
+    model = ClientFeature
     queryset = ClientFeature.objects.all()
     serializer_class = ClientFeatureSerializer
 
 
-class PricePlanViewSet(viewsets.ModelViewSet):
+class PricePlanViewSet(Repository):
+    model = PricePlan
     queryset = PricePlan.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = PricePlanSerializer
@@ -29,7 +31,8 @@ class PricePlanViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class FeatureViewSet(viewsets.ModelViewSet):
+class FeatureViewSet(Repository):
+    model = Feature
     queryset = Feature.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = FeatureSerializer
@@ -40,7 +43,8 @@ class FeatureViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class RequirementViewSet(viewsets.ModelViewSet):
+class RequirementViewSet(Repository):
+    model = Requirement
     queryset = Requirement.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = RequirementSerializer

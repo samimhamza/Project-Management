@@ -1,27 +1,26 @@
 from common.project_actions import (
     shareTo, notification, getAssignNotification, getRevokeNotification, broadcastProject, broadcastDeleteProject)
-from common.actions import (restore, delete, withTrashed, trashList,
-                            allItems, filterRecords, countStatuses,
-                            addAttachment, deleteAttachments, getAttachments)
+from common.actions import (delete, allItems, filterRecords,
+                            countStatuses, addAttachment, deleteAttachments, getAttachments)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
-from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from common.Repository import Repository
 from users.models import User, Team
 from projects.models import Project
+from rest_framework import status
 from tasks.models import Task
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(Repository):
+    model = Project
     queryset = Project.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProjectSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (ProjectPermissions,)
     serializer_action_classes = {
         "trashed": ProjectTrashedSerializer,
@@ -101,19 +100,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             ids.append(str(id))
         broadcastDeleteProject({'deleted_ids': ids})
         return response
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Project, order_by="-created_at")
-
-    @ action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Project)
-
-    # for multi and single restore
-    @ action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Project)
 
     # Custom Actions
     @ action(detail=True, methods=["get"])
@@ -236,15 +222,3 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = LessFieldsTeamSerializer(
             teams, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()
