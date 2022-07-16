@@ -1,23 +1,23 @@
-from common.actions import (withTrashed, trashList, restore, delete,
-                            allItems, filterRecords, dataWithPermissions, convertBase64ToImage)
 from users.api.serializers import (
     UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer)
 from users.api.teams.serializers import TeamListSerializer, TeamUserSerializer
+from common.actions import (allItems, filterRecords,
+                            dataWithPermissions, convertBase64ToImage)
 from common.permissions import addPermissionsToUser, addRolesToUser
 from users.models import User, UserPermissionList, TeamUser, Team
 from common.permissions_scopes import UserPermissions
-from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from common.Repository import Repository
+from rest_framework import status
 import os
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(Repository):
+    model = User
     queryset = User.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = UserSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (UserPermissions,)
     serializer_action_classes = {
         "trashed": UserTrashedSerializer
@@ -93,17 +93,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         return dataWithPermissions(self, 'users')
 
-    def destroy(self, request, pk=None):
-        return delete(self, request, User, 'profile')
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, User, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, User)
-
     @action(detail=True, methods=["post"])
     def change_password(self, request, pk=None):
         try:
@@ -113,11 +102,6 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
         except:
             return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # for multi restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, User)
 
     @action(detail=True, methods=["get"])
     def teams(self, request, pk=None):
@@ -152,15 +136,3 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"error": "username already in use"}, status=400)
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()

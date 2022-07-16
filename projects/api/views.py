@@ -1,13 +1,10 @@
-from datetime import datetime
-from common.actions import (delete, allItems, filterRecords, addAttachment,
-                            deleteAttachments, getAttachments, restore, withTrashed, trashList)
 from common.permissions_scopes import (
     IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions)
-from common.custom import CustomPageNumberPagination
+from common.actions import (allItems, filterRecords,
+                            addAttachment, deleteAttachments, getAttachments)
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
-from rest_framework import generics
+from common.Repository import Repository
 from projects.api.serializers import (
     FocalPointSerializer,
     CountrySerializer,
@@ -21,6 +18,9 @@ from projects.api.serializers import (
     IncomeTrashedSerializer,
     PaymentTrashedSerializer
 )
+from rest_framework import generics
+from rest_framework import status
+from datetime import datetime
 from projects.models import (
     Country,
     Location,
@@ -82,7 +82,8 @@ class LocationCreateAPIView(generics.CreateAPIView):
         return Response(serializer.data, status=201)
 
 
-class PaymentViewSet(viewsets.ModelViewSet):
+class PaymentViewSet(Repository):
+    model = Payment
     queryset = Payment.objects.filter(deleted_at__isnull=True)
     serializer_class = PaymentSerializer
     permission_classes = (PaymentPermissions,)
@@ -110,32 +111,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
             income)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Payment, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Payment)
-
-    # for multi and single restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Payment)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-
-class IncomeViewSet(viewsets.ModelViewSet):
+class IncomeViewSet(Repository):
+    model = Income
     queryset = Income.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = IncomeSerializer
     permission_classes = (IncomePermissions,)
-    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "trashed": IncomeTrashedSerializer
     }
@@ -194,9 +176,6 @@ class IncomeViewSet(viewsets.ModelViewSet):
         serializer = IncomeSerializer(income)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-    def destroy(self, request, pk=None):
-        return delete(self, request, Income)
-
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
         return addAttachment(self, request)
@@ -205,27 +184,9 @@ class IncomeViewSet(viewsets.ModelViewSet):
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
 
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Income, order_by="-created_at")
 
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Income)
-
-    # for multi and single restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Income)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-
-class FocalPointViewSet(viewsets.ModelViewSet):
+class FocalPointViewSet(Repository):
+    model = FocalPoint
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
     permission_classes = (FocalPointPermissions,)
@@ -242,22 +203,3 @@ class FocalPointViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, FocalPoint, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, FocalPoint)
-
-    # for multi and single restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, FocalPoint)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()

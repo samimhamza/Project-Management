@@ -1,10 +1,10 @@
+from common.tasks_actions import (tasksOfProject, tasksResponse, checkAttributes, excludedDependencies,
+                                  assignToUsers, taskProgress, prepareData, broadcastProgress, projectProgress)
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
-from common.actions import (withTrashed, trashList, delete, restore,
-                            allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
-from common.tasks_actions import (tasksOfProject, tasksResponse, checkAttributes,
-                                  excludedDependencies, assignToUsers, taskProgress, prepareData, broadcastProgress, projectProgress)
+from common.actions import (
+    delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from users.api.serializers import UserWithProfileSerializer
 from common.custom import CustomPageNumberPagination
@@ -13,14 +13,15 @@ from tasks.models import Task, Comment, UserTask
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
+from common.Repository import Repository
 from users.models import User
 
 
-class TaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(Repository):
+    model = Task
     queryset = Task.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TaskSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (TaskPermissions,)
     serializer_action_classes = {
         "retrieve": TaskListSerializer,
@@ -94,9 +95,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(task)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-    def destroy(self, request, pk=None):
-        return delete(self, request, Task)
-
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
         task = self.get_object()
@@ -111,19 +109,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         task.dependencies.remove(request.data.get('id'))
         task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Task, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Task)
-
-    # for multi restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Task)
 
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
@@ -159,18 +144,6 @@ class TaskViewSet(viewsets.ModelViewSet):
             return Response(serializerData)
         except:
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()
 
 
 class ProjectCommentViewSet(viewsets.ModelViewSet):

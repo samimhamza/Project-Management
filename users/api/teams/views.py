@@ -1,14 +1,13 @@
-from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import TeamPermissions
 from rest_framework.generics import get_object_or_404
-from common.custom import CustomPageNumberPagination
+from common.actions import allItems, filterRecords
 from users.models import User, Team, TeamUser
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from common.Repository import Repository
 from users.api.teams.serializers import (
     TeamListSerializer,
     TeamUserSerializer,
@@ -19,13 +18,14 @@ from users.api.teams.serializers import (
 )
 from projects.models import Project
 from django.db import transaction
+from rest_framework import status
 
 
-class TeamViewSet(viewsets.ModelViewSet):
+class TeamViewSet(Repository):
+    model = Team
     queryset = Team.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TeamListSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (TeamPermissions,)
     serializer_action_classes = {
         "retrieve": TeamRetieveSerializer,
@@ -102,22 +102,6 @@ class TeamViewSet(viewsets.ModelViewSet):
         data["total_users"] = get_total(team)
         data["leader"] = get_leader(team)
         return Response(data, status=status.HTTP_202_ACCEPTED)
-
-    def destroy(self, request, pk=None):
-        return delete(self, request, Team)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Team, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Team)
-
-    # for multi and single restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Team)
 
     # Custom Actions
     @action(detail=True, methods=["get"])
@@ -201,17 +185,3 @@ class TeamViewSet(viewsets.ModelViewSet):
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-
-    # return different Serializers for different actions
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    # return different Querysets from different actions
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()
