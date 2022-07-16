@@ -39,3 +39,16 @@ class ServiceViewSet(viewsets.ModelViewSet):
         new_service.save()
         serializer = self.get_serializer(new_service)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        service = self.get_object()
+        if "parent" in request.data:
+            parent = Service.objects.only('id').get(pk=request.data['parent'])
+            service.parent = parent
+        for key, value in request.data.items():
+            if key != "parent":
+                setattr(service, key, value)
+        service.updated_by = request.user
+        service.save()
+        serializer = self.get_serializer(service)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
