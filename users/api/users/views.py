@@ -68,9 +68,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         if request.data.get("profile"):
             imageField = convertBase64ToImage(request.data.get("profile"))
-            if os.path.isfile('media/'+str(user.profile)):
-                os.remove('media/'+str(user.profile))
-            user.profile = imageField
+            if imageField:
+                if os.path.isfile('media/'+str(user.profile)):
+                    os.remove('media/'+str(user.profile))
+                user.profile = imageField
         for key, value in request.data.items():
             if key != "profile" and key != "permissions_users" and key != "roles_users":
                 setattr(user, key, value)

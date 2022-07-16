@@ -1,19 +1,17 @@
-from common.actions import (filterRecords, allItems, withTrashed,
-                            trashList, restore, delete, convertBase64ToImage)
 from .serializers import ProductSerializer, ProductListSerializer, ProductTrashedSerializer
-from common.custom import CustomPageNumberPagination
+from common.actions import (filterRecords, allItems, convertBase64ToImage)
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from common.Repository import Repository
 from clients.models import Product
+from rest_framework import status
 import os
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductViewSet(Repository):
+    model = Product
     queryset = Product.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProductSerializer
-    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "trashed": ProductTrashedSerializer
     }
@@ -57,9 +55,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         product = self.get_object()
         if "photo" in request.data:
             imageField = convertBase64ToImage(request.data["photo"])
-            if os.path.isfile('media/'+str(product.photo)):
-                os.remove('media/'+str(product.photo))
-            product.photo = imageField
+            if imageField:
+                if os.path.isfile('media/'+str(product.photo)):
+                    os.remove('media/'+str(product.photo))
+                product.photo = imageField
 
         for key, value in request.data.items():
             if key != "photo":
@@ -68,30 +67,3 @@ class ProductViewSet(viewsets.ModelViewSet):
         product.save()
         serializer = self.get_serializer(product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-    def destroy(self, request, pk=None):
-        return delete(self, request, Product)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Product, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Product)
-
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Product)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except(KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()

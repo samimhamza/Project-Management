@@ -1,17 +1,16 @@
-from common.actions import filterRecords, allItems, delete, withTrashed, trashList, restore
 from .serializers import ServiceSerializer, ServiceListSerializer, ServiceTrashedSerializer
-from common.custom import CustomPageNumberPagination
+from common.actions import filterRecords, allItems
+from common.Repository import Repository
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework import viewsets, status
 from clients.models import Service
+from rest_framework import status
 
 
-class ServiceViewSet(viewsets.ModelViewSet):
+class ServiceViewSet(Repository):
+    model = Service
     queryset = Service.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ServiceSerializer
-    pagination_class = CustomPageNumberPagination
     serializer_action_classes = {
         "trashed": ServiceTrashedSerializer
     }
@@ -59,30 +58,3 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service.save()
         serializer = self.get_serializer(service)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-    def destroy(self, request, pk=None):
-        return delete(self, request, Service)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Service, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Service)
-
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Service)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except(KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()

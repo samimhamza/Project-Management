@@ -17,11 +17,11 @@ import datetime
 import base64
 import uuid
 import os
+from django.core.validators import URLValidator
 
 
 def convertBase64ToImage(base64file):
-    if(base64file and base64file != ""):
-
+    if base64file and base64file != "" and ';base64,' in base64file:
         format, imgstr = base64file.split(';base64,')
         ext = format.split('/')[-1]
         name = str(uuid.uuid4())+'.' + ext
