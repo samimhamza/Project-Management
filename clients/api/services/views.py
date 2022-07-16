@@ -1,6 +1,6 @@
 from .serializers import ServiceSerializer, ServiceListSerializer
+from common.actions import filterRecords, allItems, delete
 from common.custom import CustomPageNumberPagination
-from common.actions import filterRecords, allItems
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from clients.models import Service
@@ -52,3 +52,6 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service.save()
         serializer = self.get_serializer(service)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Service)
