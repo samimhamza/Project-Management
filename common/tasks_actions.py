@@ -160,7 +160,7 @@ def tasksOfProject(self, request, queryset):
     project_id = request.GET.get("project_id")
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
-    if request.GET.get('status'):
+    if request.GET.get('statuses'):
         return tasksAccordingToStatus(self, request, queryset, project_id)
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
