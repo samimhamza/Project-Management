@@ -1,5 +1,5 @@
 from common.actions import filterRecords, allItems, delete, withTrashed, trashList, restore
-from .serializers import ServiceSerializer, ServiceListSerializer
+from .serializers import ServiceSerializer, ServiceListSerializer, ServiceTrashedSerializer
 from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -12,6 +12,9 @@ class ServiceViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ServiceSerializer
     pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+        "trashed": ServiceTrashedSerializer
+    }
     queryset_actions = {
         "destroy": Service.objects.all(),
     }
@@ -71,6 +74,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Service)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except(KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:

@@ -1,6 +1,7 @@
 from common.actions import (withTrashed, trashList, delete,
                             restore, clientFeaturesFormatter, clientServicesFormatter, filterRecords, allItems)
-from .serializers import ClientSerializer, ClientDetailedSerializer, ClientListSerializer
+from .serializers import (ClientSerializer, ClientDetailedSerializer,
+                          ClientListSerializer, ClientTrashedSerializer)
 from common.permissions_scopes import ClientPermissions
 from common.custom import CustomPageNumberPagination
 from rest_framework import viewsets, status
@@ -16,6 +17,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     permission_classes = (ClientPermissions,)
     serializer_action_classes = {
+        "trashed": ClientTrashedSerializer,
         "retrieve": ClientDetailedSerializer,
     }
     queryset_actions = {

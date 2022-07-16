@@ -1,6 +1,6 @@
 from common.actions import (filterRecords, allItems, withTrashed,
                             trashList, restore, delete, convertBase64ToImage)
-from .serializers import ProductSerializer, ProductListSerializer
+from .serializers import ProductSerializer, ProductListSerializer, ProductTrashedSerializer
 from common.custom import CustomPageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -14,6 +14,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProductSerializer
     pagination_class = CustomPageNumberPagination
+    serializer_action_classes = {
+        "trashed": ProductTrashedSerializer
+    }
     queryset_actions = {
         "destroy": Product.objects.all(),
     }
@@ -80,6 +83,12 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):
         return restore(self, request, Product)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except(KeyError, AttributeError):
+            return super().get_serializer_class()
 
     def get_queryset(self):
         try:
