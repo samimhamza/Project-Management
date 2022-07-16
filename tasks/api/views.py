@@ -71,7 +71,7 @@ class TaskViewSet(Repository):
             status=task_status,
         )
         new_Task.save()
-        serializer = TaskSerializer(new_Task)
+        serializer = TaskSerializer(new_Task, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -92,7 +92,7 @@ class TaskViewSet(Repository):
                 setattr(task, key, value)
         task.updated_by = request.user
         task.save()
-        serializer = self.get_serializer(task)
+        serializer = self.get_serializer(task, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=["get"])
