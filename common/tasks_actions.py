@@ -115,14 +115,6 @@ def tasksResponse(self, serializer, project_id=None):
     return Response(data)
 
 
-def tasksAccordingToStatus(self, request, queryset, project_id):
-    queryset = queryset.filter(status=request.GET.get(
-        'status')).order_by("-created_at")
-    page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
-    return tasksResponse(self, serializer, project_id)
-
-
 def taskThumbnail(self, request, queryset):
     items_per_page = request.GET.get(
         "items_per_page") if request.GET.get("items_per_page") else 10
@@ -160,8 +152,6 @@ def tasksOfProject(self, request, queryset):
     project_id = request.GET.get("project_id")
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
-    if request.GET.get('statuses'):
-        return tasksAccordingToStatus(self, request, queryset, project_id)
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
     if request.GET.get('thumbnail'):
