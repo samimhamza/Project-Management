@@ -32,7 +32,10 @@ class ServiceViewSet(Repository):
         data = request.data
         creator = request.user
         if request.data.get("parent"):
-            parent = Service.objects.only('id').get(pk=data['parent'])
+            try:
+                parent = Service.objects.only('id').get(pk=data['parent'])
+            except Service.DoesNotExist:
+                parent = None
         else:
             parent = None
         new_service = Service.objects.create(
@@ -49,7 +52,14 @@ class ServiceViewSet(Repository):
     def update(self, request, pk=None):
         service = self.get_object()
         if "parent" in request.data:
-            parent = Service.objects.only('id').get(pk=request.data['parent'])
+            try:
+                if request.data["parent"]:
+                    parent = Service.objects.only(
+                        'id').get(pk=request.data['parent'])
+                else:
+                    parent = None
+            except Service.DoesNotExist:
+                parent = None
             service.parent = parent
         for key, value in request.data.items():
             if key != "parent":
