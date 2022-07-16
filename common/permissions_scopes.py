@@ -78,7 +78,8 @@ class UserPermissions(CustomPermissions):
         'trashed': 'users_d',
         'all': 'users_v',
         'check_uniqueness': 'users_c',
-        'teams': 'users_v'
+        'teams': 'users_v',
+        'tasks_projects': 'users_v'
     }
 
 

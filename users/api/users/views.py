@@ -11,6 +11,8 @@ from rest_framework.decorators import action
 from common.Repository import Repository
 from rest_framework import status
 import os
+from projects.models import Project
+from tasks.models import Task, UserTask
 
 
 class UserViewSet(Repository):
@@ -136,3 +138,28 @@ class UserViewSet(Repository):
                 return Response({"error": "username already in use"}, status=400)
             except User.DoesNotExist:
                 return Response({"success": "username is available"}, status=200)
+
+    @action(detail=True, methods=["get"])
+    def tasks_projects(self, request, pk=None):
+        user = self.get_object()
+        projects = Project.objects.filter(
+            users=user, status__in=['in_progress', 'completed'])
+        in_progress = projects.filter(status="in_progress").count()
+        completed = projects.filter(status="completed").count()
+        projects = projects.count()
+        userTasks = UserTask.objects.filter(user=user).values('task')
+        tasks = Task.objects.filter(
+            pk__in=userTasks, status__in=['in_progress', 'completed'])
+        in_progress_tasks = tasks.filter(status="in_progress").count()
+        completed_tasks = tasks.filter(status="completed").count()
+        tasks = tasks.count()
+        return Response({"projects": {
+            "all": projects,
+            "in_progress": in_progress,
+            "completed": completed
+        },
+            "tasks": {
+            "all": tasks,
+            "in_progress": in_progress_tasks,
+            "completed": completed_tasks
+        }}, status=status.HTTP_200_OK)
