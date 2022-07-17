@@ -84,28 +84,6 @@ class Feature(models.Model):
         max_length=24, choices=Types.choices, default="main"
     )
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="feature_created_by"
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="feature_updated_by"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="feature_deleted_by",
-    )
 
     def __str__(self):
         return self.name
@@ -244,30 +222,8 @@ class PricePlan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     plan_name = models.CharField(max_length=128)
     plan_price = models.FloatField(max_length=120, null=True, blank=True)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="price_plan_created_by"
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="price_plan_updated_by"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     feature = models.ForeignKey(
         Feature, null=True, on_delete=models.SET_NULL, related_name="price_plans")
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="price_plan_deleted_by",
-    )
 
     def __str__(self):
         return self.plan_name

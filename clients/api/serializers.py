@@ -12,12 +12,9 @@ class ClientFeatureSerializer(serializers.ModelSerializer):
 
 class FeatureCustomSerializer(serializers.ModelSerializer):
     price_plans = serializers.SerializerMethodField()
-    created_by = UserWithProfileSerializer(read_only=True)
-    updated_by = UserWithProfileSerializer(read_only=True)
-    deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_price_plans(self, feature):
-        qs = PricePlan.objects.filter(deleted_at__isnull=True, feature=feature)
+        qs = PricePlan.objects.filter(feature=feature)
         serializers = PricePlanSerializer(instance=qs, many=True)
         return serializers.data
 
@@ -27,9 +24,6 @@ class FeatureCustomSerializer(serializers.ModelSerializer):
 
 
 class PricePlanSerializer(serializers.ModelSerializer):
-    created_by = UserWithProfileSerializer(read_only=True)
-    updated_by = UserWithProfileSerializer(read_only=True)
-    deleted_by = UserWithProfileSerializer(read_only=True)
 
     class Meta:
         model = PricePlan
@@ -46,7 +40,7 @@ class FeatureListSerializer(serializers.ModelSerializer):
     price_plans = serializers.SerializerMethodField()
 
     def get_price_plans(self, feature):
-        qs = PricePlan.objects.filter(deleted_at__isnull=True, feature=feature)
+        qs = PricePlan.objects.filter(feature=feature)
         serializers = PricePlanListSerializer(instance=qs, many=True)
         return serializers.data
 

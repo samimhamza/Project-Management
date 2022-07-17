@@ -21,8 +21,7 @@ class ClientFeatureViewSet(Repository):
 
 class PricePlanViewSet(Repository):
     model = PricePlan
-    queryset = PricePlan.objects.filter(
-        deleted_at__isnull=True).order_by("-created_at")
+    queryset = PricePlan.objects.all()
     serializer_class = PricePlanSerializer
 
     def list(self, request):
@@ -33,8 +32,7 @@ class PricePlanViewSet(Repository):
 
 class FeatureViewSet(Repository):
     model = Feature
-    queryset = Feature.objects.filter(
-        deleted_at__isnull=True).order_by("-created_at")
+    queryset = Feature.objects.all()
     serializer_class = FeatureSerializer
 
     def list(self, request):

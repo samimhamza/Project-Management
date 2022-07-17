@@ -24,7 +24,7 @@ class ProductSerializer(serializers.ModelSerializer):
     deleted_by = UserWithProfileSerializer(read_only=True)
 
     def get_features(self, product):
-        qs = Feature.objects.filter(deleted_at__isnull=True, product=product)
+        qs = Feature.objects.filter(product=product)
         serializers = FeatureCustomSerializer(instance=qs, many=True)
         return serializers.data
 
@@ -35,9 +35,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class FeatureSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
-    created_by = UserWithProfileSerializer(read_only=True)
-    updated_by = UserWithProfileSerializer(read_only=True)
-    deleted_by = UserWithProfileSerializer(read_only=True)
 
     class Meta:
         model = Feature
