@@ -1,4 +1,3 @@
-import re
 from projects.models import Country
 from django.db import models
 import uuid
