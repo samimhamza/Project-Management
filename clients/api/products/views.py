@@ -1,8 +1,10 @@
+from hashlib import new
+from clients.api.serializers import PricePlanSerializer
 from .serializers import ProductSerializer, ProductListSerializer, ProductTrashedSerializer
 from common.actions import (filterRecords, allItems, convertBase64ToImage)
 from rest_framework.response import Response
 from common.Repository import Repository
-from clients.models import Product
+from clients.models import Product, Feature, PricePlan
 from rest_framework import status
 import os
 
@@ -47,6 +49,20 @@ class ProductViewSet(Repository):
             updated_by=creator,
         )
         new_product.save()
+        feature = Feature.objects.create(
+            name=data['name'], description=data['details'], product=new_product)
+        for price_plan in request.data['price_plans']:
+            price_plan = feature.price_plans.create(
+                plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+        if "features" in request.data:
+            for feature in request.data['features']:
+                new_feature = Feature.objects.create(
+                    name=feature['name'], description=feature['description'], product=new_product)
+                for price_plan in feature['price_plans']:
+                    new_feature.price_plans.create(
+                        plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+                new_feature.save()
+
         serializer = self.get_serializer(
             new_product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)

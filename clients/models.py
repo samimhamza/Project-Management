@@ -83,7 +83,8 @@ class Feature(models.Model):
     type = models.CharField(
         max_length=24, choices=Types.choices, default="main"
     )
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    product = models.ForeignKey(
+        Product, null=True, on_delete=models.SET_NULL, related_name="product_features")
 
     def __str__(self):
         return self.name
