@@ -3,9 +3,9 @@ from common.tasks_actions import (tasksOfProject, tasksResponse, checkAttributes
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
+from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from common.actions import (
     delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
-from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from users.api.serializers import UserWithProfileSerializer
 from common.custom import CustomPageNumberPagination
 from tasks.api.serializers import ProgressSerializer
