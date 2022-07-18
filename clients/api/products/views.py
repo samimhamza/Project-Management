@@ -51,14 +51,14 @@ class ProductViewSet(Repository):
             name=data['name'], description=data['details'], product=new_product)
         for price_plan in request.data['price_plans']:
             price_plan = feature.price_plans.create(
-                plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+                plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'], duration=price_plan['duration'])
         if "features" in request.data:
             for feature in request.data['features']:
                 new_feature = Feature.objects.create(
                     name=feature['name'], description=feature['description'], product=new_product, type='additional')
                 for price_plan in feature['price_plans']:
                     new_feature.price_plans.create(
-                        plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+                        plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'], duration=price_plan['duration'])
                 new_feature.save()
 
         serializer = self.get_serializer(
@@ -85,14 +85,14 @@ class ProductViewSet(Repository):
             name=data['name'], description=data['details'], product=product)
         for price_plan in data['price_plans']:
             price_plan = feature.price_plans.create(
-                plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+                plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'], duration=price_plan['duration'])
         if "features" in data:
             for addedFeature in data['features']:
                 new_feature = Feature.objects.create(
                     name=addedFeature['name'], description=addedFeature['description'], product=product, type='additional')
                 for price_plan in addedFeature['price_plans']:
                     new_feature.price_plans.create(
-                        plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+                        plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'], duration=price_plan['duration'])
                 new_feature.save()
         serializer = self.get_serializer(product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
