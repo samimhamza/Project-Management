@@ -8,7 +8,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     features = serializers.SerializerMethodField()
 
     def get_features(self, product):
-        qs = Feature.objects.filter(deleted_at__isnull=True, product=product)
+        qs = Feature.objects.filter(product=product)
         serializers = FeatureListSerializer(instance=qs, many=True)
         return serializers.data
 
