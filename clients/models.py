@@ -84,7 +84,7 @@ class Feature(models.Model):
         max_length=24, choices=Types.choices, default="main"
     )
     product = models.ForeignKey(
-        Product, null=True, on_delete=models.SET_NULL, related_name="product_features")
+        Product, null=True, on_delete=models.CASCADE, related_name="product_features")
 
     def __str__(self):
         return self.name
@@ -224,7 +224,7 @@ class PricePlan(models.Model):
     plan_name = models.CharField(max_length=128)
     plan_price = models.FloatField(max_length=120, null=True, blank=True)
     feature = models.ForeignKey(
-        Feature, null=True, on_delete=models.SET_NULL, related_name="price_plans")
+        Feature, null=True, on_delete=models.CASCADE, related_name="price_plans")
 
     def __str__(self):
         return self.plan_name

@@ -1,5 +1,3 @@
-from hashlib import new
-from clients.api.serializers import PricePlanSerializer
 from .serializers import ProductSerializer, ProductListSerializer, ProductTrashedSerializer
 from common.actions import (filterRecords, allItems, convertBase64ToImage)
 from rest_framework.response import Response
@@ -69,17 +67,32 @@ class ProductViewSet(Repository):
 
     def update(self, request, pk=None):
         product = self.get_object()
-        if "photo" in request.data:
-            imageField = convertBase64ToImage(request.data["photo"])
+        data = request.data
+        if "photo" in data:
+            imageField = convertBase64ToImage(data["photo"])
             if imageField:
                 if os.path.isfile('media/'+str(product.photo)):
                     os.remove('media/'+str(product.photo))
                 product.photo = imageField
-
-        for key, value in request.data.items():
+        for key, value in data.items():
             if key != "photo":
                 setattr(product, key, value)
         product.updated_by = request.user
         product.save()
+        allFeatures = Feature.objects.filter(product=product)
+        allFeatures.delete()
+        feature = Feature.objects.create(
+            name=data['name'], description=data['details'], product=product)
+        for price_plan in data['price_plans']:
+            price_plan = feature.price_plans.create(
+                plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+        if "features" in data:
+            for addedFeature in data['features']:
+                new_feature = Feature.objects.create(
+                    name=addedFeature['name'], description=addedFeature['description'], product=product, type='additional')
+                for price_plan in addedFeature['price_plans']:
+                    new_feature.price_plans.create(
+                        plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
+                new_feature.save()
         serializer = self.get_serializer(product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
