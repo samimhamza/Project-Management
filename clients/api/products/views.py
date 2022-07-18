@@ -57,7 +57,7 @@ class ProductViewSet(Repository):
         if "features" in request.data:
             for feature in request.data['features']:
                 new_feature = Feature.objects.create(
-                    name=feature['name'], description=feature['description'], product=new_product)
+                    name=feature['name'], description=feature['description'], product=new_product, type='additional')
                 for price_plan in feature['price_plans']:
                     new_feature.price_plans.create(
                         plan_name=price_plan['plan_name'], plan_price=price_plan['plan_price'])
