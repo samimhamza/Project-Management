@@ -49,6 +49,13 @@ class ProjectListSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
+class ProjectDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name", "progress", "p_start_date",
+                  "p_end_date", "a_start_date", "a_end_date", "status", "description"]
+
+
 class ProjectTrashedSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)

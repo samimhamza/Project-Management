@@ -79,7 +79,8 @@ class UserPermissions(CustomPermissions):
         'all': 'users_v',
         'check_uniqueness': 'users_c',
         'teams': 'users_v',
-        'tasks_projects': 'users_v'
+        'tasks_projects': 'users_v',
+        'projects': 'users_v'
     }
 
 

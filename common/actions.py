@@ -276,21 +276,24 @@ def deleteAttachments(self, request):
 def clientFeaturesFormatter(clientData):
     products = []
     for clientfeature in clientData['features']:
-        feature = clientfeature['feature']
-        del clientfeature['feature']
+        feature = clientfeature['feature'] if clientfeature['feature'] else {}
+        if clientfeature['feature']:
+            del clientfeature['feature']
         feature.update(clientfeature)
-        product = feature['product']
-        del feature['product']
+        product = feature['product'] if feature['product'] else {}
+        if feature['product']:
+            del feature['product']
         hasProduct = False
+        if hasProduct == False:
+            product["features"] = []
+            product["features"].append(feature)
+            products.append(product)
+
         for x in products:
             if x["id"] == product["id"]:
                 hasProduct = True
                 x["features"].append(feature)
                 break
-        if hasProduct == False:
-            product["features"] = []
-            product["features"].append(feature)
-            products.append(product)
 
     del clientData['features']
     clientData['products'] = []

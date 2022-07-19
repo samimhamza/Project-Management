@@ -5,14 +5,15 @@ from common.actions import (allItems, filterRecords,
                             dataWithPermissions, convertBase64ToImage)
 from common.permissions import addPermissionsToUser, addRolesToUser
 from users.models import User, UserPermissionList, TeamUser, Team
+from projects.api.project.serializers import ProjectDetailSerializer
 from common.permissions_scopes import UserPermissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
+from tasks.models import Task, UserTask
+from projects.models import Project
 from rest_framework import status
 import os
-from projects.models import Project
-from tasks.models import Task, UserTask
 
 
 class UserViewSet(Repository):
@@ -116,6 +117,14 @@ class UserViewSet(Repository):
             team_user_serializer = TeamUserSerializer(team_user)
             team['is_leader'] = team_user_serializer.data['is_leader']
             team['position'] = team_user_serializer.data['position']
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def projects(self, request, pk=None):
+        user = self.get_object()
+        projects = Project.objects.filter(deleted_at__isnull=True, users=user)
+        page = self.paginate_queryset(projects)
+        serializer = ProjectDetailSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])

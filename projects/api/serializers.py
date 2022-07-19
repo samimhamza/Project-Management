@@ -79,28 +79,6 @@ class IncomeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProjectLessListSerializer(serializers.ModelSerializer):
-    company_location = LocationSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
-            "description",
-            "p_start_date",
-            "p_end_date",
-            "a_start_date",
-            "a_end_date",
-            "status",
-            "progress",
-            "priority",
-            "company_name",
-            "company_email",
-            "company_location",
-        ]
-
-
 class ProjectNameListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
