@@ -24,6 +24,7 @@ class CustoUserModelSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -38,6 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
             "whatsapp",
             "created_by",
             "updated_by",
+            "deleted_by",
             "created_at",
             "updated_at",
             "deleted_at",
