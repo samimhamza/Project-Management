@@ -283,17 +283,9 @@ def clientFeaturesFormatter(clientData):
         product = feature['product'] if feature['product'] else {}
         if feature['product']:
             del feature['product']
-        hasProduct = False
-        if hasProduct == False:
-            product["features"] = []
-            product["features"].append(feature)
-            products.append(product)
-
-        for x in products:
-            if x["id"] == product["id"]:
-                hasProduct = True
-                x["features"].append(feature)
-                break
+        product["features"] = []
+        product["features"].append(feature)
+        products.append(product)
 
     del clientData['features']
     clientData['products'] = []
