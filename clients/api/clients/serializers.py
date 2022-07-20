@@ -45,7 +45,7 @@ class ClientSerializer(serializers.ModelSerializer):
 class ClientDetailedSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
     features = serializers.SerializerMethodField()
-    requirement = serializers.SerializerMethodField()
+    requirement = RequirementSerializer()
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
     deleted_by = UserWithProfileSerializer(read_only=True)
@@ -58,11 +58,6 @@ class ClientDetailedSerializer(serializers.ModelSerializer):
     def get_features(self, client):
         qs = ClientFeature.objects.filter(client=client)
         serializers = ClientFeatureCustomSerializer(instance=qs, many=True)
-        return serializers.data
-
-    def get_requirement(self, client):
-        qs = Requirement.objects.get(client=client)
-        serializers = RequirementSerializer(instance=qs)
         return serializers.data
 
     class Meta:

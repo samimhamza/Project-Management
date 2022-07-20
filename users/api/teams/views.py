@@ -81,7 +81,6 @@ class TeamViewSet(Repository):
             TeamUser.objects.create(
                 user=user, team=new_team, is_leader=True, position="Leader"
             )
-        new_team.save()
         serializer = TeamListSerializer(new_team)
         data = serializer.data
         data["total_users"] = get_total(new_team)
