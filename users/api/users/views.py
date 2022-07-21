@@ -54,6 +54,7 @@ class UserViewSet(Repository):
             last_name=data["last_name"],
             phone=data["phone"],
             whatsapp=data["whatsapp"],
+            position=data["position"],
             profile=imageField,
             is_active=True,
             created_by=data["created_by"],

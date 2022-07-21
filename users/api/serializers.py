@@ -37,6 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
             "profile",
             "phone",
             "whatsapp",
+            "position",
             "created_by",
             "updated_by",
             "deleted_by",
@@ -56,6 +57,7 @@ class AuthUserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "profile",
+            "position",
         ]
 
 

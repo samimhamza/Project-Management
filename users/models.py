@@ -10,6 +10,7 @@ class User(AbstractUser):
         upload_to="user_profiles", blank=True, null=True)
     phone = models.CharField(max_length=32, blank=True, null=True)
     whatsapp = models.CharField(max_length=64, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
