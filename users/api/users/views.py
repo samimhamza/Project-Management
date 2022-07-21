@@ -79,8 +79,10 @@ class UserViewSet(Repository):
             if key != "profile" and key != "permissions_users" and key != "roles_users":
                 setattr(user, key, value)
         user.updated_by = request.user
-        addPermissionsToUser(request.data.get("permissions"), user)
-        addRolesToUser(request.data.get("roles"), user)
+        if "permissions" in request.data:
+            addPermissionsToUser(request.data.get("permissions"), user)
+        if "roles" in request.data:
+            addRolesToUser(request.data.get("roles"), user)
         user.save()
         serializer = UserSerializer(user, context={"request": request})
         if user == request.user:
