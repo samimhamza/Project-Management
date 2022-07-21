@@ -122,7 +122,7 @@ class RoleViewSet(Repository):
             updated_by=data["created_by"],
         )
         addPermissionsToRole(data['permissions'], new_role)
-        serializer = RoleSerializer(new_role)
+        serializer = RoleSerializer(new_role, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):

@@ -1,4 +1,3 @@
-from tkinter import N
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from expenses.api.serializers import LessFieldExpenseSerializer
 from .team_actions import get_leader_by_id, get_total_users
@@ -17,7 +16,6 @@ import datetime
 import base64
 import uuid
 import os
-from django.core.validators import URLValidator
 
 
 def convertBase64ToImage(base64file):
@@ -271,35 +269,3 @@ def deleteAttachments(self, request):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
-
-
-def clientFeaturesFormatter(clientData):
-    products = []
-    for clientfeature in clientData['features']:
-        feature = clientfeature['feature'] if clientfeature['feature'] else {}
-        if clientfeature['feature']:
-            del clientfeature['feature']
-        feature.update(clientfeature)
-        product = feature['product'] if feature['product'] else {}
-        if feature['product']:
-            del feature['product']
-        product["features"] = []
-        product["features"].append(feature)
-        products.append(product)
-
-    del clientData['features']
-    clientData['products'] = []
-    clientData['products'] = products
-    return clientData
-
-
-def clientServicesFormatter(clientData):
-    services = []
-    for service in clientData['services']:
-        service_obj = service['service']
-        del service['service']
-        client_service = service
-        service_obj.update(client_service)
-        services.append(service_obj)
-    clientData['services'] = services
-    return clientData
