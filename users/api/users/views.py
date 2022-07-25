@@ -109,27 +109,6 @@ class UserViewSet(Repository):
         except:
             return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["get"])
-    def teams(self, request, pk=None):
-        user = self.get_object()
-        teams = Team.objects.filter(deleted_at__isnull=True, users=user)
-        page = self.paginate_queryset(teams)
-        serializer = TeamListSerializer(page, many=True)
-        for team in serializer.data:
-            team_user = TeamUser.objects.get(user=user, team=team['id'])
-            team_user_serializer = TeamUserSerializer(team_user)
-            team['is_leader'] = team_user_serializer.data['is_leader']
-            team['position'] = team_user_serializer.data['position']
-        return self.get_paginated_response(serializer.data)
-
-    @action(detail=True, methods=["get"])
-    def projects(self, request, pk=None):
-        user = self.get_object()
-        projects = Project.objects.filter(deleted_at__isnull=True, users=user)
-        page = self.paginate_queryset(projects)
-        serializer = ProjectDetailSerializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
     @action(detail=False, methods=["get"])
     def auth_user(self, request, pk=None):
         user = request.user

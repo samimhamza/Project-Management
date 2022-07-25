@@ -1,9 +1,9 @@
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
+from common.actions import allItems, filterRecords, teamsOfUser
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import TeamPermissions
 from rest_framework.generics import get_object_or_404
-from common.actions import allItems, filterRecords
 from users.models import User, Team, TeamUser
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -45,6 +45,8 @@ class TeamViewSet(Repository):
         )
         columns = ['name']
         queryset = filterRecords(queryset, request, columns, table=Team)
+        if request.GET.get("user_id"):
+            return teamsOfUser(self, request, queryset)
         if request.GET.get("items_per_page") == "-1":
             return allItems(TeamNamesSerializer, queryset)
 

@@ -1,7 +1,8 @@
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
+from projects.api.serializers import AttachmentSerializer, ProjectNameListSerializer
 from expenses.api.serializers import LessFieldExpenseSerializer
 from .team_actions import get_leader_by_id, get_total_users
-from projects.api.serializers import AttachmentSerializer
+from users.api.teams.serializers import TeamListSerializer
 from users.models import Team, Permission, Action, Role
 from common.permissions import checkCustomPermissions
 from projects.models import Project, Attachment
@@ -269,3 +270,23 @@ def deleteAttachments(self, request):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+def teamsOfUser(self, request, queryset):
+    user_id = request.GET.get("user_id")
+    queryset = queryset.filter(users=user_id).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(TeamListSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
+
+
+def projectsOfUser(self, request, queryset):
+    user_id = request.GET.get("user_id")
+    queryset = queryset.filter(users=user_id).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(ProjectNameListSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)

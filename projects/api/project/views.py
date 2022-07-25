@@ -1,7 +1,7 @@
 from common.project_actions import (
     shareTo, notification, getAssignNotification, getRevokeNotification, broadcastProject, broadcastDeleteProject)
 from common.actions import (delete, allItems, filterRecords,
-                            countStatuses, addAttachment, deleteAttachments, getAttachments)
+                            countStatuses, addAttachment, deleteAttachments, getAttachments, projectsOfUser)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import ProjectNameListSerializer
@@ -37,6 +37,8 @@ class ProjectViewSet(Repository):
         if request.GET.get("items_per_page") == "-1":
             return allItems(ProjectNameListSerializer, queryset)
 
+        if request.GET.get("user_id"):
+            return projectsOfUser(self, request, queryset)
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(
             page, many=True, context={"request": request})
