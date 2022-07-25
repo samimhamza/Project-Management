@@ -1,12 +1,10 @@
 from users.api.serializers import (
     UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer)
-from users.api.teams.serializers import TeamListSerializer, TeamUserSerializer
 from common.actions import (allItems, filterRecords,
                             dataWithPermissions, convertBase64ToImage)
 from common.permissions import addPermissionsToUser, addRolesToUser
-from users.models import User, UserPermissionList, TeamUser, Team
-from projects.api.project.serializers import ProjectDetailSerializer
 from common.permissions_scopes import UserPermissions
+from users.models import User, UserPermissionList
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
