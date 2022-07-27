@@ -22,7 +22,7 @@ class ProductViewSet(Repository):
     def list(self, request):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request, table=Product)
-        if request.GET.get("items_per_page") == "-1":
+        if request.GET.get("items_per_page") == "-1" or request.GET.get("items_per_page") == "-2":
             if request.GET.get("lessData"):
                 serializer = ProductListSerializer(
                     queryset, many=True, context={"request": request})
