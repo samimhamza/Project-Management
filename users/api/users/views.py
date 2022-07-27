@@ -75,8 +75,10 @@ class UserViewSet(Repository):
                     os.remove('media/'+str(user.profile))
                 user.profile = imageField
         for key, value in request.data.items():
-            if key != "profile" and key != "permissions_users" and key != "roles_users":
+            if key != "profile" and key != "permissions_users" and key != "roles_users" and key != "password":
                 setattr(user, key, value)
+        if "password" in request.data:
+            user.set_password(request.data.get("password"))
         user.updated_by = request.user
         if "permissions" in request.data:
             addPermissionsToUser(request.data.get("permissions"), user)
