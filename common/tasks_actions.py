@@ -154,6 +154,8 @@ def tasksOfProject(self, request, queryset):
         "project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldsTaskSerializer, queryset)
+    if request.GET.get("items_per_page") == "-2":
+        return allItems(self.get_serializer, queryset)
     if request.GET.get('thumbnail'):
         return taskThumbnail(self, request, queryset)
     page = self.paginate_queryset(queryset)

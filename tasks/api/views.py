@@ -41,6 +41,8 @@ class TaskViewSet(Repository):
             if request.GET.get("excluded_dependencies"):
                 return excludedDependencies(LessFieldsTaskSerializer, queryset, request)
             return allItems(LessFieldsTaskSerializer, queryset)
+        if request.GET.get("items_per_page") == "-2":
+            return allItems(self.get_serializer, queryset)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(

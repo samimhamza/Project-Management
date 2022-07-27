@@ -22,6 +22,8 @@ class DepartmentViewSet(Repository):
         queryset = filterRecords(queryset, request, table=Department)
         if request.GET.get("items_per_page") == "-1":
             return allItems(DepartmentSerializer, queryset)
+        if request.GET.get("items_per_page") == "-2":
+            return allItems(self.get_serializer, queryset)
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
