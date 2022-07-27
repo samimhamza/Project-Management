@@ -36,6 +36,8 @@ class ProjectViewSet(Repository):
         queryset = filterRecords(queryset, request, table=Project)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ProjectNameListSerializer, queryset)
+        if request.GET.get("items_per_page") == "-2":
+            return allItems(self.get_serializer, queryset)
 
         if request.GET.get("user_id"):
             return projectsOfUser(self, request, queryset)
