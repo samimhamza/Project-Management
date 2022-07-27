@@ -107,6 +107,8 @@ class RoleViewSet(Repository):
         queryset = filterRecords(queryset, request,  table=Role)
         if request.GET.get("items_per_page") == "-1":
             return allItems(RoleListSerializer, queryset)
+        if request.GET.get("items_per_page") == "-2":
+            return allItems(self.get_serializer, queryset)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(
