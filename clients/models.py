@@ -1,5 +1,5 @@
-from http import client
-from projects.models import Country
+from django.contrib.contenttypes.fields import GenericRelation
+from projects.models import Country, Attachment
 from django.db import models
 import uuid
 
@@ -215,6 +215,12 @@ class ClientService(models.Model):
     client = models.ForeignKey(
         Client, null=True, on_delete=models.SET_NULL, related_name='clientService_client')
     details = models.TextField(blank=True, null=True)
+    attachments = GenericRelation(
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+        related_query_name='comments'
+    )
 
     def __str__(self):
         if self.client:
