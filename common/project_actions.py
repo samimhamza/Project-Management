@@ -93,7 +93,9 @@ def addStagesToProject(project, department, request):
             description=stage.description,
             project=project,
             created_by=request.user,
-            updated_by=request.user)
+            updated_by=request.user,
+            type="stage"
+        )
         sub_stages = SubStage.objects.filter(
             stage=stage, deleted_at__isnull=True)
         for sub_stage in sub_stages:
@@ -103,4 +105,6 @@ def addStagesToProject(project, department, request):
                 parent=task,
                 project=project,
                 created_by=request.user,
-                updated_by=request.user)
+                updated_by=request.user,
+                type="sub_stage"
+            )
