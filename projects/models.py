@@ -137,7 +137,8 @@ class Project(models.Model):
     p_end_date = models.DateTimeField(null=True, blank=True)
     a_start_date = models.DateTimeField(null=True, blank=True)
     a_end_date = models.DateTimeField(null=True, blank=True)
-    banner = models.CharField(max_length=120, null=True, blank=True)
+    banner = models.ImageField(
+        upload_to="project_banners", blank=True, null=True)
     department = models.ForeignKey(
         Department, related_name="department", on_delete=models.SET_NULL, null=True)
 
