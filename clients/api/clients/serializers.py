@@ -1,6 +1,6 @@
 from clients.models import (Client, ClientService, ClientFeature, Requirement)
 from clients.api.services.serializers import ServiceCustomSerializer
-from clients.api.products.serializers import FeatureSerializer
+from clients.api.products.serializers import LessFieldsFeatureSerializer
 from users.api.serializers import UserWithProfileSerializer
 from projects.api.serializers import CountryListSerializer
 from clients.api.serializers import RequirementSerializer
@@ -16,7 +16,7 @@ class ClientServiceListSerializer(serializers.ModelSerializer):
 
 
 class ClientFeatureCustomSerializer(serializers.ModelSerializer):
-    feature = FeatureSerializer()
+    feature = LessFieldsFeatureSerializer()
 
     class Meta:
         model = ClientFeature
@@ -62,7 +62,9 @@ class ClientDetailedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = "__all__"
+        fields = ["id", "first_name", "last_name", "phone", "whatsapp", "email", "profile", "country", "company_name",
+                  "industry", "services", "features", "hear_about_us", "lead_type", "prefer_com_way", "is_requirement_ready",
+                  "status", "date", "requirement", "created_by", "updated_by", "created_at", "updated_at", "deleted_by", "deleted_at"]
 
 
 class ClientServiceSerializer(serializers.ModelSerializer):

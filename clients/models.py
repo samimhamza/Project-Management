@@ -1,3 +1,4 @@
+from http import client
 from projects.models import Country
 from django.db import models
 import uuid
@@ -216,7 +217,10 @@ class ClientService(models.Model):
     details = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.client.first_name
+        if self.client:
+            return self.client.first_name
+        else:
+            return self.details
 
 
 class PricePlan(models.Model):
@@ -264,7 +268,7 @@ class Requirement(models.Model):
 
     status = models.CharField(
         max_length=32, choices=statusChoices.choices, default="pending")
-    goals_and_expectation = models.TextField(blank=True, null=True)
+    goals_and_expectation = models.JSONField(blank=True, null=True)
     budget = models.FloatField(max_length=255, blank=True, null=True)
     currency = models.CharField(max_length=32, blank=True, null=True)
     project_timeline = models.CharField(max_length=255, blank=True, null=True)
@@ -273,11 +277,11 @@ class Requirement(models.Model):
     what_are_we_delivering = models.TextField(blank=True, null=True)
     what_are_we_not_delivering = models.TextField(blank=True, null=True)
     target_audience = models.TextField(blank=True, null=True)
-    technologies = models.TextField(blank=True, null=True)
-    functionalities = models.TextField(blank=True, null=True)
-    tools = models.TextField(blank=True, null=True)
-    data_storing_requirements = models.TextField(blank=True, null=True)
-    restrictions = models.TextField(blank=True, null=True)
+    technologies = models.JSONField(blank=True, null=True)
+    functionalities = models.JSONField(blank=True, null=True)
+    tools = models.JSONField(blank=True, null=True)
+    data_storing_requirements = models.JSONField(blank=True, null=True)
+    restrictions = models.JSONField(blank=True, null=True)
     confidentiality = models.TextField(blank=True, null=True)
     how_many_people_use_this = models.IntegerField(blank=True, null=True)
     created_by = models.ForeignKey(

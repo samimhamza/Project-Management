@@ -3,19 +3,25 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-def clientFeaturesFormatter(clientData):
+def clientProductsFormatter(clientData):
     products = []
     for clientfeature in clientData['features']:
         feature = clientfeature['feature'] if clientfeature['feature'] else {}
-        if clientfeature['feature']:
-            del clientfeature['feature']
+        del clientfeature['feature']
         feature.update(clientfeature)
-        product = feature['product'] if feature['product'] else {}
-        if feature['product']:
+        if "product" in feature:
+            product = feature['product']
             del feature['product']
-        product["features"] = []
-        product["features"].append(feature)
-        products.append(product)
+            hasProduct = False
+            for x in products:
+                if x["id"] == product["id"]:
+                    hasProduct = True
+                    x["features"].append(feature)
+                    break
+            if hasProduct == False:
+                product["features"] = []
+                product["features"].append(feature)
+                products.append(product)
 
     del clientData['features']
     clientData['products'] = []

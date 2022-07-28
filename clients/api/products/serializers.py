@@ -33,12 +33,27 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class LessFieldsProductSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "developed_by", "details", "photo"]
+
+
 class FeatureSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
 
     class Meta:
         model = Feature
         fields = "__all__"
+
+
+class LessFieldsFeatureSerializer(serializers.ModelSerializer):
+    product = LessFieldsProductSerializer()
+
+    class Meta:
+        model = Feature
+        fields = ["id", "name", "description", "type", "product"]
 
 
 class ProductTrashedSerializer(serializers.ModelSerializer):

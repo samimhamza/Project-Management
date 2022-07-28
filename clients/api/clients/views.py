@@ -1,5 +1,5 @@
 from asyncio import exceptions
-from common.client_actions import clientFeaturesFormatter, clientServicesFormatter, setProducts, setServices
+from common.client_actions import clientProductsFormatter, clientServicesFormatter, setProducts, setServices
 from common.actions import (filterRecords, allItems, convertBase64ToImage)
 from .serializers import (ClientSerializer, ClientDetailedSerializer,
                           ClientListSerializer, ClientTrashedSerializer)
@@ -43,7 +43,7 @@ class ClientViewSet(Repository):
         serailizer = self.get_serializer(client)
         clientData = serailizer.data
         clientServicesFormatter(clientData)
-        clientFeaturesFormatter(clientData)
+        clientProductsFormatter(clientData)
         return Response(clientData)
 
     def create(self, request):
