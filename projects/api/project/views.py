@@ -1,17 +1,17 @@
-from common.project_actions import (
-    shareTo, notification, getAssignNotification, getRevokeNotification, broadcastProject, broadcastDeleteProject)
-from common.actions import (delete, allItems, filterRecords,
-                            countStatuses, addAttachment, deleteAttachments, getAttachments, projectsOfUser)
+from common.project_actions import (shareTo, notification, getAssignNotification,
+                                    getRevokeNotification, broadcastProject, broadcastDeleteProject, addStagesToProject)
+from common.actions import (delete, allItems, filterRecords, countStatuses, addAttachment,
+                            deleteAttachments, getAttachments, projectsOfUser, convertBase64ToImage)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
+from projects.models import Project, Department
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
 from users.models import User, Team
-from projects.models import Project
 from rest_framework import status
 from tasks.models import Task
 
@@ -66,10 +66,22 @@ class ProjectViewSet(Repository):
     def create(self, request):
         project_data = request.data
         project_data["created_by"] = request.user
+        try:
+            department = Department.objects.only(
+                'id').get(pk=project_data["department"])
+        except Department.DoesNotExist:
+            return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        imageField = convertBase64ToImage(project_data["banner"])
         new_project = Project.objects.create(
             name=project_data["name"],
+            department=department,
+            priority=project_data["priority"],
+            company_name=project_data["company_name"],
+            company_email=project_data["company_email"],
+            description=project_data["description"],
             p_start_date=project_data["p_start_date"],
             p_end_date=project_data["p_end_date"],
+            banner=imageField,
             created_by=project_data["created_by"],
             updated_by=project_data["created_by"],
         )
@@ -78,6 +90,7 @@ class ProjectViewSet(Repository):
         serializer = ProjectSerializer(
             new_project, context={"request": request})
         broadcastProject(new_project, serializer.data)
+        addStagesToProject(new_project, department, request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):

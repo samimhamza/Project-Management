@@ -1,6 +1,9 @@
+from pydoc import describe
 from common.notification import sendNotification
 from common.pusher import pusher_client
 from users.models import User, Team
+from projects.models import Stage, SubStage
+from tasks.models import Task
 
 
 def broadcastProject(item, data, update=False):
@@ -79,3 +82,25 @@ def shareTo(request, project_data, new_project):
             project_data, new_project, request)
         sendNotification(request, users, data, team_users)
     return new_project
+
+
+def addStagesToProject(project, department, request):
+    stages = Stage.objects.filter(
+        department=department, deleted_at__isnull=True)
+    for stage in stages:
+        task = Task.objects.create(
+            name=stage.name,
+            description=stage.description,
+            project=project,
+            created_by=request.user,
+            updated_by=request.user)
+        sub_stages = SubStage.objects.filter(
+            stage=stage, deleted_at__isnull=True)
+        for sub_stage in sub_stages:
+            Task.objects.create(
+                name=sub_stage.name,
+                description=sub_stage.description,
+                parent=task,
+                project=project,
+                created_by=request.user,
+                updated_by=request.user)
