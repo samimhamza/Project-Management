@@ -35,6 +35,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "company_email",
             "company_location",
             "users",
+            "department",
+            "banner",
             "created_at",
             "updated_at",
             "created_by",

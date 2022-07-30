@@ -14,6 +14,7 @@ from common.Repository import Repository
 from users.models import User, Team
 from rest_framework import status
 from tasks.models import Task
+import os
 
 
 class ProjectViewSet(Repository):
@@ -64,28 +65,28 @@ class ProjectViewSet(Repository):
         return Response(data)
 
     def create(self, request):
-        project_data = request.data
-        project_data["created_by"] = request.user
+        data = request.data
+        data["created_by"] = request.user
         try:
             department = Department.objects.only(
-                'id').get(pk=project_data["department"])
+                'id').get(pk=data["department"])
         except Department.DoesNotExist:
             return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-        imageField = convertBase64ToImage(project_data["banner"])
+        imageField = convertBase64ToImage(data["banner"])
         new_project = Project.objects.create(
-            name=project_data["name"],
+            name=data["name"],
             department=department,
-            priority=project_data["priority"],
-            company_name=project_data["company_name"],
-            company_email=project_data["company_email"],
-            description=project_data["description"],
-            p_start_date=project_data["p_start_date"],
-            p_end_date=project_data["p_end_date"],
+            priority=data["priority"],
+            company_name=data["company_name"],
+            company_email=data["company_email"],
+            description=data["description"],
+            p_start_date=data["p_start_date"],
+            p_end_date=data["p_end_date"],
             banner=imageField,
-            created_by=project_data["created_by"],
-            updated_by=project_data["created_by"],
+            created_by=data["created_by"],
+            updated_by=data["created_by"],
         )
-        new_project = shareTo(request, project_data, new_project)
+        new_project = shareTo(request, data, new_project)
         new_project.save()
         serializer = ProjectSerializer(
             new_project, context={"request": request})
@@ -100,8 +101,14 @@ class ProjectViewSet(Repository):
             project.users.set(request.data.get("users"))
         if request.data.get("teams") is not None:
             project.teams.set(request.data.get("teams"))
+        if request.data.get("banner"):
+            imageField = convertBase64ToImage(data["banner"])
+            if imageField:
+                if os.path.isfile('media/'+str(project.banner)):
+                    os.remove('media/'+str(project.banner))
+                project.banner = imageField
         for key, value in data.items():
-            if key != "users" and key != "teams" and key != "id":
+            if key != "users" and key != "teams" and key != "id" and key != "department" and key != "banner":
                 setattr(project, key, value)
         project.updated_by = request.user
         project.save()
