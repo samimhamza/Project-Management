@@ -153,6 +153,12 @@ def tasksOfProject(self, request, queryset):
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
+        if request.GET.get("extract_stages"):
+            stages = queryset.filter(
+                type="stage", childs__isnull=True)
+            print(stages)
+            # sub_stages = queryset.filter(status='sub_stages').values('id')
+            return Response("s")
         return allItems(LessFieldsTaskSerializer, queryset)
     if request.GET.get("items_per_page") == "-2":
         return allItems(self.get_serializer, queryset)
