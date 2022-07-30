@@ -59,7 +59,7 @@ class TaskViewSet(Repository):
 
     def create(self, request):
         [name, parent, project, start_date, end_date, description,
-            priority, task_status, creator] = checkAttributes(request)
+            priority, task_status, progress, creator] = checkAttributes(request)
         new_Task = Task.objects.create(
             parent=parent,
             name=name,
@@ -70,6 +70,7 @@ class TaskViewSet(Repository):
             created_by=creator,
             updated_by=creator,
             priority=priority,
+            progress=progress,
             status=task_status,
         )
         new_Task.save()

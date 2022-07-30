@@ -154,11 +154,9 @@ def tasksOfProject(self, request, queryset):
         "project_id")).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
         if request.GET.get("extract_stages"):
-            stages = queryset.filter(
-                type="stage", childs__isnull=True)
-            print(stages)
-            # sub_stages = queryset.filter(status='sub_stages').values('id')
-            return Response("s")
+            queryset = queryset.exclude(
+                type="stage", childs__isnull=False)
+            return allItems(LessFieldsTaskSerializer, queryset)
         return allItems(LessFieldsTaskSerializer, queryset)
     if request.GET.get("items_per_page") == "-2":
         return allItems(self.get_serializer, queryset)
@@ -200,7 +198,11 @@ def checkAttributes(request):
         task_status = data['status']
     else:
         task_status = "pending"
-    return [data['name'], parent, project, start_date, end_date, description, priority, task_status, creator]
+    if request.data.get('progress'):
+        progress = data['progress']
+    else:
+        progress = 0
+    return [data['name'], parent, project, start_date, end_date, description, priority, task_status, progress, creator]
 
 
 def excludedDependencies(serializerName, queryset, request):
