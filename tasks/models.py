@@ -40,7 +40,7 @@ class Task(models.Model):
     project = models.ForeignKey(
         Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
     )
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=128)
     description = models.TextField(blank=True, null=True)
     p_start_date = models.DateTimeField(blank=True, null=True)
     p_end_date = models.DateTimeField(blank=True, null=True)

@@ -131,7 +131,7 @@ class State(models.Model):
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=30, null=True, blank=True)
+    name = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     p_start_date = models.DateField(null=True, blank=True)
     p_end_date = models.DateField(null=True, blank=True)
