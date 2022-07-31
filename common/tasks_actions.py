@@ -1,3 +1,4 @@
+from os import stat
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer
 from common.notification import sendNotification
 from .actions import allItems, countStatuses
@@ -122,6 +123,9 @@ def taskThumbnail(self, request, queryset):
         "page") if request.GET.get("page") else 1
     page = int(page)
     items_per_page = int(items_per_page)
+    pendingTotal = queryset.filter(status='pending').count()
+    inProgressTotal = queryset.filter(status='in_progress').count()
+    completedTotal = queryset.filter(status='completed').count()
     pending = queryset.filter(status='pending')[
         0 if page == 1 else ((page-1) * items_per_page): page * items_per_page]
     in_progress = queryset.filter(status='in_progress')[
@@ -131,7 +135,7 @@ def taskThumbnail(self, request, queryset):
     if pending.count() == 0 and in_progress.count() == 0 and completed.count() == 0:
         return Response(
             {
-                "detail": "Invalid  page"
+                "detail": "Invalid page"
             }
         )
     serializer1 = self.get_serializer(pending, many=True)
@@ -139,11 +143,14 @@ def taskThumbnail(self, request, queryset):
     serializer3 = self.get_serializer(completed, many=True)
     return Response(
         {
-            "count": queryset.count(),
-            "total_pages": math.ceil(queryset.count() / items_per_page),
+            "count": queryset.filter(status__in=["in_progress", "pending", "completed"]).count(),
+            "total_pages": math.ceil(queryset.count() / (items_per_page * 3)),
             "total": int(request.GET.get("items_per_page")) if request.GET.get("items_per_page") else 10,
             "current_page": int(request.GET.get("page")) if request.GET.get("page") else 1,
-            "results": {'pending': serializer1.data, 'in_progress': serializer2.data, 'completed': serializer3.data}
+            "pendingTotal": pendingTotal,
+            "inProgressTotal": inProgressTotal,
+            "completedTotal": completedTotal,
+            "results": {'pending': serializer1.data, 'in_progress': serializer2.data, 'completed': serializer3.data},
         }
     )
 
