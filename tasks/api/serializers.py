@@ -123,6 +123,7 @@ class SubTaskSerializer(serializers.ModelSerializer):
             "progress",
             "status",
             "type",
+            "pin",
             "users",
             "deleted_at"
         ]
@@ -170,6 +171,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             "dependencies",
             "sub_tasks",
             "users",
+            "pin",
             "deleted_at",
             "project",
             "created_at",
