@@ -162,7 +162,7 @@ def tasksOfProject(self, request, queryset):
     if request.GET.get("items_per_page") == "-1":
         if request.GET.get("extract_stages"):
             queryset = queryset.exclude(
-                type="stage", childs__isnull=False)
+                type="stage", childs__type="sub_stage")
             return allItems(LessFieldsTaskSerializer, queryset)
         return allItems(LessFieldsTaskSerializer, queryset)
     if request.GET.get("items_per_page") == "-2":

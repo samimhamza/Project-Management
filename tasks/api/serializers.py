@@ -27,7 +27,7 @@ class TaskTrashedSerializer(serializers.ModelSerializer):
 class LessFieldsTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["id", "name", "progress"]
+        fields = ["id", "name", "progress", "type"]
 
 
 class LessTaskSerializer(serializers.ModelSerializer):
@@ -134,6 +134,8 @@ class TaskListSerializer(serializers.ModelSerializer):
     parent = LessFieldsTaskSerializer()
     sub_tasks = serializers.SerializerMethodField()
     dependencies = serializers.SerializerMethodField()
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
 
     def get_users(self, task):
         return users(self, task)
