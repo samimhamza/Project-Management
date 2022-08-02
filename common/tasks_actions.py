@@ -167,6 +167,8 @@ def tasksOfProject(self, request, queryset):
             queryset = queryset.exclude(
                 type="stage", childs__type="sub_stage").order_by("type")
             return allItems(LessFieldsTaskSerializer, queryset)
+        if request.GET.get("excluded_dependencies"):
+            return excludedDependencies(LessFieldsTaskSerializer, queryset, request)
         return allItems(LessFieldsTaskSerializer, queryset)
     if request.GET.get("items_per_page") == "-2":
         return allItems(self.get_serializer, queryset)
@@ -218,7 +220,7 @@ def checkAttributes(request):
 
 def excludedDependencies(serializerName, queryset, request):
     task = Task.objects.get(pk=request.GET.get("excluded_dependencies"))
-    queryset = queryset.exclude(pk=task.id)
+    queryset = queryset.exclude(pk=task.id).order_by("type")
     if task.dependencies:
         queryset = queryset.exclude(pk__in=task.dependencies)
     serializer = serializerName(queryset, many=True)
