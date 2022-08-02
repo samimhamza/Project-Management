@@ -138,9 +138,12 @@ def taskThumbnail(self, request, queryset):
                 "detail": "Invalid page"
             }
         )
-    serializer1 = self.get_serializer(pending, many=True)
-    serializer2 = self.get_serializer(in_progress, many=True)
-    serializer3 = self.get_serializer(completed, many=True)
+    serializer1 = self.get_serializer(
+        pending, many=True, context={"request": request})
+    serializer2 = self.get_serializer(
+        in_progress, many=True, context={"request": request})
+    serializer3 = self.get_serializer(
+        completed, many=True, context={"request": request})
     return Response(
         {
             "count": queryset.filter(status__in=["in_progress", "pending", "completed"]).count(),
@@ -170,7 +173,8 @@ def tasksOfProject(self, request, queryset):
     if request.GET.get('thumbnail'):
         return taskThumbnail(self, request, queryset)
     page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
+    serializer = self.get_serializer(
+        page, many=True, context={"request": request})
     return tasksResponse(self, serializer, project_id)
 
 
