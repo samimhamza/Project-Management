@@ -284,6 +284,7 @@ class Requirement(models.Model):
     what_are_we_delivering = models.TextField(blank=True, null=True)
     what_are_we_not_delivering = models.TextField(blank=True, null=True)
     target_audience = models.TextField(blank=True, null=True)
+    target_gender = models.JSONField(blank=True, null=True)
     technologies = models.JSONField(blank=True, null=True)
     functionalities = models.JSONField(blank=True, null=True)
     tools = models.JSONField(blank=True, null=True)
