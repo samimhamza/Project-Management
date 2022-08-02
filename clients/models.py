@@ -277,7 +277,8 @@ class Requirement(models.Model):
     goals_and_expectation = models.JSONField(blank=True, null=True)
     budget = models.FloatField(max_length=255, blank=True, null=True)
     currency = models.CharField(max_length=32, blank=True, null=True)
-    project_timeline = models.CharField(max_length=255, blank=True, null=True)
+    project_timeline_start = models.DateField( blank=True, null=True)
+    project_timeline_end = models.DateField( blank=True, null=True)
     frequently_of_receive_progress_report = models.TextField(
         blank=True, null=True)
     what_are_we_delivering = models.TextField(blank=True, null=True)
