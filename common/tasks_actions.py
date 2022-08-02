@@ -138,9 +138,12 @@ def taskThumbnail(self, request, queryset):
                 "detail": "Invalid page"
             }
         )
-    serializer1 = self.get_serializer(pending, many=True)
-    serializer2 = self.get_serializer(in_progress, many=True)
-    serializer3 = self.get_serializer(completed, many=True)
+    serializer1 = self.get_serializer(
+        pending, many=True, context={"request": request})
+    serializer2 = self.get_serializer(
+        in_progress, many=True, context={"request": request})
+    serializer3 = self.get_serializer(
+        completed, many=True, context={"request": request})
     return Response(
         {
             "count": queryset.filter(status__in=["in_progress", "pending", "completed"]).count(),
@@ -162,15 +165,18 @@ def tasksOfProject(self, request, queryset):
     if request.GET.get("items_per_page") == "-1":
         if request.GET.get("extract_stages"):
             queryset = queryset.exclude(
-                type="stage", childs__type="sub_stage")
+                type="stage", childs__type="sub_stage").order_by("type")
             return allItems(LessFieldsTaskSerializer, queryset)
+        if request.GET.get("excluded_dependencies"):
+            return excludedDependencies(LessFieldsTaskSerializer, queryset, request)
         return allItems(LessFieldsTaskSerializer, queryset)
     if request.GET.get("items_per_page") == "-2":
         return allItems(self.get_serializer, queryset)
     if request.GET.get('thumbnail'):
         return taskThumbnail(self, request, queryset)
     page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
+    serializer = self.get_serializer(
+        page, many=True, context={"request": request})
     return tasksResponse(self, serializer, project_id)
 
 
@@ -214,7 +220,7 @@ def checkAttributes(request):
 
 def excludedDependencies(serializerName, queryset, request):
     task = Task.objects.get(pk=request.GET.get("excluded_dependencies"))
-    queryset = queryset.exclude(pk=task.id)
+    queryset = queryset.exclude(pk=task.id).order_by("type")
     if task.dependencies:
         queryset = queryset.exclude(pk__in=task.dependencies)
     serializer = serializerName(queryset, many=True)

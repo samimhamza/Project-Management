@@ -75,6 +75,10 @@ class TaskSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
     parent = LessFieldsTaskSerializer()
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, task):
+        return users(self, task)
 
     class Meta:
         model = Task
