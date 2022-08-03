@@ -44,6 +44,26 @@ class ProjectPermissions(CustomPermissions):
     }
 
 
+class MyProjectPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'pass',
+        'retrieve': "pass",
+        'update': 'projects_u',
+        'partial_update': 'projects_u',
+        'destroy': 'projects_d',
+        'users': 'projects_v',
+        'add_users': 'projects_c',
+        'teams': 'projects_v',
+        'add_teams': 'projects_c',
+        'excluded_users': "users_v",
+        'excluded_teams': "teams_v",
+        'delete_users': 'projects_u',
+        'delete_teams': 'projects_u',
+        'add_attachments': 'project_attachments_c',
+        'delete_attachments': 'project_attachments_d'
+    }
+
+
 class ProjectCommentPermissions(CustomPermissions):
     actions_scopes = {
         'list': 'project_comments_v',

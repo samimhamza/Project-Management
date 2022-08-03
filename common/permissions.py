@@ -1,3 +1,4 @@
+import re
 from users.models import UserPermissionList, Permission, Action, SubAction, Role
 from users.models import Role, Permission, UserPermissionList, User
 from users.api.serializers import PermissionSerializer
@@ -47,6 +48,8 @@ class CustomPermissions(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated:
             for attr, value in self.actions_scopes.items():
+                if value == "pass":
+                    return True
                 if view.action == attr:
                     return checkScope(request.user, value)
             for attr, value in self.methods_scopes.items():

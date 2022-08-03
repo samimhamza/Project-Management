@@ -1,8 +1,7 @@
-from pydoc import describe
 from common.notification import sendNotification
+from projects.models import Stage, SubStage
 from common.pusher import pusher_client
 from users.models import User, Team
-from projects.models import Stage, SubStage
 from tasks.models import Task
 
 
@@ -75,7 +74,7 @@ def shareTo(request, project_data, new_project):
         teams = Team.objects.only('id').filter(pk__in=project_data["teams"])
         new_project.teams.set(teams)
     if project_data["share"] == "everyone":
-        users = User.objects.all()
+        users = User.objects.filter(deleted_at__isnull=True)
         new_project.users.set(users)
     if project_data["share"] != "justMe":
         [team_users, data] = getNotificationData(
