@@ -1,4 +1,5 @@
-from clients.models import ClientFeature,  PricePlan, Feature, Requirement, ClientService
+from http import client
+from clients.models import ClientFeature,  PricePlan, Feature, Requirement, ClientService,Client
 from clients.api.serializers import (
     ClientFeatureSerializer, ClientFeature, RequirementSerializer, PricePlanSerializer)
 from clients.api.clients.serializers import ClientServiceSerializer
@@ -51,3 +52,19 @@ class RequirementViewSet(Repository):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        requirement = self.get_object()
+        try:
+            client = Client.objects.only(
+                'id').get(pk=request.data["client"])
+        except Client.DoesNotExist:
+            return Response({"error": "Department does not exist!"}, status=404)
+        for key, value in request.data.items():
+            if key != "client":
+                setattr(requirement, key, value)
+        requirement.updated_by = request.user
+        requirement.client=client
+        requirement.save()
+        serializer = self.get_serializer(requirement)
+        return Response(serializer.data, status=202)
