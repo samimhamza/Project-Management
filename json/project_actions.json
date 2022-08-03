@@ -9,8 +9,8 @@
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
 			{ "code": "u", "name": "Update" },
-			{ "code": "e", "name": "Export" },
-			{ "code": "m", "name": "Member" }
+			{ "code": "m", "name": "Member" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -112,7 +112,9 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "m", "name": "Member" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{

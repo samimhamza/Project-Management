@@ -383,38 +383,38 @@ class FocalPoint(models.Model):
         return self.contact_name + " " + self.contact_last_name
 
 
-class ProjectRole(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64, unique=True)
-    project = models.ForeignKey(
-        Project, related_name="project_role", on_delete=models.CASCADE)
-    users = models.ManyToManyField(
-        'users.User', related_name="prole_users")
-    created_by = models.ForeignKey(
-        'users.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="prole_created_by",
-    )
-    updated_by = models.ForeignKey(
-        'users.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="prole_updated_by",
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="project_role_deleted_by",
-    )
+# class ProjectRole(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     name = models.CharField(max_length=64, unique=True)
+#     project = models.ForeignKey(
+#         Project, related_name="project_role", on_delete=models.CASCADE)
+#     users = models.ManyToManyField(
+#         'users.User', related_name="prole_users")
+#     created_by = models.ForeignKey(
+#         'users.User',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         related_name="prole_created_by",
+#     )
+#     updated_by = models.ForeignKey(
+#         'users.User',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         related_name="prole_updated_by",
+#     )
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     deleted_at = models.DateTimeField(blank=True, null=True)
+#     deleted_by = models.ForeignKey(
+#         "users.User",
+#         on_delete=models.SET_NULL,
+#         blank=True,
+#         null=True,
+#         related_name="project_role_deleted_by",
+#     )
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 
 class ProjectPermission(models.Model):
@@ -423,14 +423,12 @@ class ProjectPermission(models.Model):
         "users.Action", on_delete=models.CASCADE, related_name="project_action")
     sub_action = models.ForeignKey(
         "users.SubAction", on_delete=models.CASCADE, related_name="project_sub_action")
-    project_roles = models.ManyToManyField(
-        ProjectRole, related_name="permissions_roles")
-
-
-# class RolePermissionList(models.Model):
-#     prole = models.ForeignKey(
-#         ProjectRole, on_delete=models.CASCADE, related_name="prole_permissions")
-#     permissions_list = models.JSONField(blank=True, null=True)
+    project = models.ForeignKey(
+        Project, related_name="project_role", on_delete=models.CASCADE)
+    users = models.ManyToManyField(
+        "users.User", related_name="project_permissions")
+    # project_roles = models.ManyToManyField(
+    #     ProjectRole, related_name="permissions_roles")
 
 
 class Stage(models.Model):

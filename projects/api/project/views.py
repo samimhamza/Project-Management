@@ -3,10 +3,11 @@ from common.project_actions import (shareTo, notification, getAssignNotification
 from common.actions import (delete, allItems, filterRecords, countStatuses, addAttachment,
                             deleteAttachments, getAttachments, projectsOfUser, convertBase64ToImage)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
-from common.permissions_scopes import ProjectPermissions, MyProjectPermissions
 from users.api.teams.serializers import LessFieldsTeamSerializer
+from common.project_specific_scopes import MyProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
+from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
 from rest_framework.response import Response
 from rest_framework.decorators import action

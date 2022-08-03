@@ -10,7 +10,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -21,11 +22,11 @@
 			"order": 2
 		},
 		"sub_actions": [
-			{ "code": "dm", "name": "DeleteMember" },
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
 			{ "code": "u", "name": "Update" },
+			{ "code": "m", "name": "Member" },
 			{ "code": "e", "name": "Export" }
 		]
 	},
@@ -66,7 +67,9 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "m", "name": "Member" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -190,7 +193,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -204,7 +208,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -232,7 +237,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -265,19 +271,6 @@
 	},
 	{
 		"fields": {
-			"name": "trashes",
-			"codename": "tr",
-			"model": "Trashes",
-			"order": 20
-		},
-		"sub_actions": [
-			{ "code": "r", "name": "Restore" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" }
-		]
-	},
-	{
-		"fields": {
 			"name": "clients",
 			"codename": "cl",
 			"model": "Clients",
@@ -287,7 +280,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -301,7 +295,8 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
@@ -315,7 +310,21 @@
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "e", "name": "Export" }
+		]
+	},
+	{
+		"fields": {
+			"name": "trashes",
+			"codename": "tr",
+			"model": "Trashes",
+			"order": 20
+		},
+		"sub_actions": [
+			{ "code": "r", "name": "Restore" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" }
 		]
 	}
 ]

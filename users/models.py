@@ -210,8 +210,8 @@ class Permission(models.Model):
         Role, related_name="permissions_roles")
     users = models.ManyToManyField(
         User, related_name="permissions_users")
-    proles = models.ManyToManyField(
-        'projects.ProjectRole', related_name="projects_permissions")
+    # proles = models.ManyToManyField(
+    #     'projects.ProjectRole', related_name="projects_permissions")
 
 
 class UserPermissionList(models.Model):
