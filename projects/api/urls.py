@@ -1,4 +1,5 @@
-from projects.api.project.views import ProjectViewSet, MyProjectViewSet
+from projects.api.my_projects.views import MyProjectViewSet
+from projects.api.project.views import ProjectViewSet
 from .stage.views import StageViewSet, SubStageViewSet
 from rest_framework.routers import DefaultRouter
 from .department.views import DepartmentViewSet

@@ -1,40 +1,36 @@
-from common.project_actions import (shareTo, notification, getAssignNotification,
-                                    getRevokeNotification, broadcastProject, broadcastDeleteProject, addStagesToProject)
+from common.project_actions import (
+    notification, getAssignNotification, getRevokeNotification, broadcastProject, broadcastDeleteProject)
 from common.actions import (delete, allItems, filterRecords, countStatuses, addAttachment,
                             deleteAttachments, getAttachments, projectsOfUser, convertBase64ToImage)
-from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
+from projects.api.project.serializers import ProjectSerializer
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.project_specific_scopes import MyProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
-from common.permissions_scopes import ProjectPermissions
-from projects.models import Project, Department
+from common.my_project_actions import getPermission
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
 from users.models import User, Team
+from projects.models import Project
 from rest_framework import status
 from tasks.models import Task
 import os
 
 
-class ProjectViewSet(Repository):
+class MyProjectViewSet(Repository):
     model = Project
     queryset = Project.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ProjectSerializer
-    permission_classes = (ProjectPermissions,)
-    serializer_action_classes = {
-        "trashed": ProjectTrashedSerializer,
-    }
+    permission_classes = (MyProjectPermissions,)
+    serializer_action_classes = {}
     queryset_actions = {
         "destroy": Project.objects.all(),
-        "trashed": Project.objects.all(),
-        "restore": Project.objects.all(),
     }
 
     def list(self, request):
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().filter(users=request.user)
         queryset = filterRecords(queryset, request, table=Project)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ProjectNameListSerializer, queryset)
@@ -46,10 +42,16 @@ class ProjectViewSet(Repository):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(
             page, many=True, context={"request": request})
+        for project in serializer.data:
+            project["permissions"] = getPermission(
+                request.user, None, project["id"])
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        project = self.get_object()
+        try:
+            project = Project.objects.get(pk=pk, users=request.user)
+        except Project.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(project)
         data = serializer.data
         countables = [
@@ -63,37 +65,8 @@ class ProjectViewSet(Repository):
         data = getAttachments(request, data, project.id,
                               "project_attachments_v")
         data['statusTotals'] = countStatuses(Task, countables, project.id)
+        data["permissions"] = getPermission(request.user, project)
         return Response(data)
-
-    def create(self, request):
-        data = request.data
-        data["created_by"] = request.user
-        try:
-            department = Department.objects.only(
-                'id').get(pk=data["department"])
-        except Department.DoesNotExist:
-            return Response({"error": "Department does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-        imageField = convertBase64ToImage(data["banner"])
-        new_project = Project.objects.create(
-            name=data["name"],
-            department=department,
-            priority=data["priority"],
-            company_name=data["company_name"],
-            company_email=data["company_email"],
-            description=data["description"],
-            p_start_date=data["p_start_date"],
-            p_end_date=data["p_end_date"],
-            banner=imageField,
-            created_by=data["created_by"],
-            updated_by=data["created_by"],
-        )
-        new_project = shareTo(request, data, new_project)
-        new_project.save()
-        serializer = ProjectSerializer(
-            new_project, context={"request": request})
-        broadcastProject(new_project, serializer.data)
-        addStagesToProject(new_project, department, request)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
         project = self.get_object()
