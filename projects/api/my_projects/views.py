@@ -42,9 +42,9 @@ class MyProjectViewSet(Repository):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(
             page, many=True, context={"request": request})
-        for project in serializer.data:
-            project["permissions"] = getPermission(
-                request.user, None, project["id"])
+        # for project in serializer.data:
+        #     project["permissions"] = getPermission(
+        #         request.user, None, project["id"])
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):

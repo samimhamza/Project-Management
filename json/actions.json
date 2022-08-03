@@ -32,10 +32,19 @@
 	},
 	{
 		"fields": {
+			"name": "my_projects",
+			"codename": "mp",
+			"model": "My Projects",
+			"order": 3
+		},
+		"sub_actions": [{ "code": "e", "name": "Export" }]
+	},
+	{
+		"fields": {
 			"name": "project_attachments",
 			"codename": "pa",
 			"model": "Project Attachments",
-			"order": 3
+			"order": 4
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -49,7 +58,7 @@
 			"name": "project_comments",
 			"codename": "pco",
 			"model": "Project Comments",
-			"order": 4
+			"order": 5
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -61,7 +70,7 @@
 			"name": "project_tasks",
 			"codename": "pt",
 			"model": "Project Tasks",
-			"order": 5
+			"order": 6
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -77,7 +86,7 @@
 			"name": "task_comments",
 			"codename": "tc",
 			"model": "Task Comments",
-			"order": 6
+			"order": 7
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -89,7 +98,7 @@
 			"name": "task_attachments",
 			"codename": "tat",
 			"model": "Task Attachments",
-			"order": 7
+			"order": 8
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -103,7 +112,7 @@
 			"name": "project_incomes",
 			"codename": "pi",
 			"model": "Project Incomes",
-			"order": 8
+			"order": 9
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -117,7 +126,7 @@
 			"name": "income_attachments",
 			"codename": "ia",
 			"model": "Income Attachments",
-			"order": 9
+			"order": 10
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -131,7 +140,7 @@
 			"name": "project_expenses",
 			"codename": "pe",
 			"model": "Project Expenses",
-			"order": 10
+			"order": 11
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -145,7 +154,7 @@
 			"name": "expense_attachments",
 			"codename": "ea",
 			"model": "Expense Attachments",
-			"order": 11
+			"order": 12
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -159,7 +168,7 @@
 			"name": "project_payments",
 			"codename": "pp",
 			"model": "Project Payments",
-			"order": 12
+			"order": 13
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -173,7 +182,7 @@
 			"name": "project_focal_points",
 			"codename": "pf",
 			"model": "Project Focal Points",
-			"order": 13
+			"order": 14
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -187,7 +196,7 @@
 			"name": "users",
 			"codename": "u",
 			"model": "Users",
-			"order": 14
+			"order": 15
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -202,7 +211,7 @@
 			"name": "teams",
 			"codename": "t",
 			"model": "Teams",
-			"order": 15
+			"order": 16
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -217,7 +226,7 @@
 			"name": "reminders",
 			"codename": "r",
 			"model": "Reminders and Notes",
-			"order": 16
+			"order": 17
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -231,7 +240,7 @@
 			"name": "roles",
 			"codename": "ro",
 			"model": "Roles",
-			"order": 17
+			"order": 18
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -246,7 +255,7 @@
 			"name": "stages",
 			"codename": "s",
 			"model": "Stages",
-			"order": 18
+			"order": 19
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -260,7 +269,7 @@
 			"name": "sub_stages",
 			"codename": "sub",
 			"model": "Sub Stages",
-			"order": 19
+			"order": 20
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -319,7 +328,7 @@
 			"name": "trashes",
 			"codename": "tr",
 			"model": "Trashes",
-			"order": 20
+			"order": 24
 		},
 		"sub_actions": [
 			{ "code": "r", "name": "Restore" },
