@@ -1,10 +1,8 @@
 from common.project_actions import (
-    notification, getRevokeNotification, update, retrieve, add_users, add_teams, members)
-from common.actions import (allItems, filterRecords, addAttachment,
-                            deleteAttachments, projectsOfUser)
+    notification, getRevokeNotification, list, update, retrieve, add_users, add_teams, members, users, teams)
+from common.actions import (addAttachment, deleteAttachments)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from projects.api.project.serializers import ProjectSerializer
-from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import checkProjectScope
@@ -29,18 +27,7 @@ class MyProjectViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset().filter(users=request.user)
-        queryset = filterRecords(queryset, request, table=Project)
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(ProjectNameListSerializer, queryset)
-        if request.GET.get("items_per_page") == "-2":
-            return allItems(self.get_serializer, queryset)
-
-        if request.GET.get("user_id"):
-            return projectsOfUser(self, request, queryset)
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(
-            page, many=True, context={"request": request})
-        return self.get_paginated_response(serializer.data)
+        return list(self, request, queryset)
 
     def retrieve(self, request, pk=None):
         try:
@@ -71,6 +58,23 @@ class MyProjectViewSet(Repository):
             "detail": "You do not have permission to perform this action."
         }, status=status.HTTP_403_FORBIDDEN)
 
+    # Custom Actions
+    @ action(detail=True, methods=["get"])
+    def users(self, request, pk=None):
+        try:
+            project = Project.objects.only('id').get(pk=pk, users=request.user)
+        except Project.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        return users(self, request, project)
+
+    @ action(detail=True, methods=["get"])
+    def teams(self, request, pk=None):
+        try:
+            project = Project.objects.only('id').get(pk=pk, users=request.user)
+        except Project.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        return teams(self, request, project)
+
     @action(detail=True, methods=["post"])
     def add_users(self, request, pk=None):
         return members(add_users, request, pk)
@@ -79,7 +83,7 @@ class MyProjectViewSet(Repository):
     def add_teams(self, request, pk=None):
         return members(add_teams, request, pk)
 
-    @ action(detail=True, methods=["delete"])
+    @action(detail=True, methods=["delete"])
     def delete_users(self, request, pk=None):
         try:
             project = self.get_object()
@@ -94,7 +98,7 @@ class MyProjectViewSet(Repository):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @ action(detail=True, methods=["delete"])
+    @action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
         try:
             project = self.get_object()
@@ -109,15 +113,15 @@ class MyProjectViewSet(Repository):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @ action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
         return addAttachment(self, request)
 
-    @ action(detail=True, methods=["delete"])
+    @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
 
-    @ action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
         users = User.objects.filter(
             deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
@@ -125,7 +129,7 @@ class MyProjectViewSet(Repository):
             users, many=True,  context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @ action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get"])
     def excluded_teams(self, request, pk=None):
         teams = Team.objects.filter(deleted_at__isnull=True).exclude(
             projects__id=pk).order_by("-created_at")

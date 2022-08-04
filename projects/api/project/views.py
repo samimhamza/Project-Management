@@ -1,10 +1,9 @@
 from common.project_actions import (shareTo, notification, getRevokeNotification, broadcastProject,
-                                    broadcastDeleteProject, addStagesToProject, update, retrieve, add_users, add_teams)
+                                    broadcastDeleteProject, addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
-from common.actions import (delete, allItems, filterRecords, addAttachment,
-                            deleteAttachments, projectsOfUser, convertBase64ToImage)
+from common.actions import (delete, filterRecords, addAttachment,
+                            deleteAttachments, convertBase64ToImage)
 from users.api.teams.serializers import LessFieldsTeamSerializer
-from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
@@ -32,18 +31,7 @@ class ProjectViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Project)
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(ProjectNameListSerializer, queryset)
-        if request.GET.get("items_per_page") == "-2":
-            return allItems(self.get_serializer, queryset)
-
-        if request.GET.get("user_id"):
-            return projectsOfUser(self, request, queryset)
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(
-            page, many=True, context={"request": request})
-        return self.get_paginated_response(serializer.data)
+        return list(self, request, queryset)
 
     def retrieve(self, request, pk=None):
         project = self.get_object()
@@ -94,34 +82,13 @@ class ProjectViewSet(Repository):
     # Custom Actions
     @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
-        project = Project.objects.only('id').get(pk=pk)
-        users = User.objects.filter(project_users=project)
-        if request.query_params.get('content'):
-            columns = ['first_name', 'last_name', 'email']
-            users = filterRecords(users, request, columns, table=User)
-            serializer = UserWithProfileSerializer(
-                users, many=True,  context={"request": request})
-            return Response(serializer.data)
-
-        page = self.paginate_queryset(users)
-        serializer = UserWithProfileSerializer(
-            page, many=True,  context={"request": request})
-        return self.get_paginated_response(serializer.data)
+        project = self.get_object()
+        return users(self, request, project)
 
     @ action(detail=True, methods=["get"])
     def teams(self, request, pk=None):
-        project = Project.objects.only('id').get(pk=pk)
-        teams = Team.objects.filter(projects=project)
-        if request.query_params.get('content'):
-            columns = ['name']
-            teams = filterRecords(teams, request, columns, table=Team)
-            serializer = LessFieldsTeamSerializer(
-                teams, many=True, context={"request": request})
-            return Response(serializer.data)
-        page = self.paginate_queryset(teams)
-        serializer = LessFieldsTeamSerializer(
-            page, many=True, context={"request": request})
-        return self.get_paginated_response(serializer.data)
+        project = self.get_object()
+        return teams(self, request, project)
 
     @ action(detail=True, methods=["post"])
     def add_users(self, request, pk=None):

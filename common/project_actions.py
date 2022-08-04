@@ -1,6 +1,8 @@
-from common.actions import convertBase64ToImage, getAttachments, countStatuses
+from common.actions import (convertBase64ToImage, getAttachments,
+                            countStatuses, filterRecords, allItems, projectsOfUser)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
+from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.notification import sendNotification
 from common.permissions import checkProjectScope
@@ -100,8 +102,6 @@ def addStagesToProject(project, department, request):
             name=stage.name,
             description=stage.description,
             project=project,
-            # created_by=request.user,
-            # updated_by=request.user,
             type="stage"
         )
         sub_stages = SubStage.objects.filter(
@@ -112,10 +112,23 @@ def addStagesToProject(project, department, request):
                 description=sub_stage.description,
                 parent=task,
                 project=project,
-                # created_by=request.user,
-                # updated_by=request.user,
                 type="sub_stage"
             )
+
+
+def list(self, request, queryset):
+    queryset = filterRecords(queryset, request, table=Project)
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(ProjectNameListSerializer, queryset)
+    if request.GET.get("items_per_page") == "-2":
+        return allItems(self.get_serializer, queryset)
+
+    if request.GET.get("user_id"):
+        return projectsOfUser(self, request, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(
+        page, many=True, context={"request": request})
+    return self.get_paginated_response(serializer.data)
 
 
 def update(self, request, project):
@@ -158,6 +171,34 @@ def retrieve(self, request, project, showPermission=False):
     if showPermission:
         data["permissions"] = getProjectPermissions(request.user, project)
     return Response(data)
+
+
+def users(self, request, project):
+    users = User.objects.filter(project_users=project)
+    if request.query_params.get('content'):
+        columns = ['first_name', 'last_name', 'email']
+        users = filterRecords(users, request, columns, table=User)
+        serializer = UserWithProfileSerializer(
+            users, many=True,  context={"request": request})
+        return Response(serializer.data)
+    page = self.paginate_queryset(users)
+    serializer = UserWithProfileSerializer(
+        page, many=True,  context={"request": request})
+    return self.get_paginated_response(serializer.data)
+
+
+def teams(self, request, project):
+    teams = Team.objects.filter(projects=project)
+    if request.query_params.get('content'):
+        columns = ['name']
+        teams = filterRecords(teams, request, columns, table=Team)
+        serializer = LessFieldsTeamSerializer(
+            teams, many=True, context={"request": request})
+        return Response(serializer.data)
+    page = self.paginate_queryset(teams)
+    serializer = LessFieldsTeamSerializer(
+        page, many=True, context={"request": request})
+    return self.get_paginated_response(serializer.data)
 
 
 def add_users(request, project):
