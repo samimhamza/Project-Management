@@ -1,0 +1,20 @@
+SECRET_KEY = "django-insecure-(4tzh!nb4rvwj^ih9lr#yr(d2b)jn5g1e$!mie@ol12=6(ri=p"
+DATABASE_ENGINE = "django.db.backends.postgresql"
+DATABASE_NAME = "taskmanager"
+DATABASE_USER = 'postgres'
+DATABASE_PASSWORD = '1234'
+DATABASE_HOST = 'localhost'
+EMAIL = 'teebalhoor@teebalhoor.com'
+EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST_USER = 'a9c3ea573a804c'
+EMAIL_HOST_PASSWORD = '2f140c9fb25937'
+EMAIL_PORT = '2525'
+PUSHER_APP_ID = "1353068"
+PUSHER_KEY = "1c669cf415f73a2a8092"
+PUSHER_SECRET = "e3750e845fcd804db13e"
+PUSHER_CLUSTER = "mt1"
+
+PUSHER_APP_ID="429503"
+PUSHER_KEY="978b75db727762c090f4"
+PUSHER_SECRET="15dda3e19a593c59283d"
+PUSHER_CLUSTER="eu"

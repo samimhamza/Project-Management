@@ -1,0 +1,7 @@
+[
+	{
+		"model": "users.role",
+		"pk": "452185a1-8a18-4d30-8ae8-3888ef2452be",
+		"fields": { "name": "Admin" }
+	}
+]

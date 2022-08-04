@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/ClientModal.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/InfoStep.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/PersonalSlideContent.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/ProductStep.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/PublicSlideContent.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/clients/ServiceStep.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/clients/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/SideNav.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/layouts/SideNav.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/Profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/Profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/UserInfoSlide.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/components/users/user/UserInfoSlide.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../project_management_froentend/src/pages/copy.js" beforeDir="false" afterPath="$PROJECT_DIR$/../project_management_froentend/src/pages/copy.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../project_management_froentend" />
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="75199aad-3740-4907-94a1-5d395995fbc7" />
+        <option name="url" value="https://github.com/Asadullahmoradi/project_management_froentend.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="28Be3CgJ9DFP6LBckYEgTQmTsY9" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/Dell/Documents/GitHub/project_management_froentend/src/components/clients",
+    "nodejs_package_manager_path": "yarn",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2022.1\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\clients" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\main" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\trash" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\pages\trashes" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\expense" />
+      <recent name="C:\Users\Dell\Documents\GitHub\project_management_froentend\src\components\project\tasks" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="88de220f-e06f-499a-ab05-958ea9cfc34a" name="Default Changelist" comment="" />
+      <created>1650694204573</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1650694204573</updated>
+      <workItem from="1650694207466" duration="5411000" />
+      <workItem from="1650857534523" duration="1751000" />
+      <workItem from="1651032595064" duration="60000" />
+      <workItem from="1651043752135" duration="1622000" />
+      <workItem from="1651048420068" duration="3528000" />
+      <workItem from="1651289456673" duration="15658000" />
+      <workItem from="1651308788720" duration="1225000" />
+      <workItem from="1651310221409" duration="3724000" />
+      <workItem from="1651635168798" duration="28762000" />
+      <workItem from="1651721609854" duration="682000" />
+      <workItem from="1651724516106" duration="214000" />
+      <workItem from="1651725168835" duration="2092000" />
+      <workItem from="1651732360732" duration="16867000" />
+      <workItem from="1651894660923" duration="764000" />
+      <workItem from="1651896446874" duration="10295000" />
+      <workItem from="1651907681475" duration="2631000" />
+      <workItem from="1651914446885" duration="12673000" />
+      <workItem from="1651981120865" duration="10772000" />
+      <workItem from="1651992338036" duration="3768000" />
+      <workItem from="1652001069510" duration="12113000" />
+      <workItem from="1652067189225" duration="15824000" />
+      <workItem from="1652086628849" duration="12516000" />
+      <workItem from="1652153590123" duration="542000" />
+      <workItem from="1652154705002" duration="414000" />
+      <workItem from="1652155253728" duration="5263000" />
+      <workItem from="1652846090064" duration="2172000" />
+      <workItem from="1653104239245" duration="957000" />
+      <workItem from="1653296783119" duration="12027000" />
+      <workItem from="1653363199447" duration="14492000" />
+      <workItem from="1653383572353" duration="11410000" />
+      <workItem from="1653450251810" duration="27118000" />
+      <workItem from="1653537837151" duration="20302000" />
+      <workItem from="1653710069890" duration="28573000" />
+      <workItem from="1653795504609" duration="374000" />
+      <workItem from="1654506746740" duration="11959000" />
+      <workItem from="1654573105719" duration="13715000" />
+      <workItem from="1654592741024" duration="11948000" />
+      <workItem from="1654659508622" duration="15560000" />
+      <workItem from="1654745631937" duration="23766000" />
+      <workItem from="1654773661003" duration="4187000" />
+      <workItem from="1654918471563" duration="15547000" />
+      <workItem from="1654938434055" duration="10374000" />
+      <workItem from="1655004938418" duration="13516000" />
+      <workItem from="1655022943376" duration="10917000" />
+      <workItem from="1655091147448" duration="6113000" />
+      <workItem from="1655098295463" duration="3932000" />
+      <workItem from="1655102576700" duration="4401000" />
+      <workItem from="1655111044380" duration="10712000" />
+      <workItem from="1655177985138" duration="11597000" />
+      <workItem from="1655190647038" duration="2891000" />
+      <workItem from="1655197501034" duration="12290000" />
+      <workItem from="1655264229326" duration="8321000" />
+      <workItem from="1655275612282" duration="4094000" />
+      <workItem from="1655283971055" duration="8741000" />
+      <workItem from="1655350598532" duration="15353000" />
+      <workItem from="1655370131764" duration="11160000" />
+      <workItem from="1655523331735" duration="14615000" />
+      <workItem from="1655543292725" duration="9555000" />
+      <workItem from="1655610045996" duration="14424000" />
+      <workItem from="1655629660794" duration="4475000" />
+      <workItem from="1655634289384" duration="72000" />
+      <workItem from="1655634696911" duration="2380000" />
+      <workItem from="1655695978255" duration="8090000" />
+      <workItem from="1655707759105" duration="1094000" />
+      <workItem from="1655709820919" duration="1087000" />
+      <workItem from="1655717595378" duration="10473000" />
+      <workItem from="1655782339008" duration="1072000" />
+      <workItem from="1655784013941" duration="8422000" />
+      <workItem from="1655793750137" duration="14557000" />
+      <workItem from="1655869923991" duration="14045000" />
+      <workItem from="1655886583075" duration="7740000" />
+      <workItem from="1655895742732" duration="3157000" />
+      <workItem from="1655899284251" duration="1453000" />
+      <workItem from="1655955600612" duration="12570000" />
+      <workItem from="1655974922627" duration="10953000" />
+      <workItem from="1656128626648" duration="13198000" />
+      <workItem from="1656147915459" duration="6878000" />
+      <workItem from="1656214663605" duration="1471000" />
+      <workItem from="1656217369016" duration="7397000" />
+      <workItem from="1656226972402" duration="3137000" />
+      <workItem from="1656234181973" duration="5882000" />
+      <workItem from="1656240146559" duration="6185000" />
+      <workItem from="1656300996550" duration="13880000" />
+      <workItem from="1656320928718" duration="11411000" />
+      <workItem from="1656387640093" duration="12695000" />
+      <workItem from="1656407350101" duration="8146000" />
+      <workItem from="1656474007248" duration="6714000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/DateAndProgress.js</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/PageHeader.js</url>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/TaskBadge.js</url>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/pages/projects/show.js</url>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/income/Create.js</url>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/Company.js</url>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/pages/focalPoint.js</url>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskComponent.js</url>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/project/tasks/TaskUsersAvatar.js</url>
+          <line>20</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/trash/TrashDropdown.js</url>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../project_management_froentend/src/components/customComponents/AddAndRemoveItems.js</url>
+          <line>38</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
