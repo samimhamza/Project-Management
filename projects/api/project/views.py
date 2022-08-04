@@ -1,10 +1,9 @@
-from common.project_actions import (shareTo, notification, getAssignNotification,
-                                    getRevokeNotification, broadcastProject, broadcastDeleteProject, addStagesToProject)
-from common.actions import (delete, allItems, filterRecords, countStatuses, addAttachment,
-                            deleteAttachments, getAttachments, projectsOfUser, convertBase64ToImage)
+from common.project_actions import (shareTo, notification, getRevokeNotification, broadcastProject,
+                                    broadcastDeleteProject, addStagesToProject, update, retrieve, add_users, add_teams)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
+from common.actions import (delete, allItems, filterRecords, addAttachment,
+                            deleteAttachments, projectsOfUser, convertBase64ToImage)
 from users.api.teams.serializers import LessFieldsTeamSerializer
-from common.project_specific_scopes import MyProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
@@ -14,8 +13,6 @@ from rest_framework.decorators import action
 from common.Repository import Repository
 from users.models import User, Team
 from rest_framework import status
-from tasks.models import Task
-import os
 
 
 class ProjectViewSet(Repository):
@@ -50,20 +47,7 @@ class ProjectViewSet(Repository):
 
     def retrieve(self, request, pk=None):
         project = self.get_object()
-        serializer = self.get_serializer(project)
-        data = serializer.data
-        countables = [
-            'pendingTasksTotal', 'status', 'pending',
-            'inProgressTasksTotal', 'status', 'in_progress',
-            'completedTasksTotal', 'status', 'completed',
-            'issuFacedTasksTotal', 'status', 'issue_faced',
-            'failedTasksTotal', 'status', 'failed',
-            'cancelledTasksTotal', 'status', 'cancelled'
-        ]
-        data = getAttachments(request, data, project.id,
-                              "project_attachments_v")
-        data['statusTotals'] = countStatuses(Task, countables, project.id)
-        return Response(data)
+        return retrieve(self, request, project)
 
     def create(self, request):
         data = request.data
@@ -97,26 +81,7 @@ class ProjectViewSet(Repository):
 
     def update(self, request, pk=None):
         project = self.get_object()
-        data = request.data
-        if request.data.get("users") is not None:
-            project.users.set(request.data.get("users"))
-        if request.data.get("teams") is not None:
-            project.teams.set(request.data.get("teams"))
-        if request.data.get("banner"):
-            imageField = convertBase64ToImage(data["banner"])
-            if imageField:
-                if os.path.isfile('media/'+str(project.banner)):
-                    os.remove('media/'+str(project.banner))
-                project.banner = imageField
-        for key, value in data.items():
-            if key != "users" and key != "teams" and key != "id" and key != "department" and key != "banner":
-                setattr(project, key, value)
-        project.updated_by = request.user
-        project.save()
-        serializer = ProjectSerializer(
-            project, context={"request": request})
-        broadcastProject(project, serializer.data)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return update(self, request, project)
 
     def destroy(self, request, pk=None):
         response = delete(self, request, Project)
@@ -161,16 +126,8 @@ class ProjectViewSet(Repository):
     @ action(detail=True, methods=["post"])
     def add_users(self, request, pk=None):
         try:
-            data = request.data
             project = self.get_object()
-            users = User.objects.filter(pk__in=data['ids'])
-            for user in data['ids']:
-                project.users.add(user)
-            notification(getAssignNotification, project,
-                         request, 'pk__in', data['ids'])
-            serializer = UserWithProfileSerializer(
-                users, many=True, context={"request": request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return add_users(request, project)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
@@ -179,16 +136,8 @@ class ProjectViewSet(Repository):
     @ action(detail=True, methods=["post"])
     def add_teams(self, request, pk=None):
         try:
-            data = request.data
             project = self.get_object()
-            teams = Team.objects.filter(pk__in=data['ids'])
-            for user in data['ids']:
-                project.teams.add(user)
-            notification(getAssignNotification,
-                         project, request, 'teams__in', data['ids'])
-            serializer = LessFieldsTeamSerializer(
-                teams, many=True, context={"request": request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return add_teams(request, project)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST

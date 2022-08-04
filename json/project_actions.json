@@ -7,8 +7,6 @@
 			"order": 1
 		},
 		"sub_actions": [
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
 			{ "code": "u", "name": "Update" },
 			{ "code": "m", "name": "Member" },
 			{ "code": "e", "name": "Export" }

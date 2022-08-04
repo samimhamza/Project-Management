@@ -1,8 +1,17 @@
+from common.actions import convertBase64ToImage, getAttachments, countStatuses
+from users.api.teams.serializers import LessFieldsTeamSerializer
+from common.my_project_permissions import getProjectPermissions
+from users.api.serializers import UserWithProfileSerializer
 from common.notification import sendNotification
+from common.permissions import checkProjectScope
+from rest_framework.response import Response
 from projects.models import Stage, SubStage
 from common.pusher import pusher_client
 from users.models import User, Team
+from projects.models import Project
+from rest_framework import status
 from tasks.models import Task
+import os
 
 
 def broadcastProject(item, data, update=False):
@@ -107,3 +116,87 @@ def addStagesToProject(project, department, request):
                 # updated_by=request.user,
                 type="sub_stage"
             )
+
+
+def update(self, request, project):
+    data = request.data
+    if request.data.get("users") is not None:
+        project.users.set(request.data.get("users"))
+    if request.data.get("teams") is not None:
+        project.teams.set(request.data.get("teams"))
+    if request.data.get("banner"):
+        imageField = convertBase64ToImage(data["banner"])
+        if imageField:
+            if os.path.isfile('media/'+str(project.banner)):
+                os.remove('media/'+str(project.banner))
+            project.banner = imageField
+    for key, value in data.items():
+        if key != "users" and key != "teams" and key != "id" and key != "department" and key != "banner":
+            setattr(project, key, value)
+    project.updated_by = request.user
+    project.save()
+    serializer = self.get_serializer(
+        project, context={"request": request})
+    broadcastProject(project, serializer.data)
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def retrieve(self, request, project, showPermission=False):
+    serializer = self.get_serializer(project)
+    data = serializer.data
+    countables = [
+        'pendingTasksTotal', 'status', 'pending',
+        'inProgressTasksTotal', 'status', 'in_progress',
+        'completedTasksTotal', 'status', 'completed',
+        'issuFacedTasksTotal', 'status', 'issue_faced',
+        'failedTasksTotal', 'status', 'failed',
+        'cancelledTasksTotal', 'status', 'cancelled'
+    ]
+    data = getAttachments(request, data, project.id,
+                          "project_attachments_v")
+    data['statusTotals'] = countStatuses(Task, countables, project.id)
+    if showPermission:
+        data["permissions"] = getProjectPermissions(request.user, project)
+    return Response(data)
+
+
+def add_users(request, project):
+    data = request.data
+    users = User.objects.filter(pk__in=data['ids'])
+    for user in data['ids']:
+        project.users.add(user)
+    notification(getAssignNotification, project,
+                 request, 'pk__in', data['ids'])
+    serializer = UserWithProfileSerializer(
+        users, many=True, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def add_teams(request, project):
+    data = request.data
+    teams = Team.objects.filter(pk__in=data['ids'])
+    for user in data['ids']:
+        project.teams.add(user)
+    notification(getAssignNotification,
+                 project, request, 'teams__in', data['ids'])
+    serializer = LessFieldsTeamSerializer(
+        teams, many=True, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def members(method, request, pk):
+    try:
+        try:
+            project = Project.objects.get(pk=pk, users=request.user)
+        except Project.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if checkProjectScope(request.user, project, "projectd_m"):
+            return method(request, project)
+        else:
+            return Response({
+                "detail": "You do not have permission to perform this action."
+            }, status=status.HTTP_403_FORBIDDEN)
+    except:
+        return Response(
+            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )

@@ -1,6 +1,6 @@
-import re
 from users.models import UserPermissionList, Permission, Action, SubAction, Role
 from users.models import Role, Permission, UserPermissionList, User
+from common.my_project_permissions import getProjectPermissions
 from users.api.serializers import PermissionSerializer
 from rest_framework import permissions
 from django.db.models import Q
@@ -14,6 +14,14 @@ def checkScope(user, scope):
         return False
 
     if scope in permissionScopes.permissions_list:
+        return True
+    else:
+        return False
+
+
+def checkProjectScope(user, project, scope):
+    permissionScopes = getProjectPermissions(user, project)
+    if scope in permissionScopes:
         return True
     else:
         return False
@@ -48,8 +56,6 @@ class CustomPermissions(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated:
             for attr, value in self.actions_scopes.items():
-                if value == "pass":
-                    return True
                 if view.action == attr:
                     return checkScope(request.user, value)
             for attr, value in self.methods_scopes.items():

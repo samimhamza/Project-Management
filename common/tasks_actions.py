@@ -1,5 +1,5 @@
-from os import stat
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer
+from common.my_project_permissions import getTaskPermissions
 from common.notification import sendNotification
 from .actions import allItems, countStatuses
 from rest_framework.response import Response
@@ -160,8 +160,7 @@ def taskThumbnail(self, request, queryset):
 
 def tasksOfProject(self, request, queryset):
     project_id = request.GET.get("project_id")
-    queryset = queryset.filter(project=request.GET.get(
-        "project_id")).order_by("-created_at")
+    queryset = queryset.filter(project=project_id).order_by("-created_at")
     if request.GET.get("items_per_page") == "-1":
         if request.GET.get("extract_stages"):
             queryset = queryset.exclude(
@@ -177,6 +176,9 @@ def tasksOfProject(self, request, queryset):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(
         page, many=True, context={"request": request})
+    for task in serializer.data:
+        task["permissions"] = getTaskPermissions(
+            request.user, None, project_id)
     return tasksResponse(self, serializer, project_id)
 
 
