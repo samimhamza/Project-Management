@@ -1,12 +1,12 @@
-from common.actions import withTrashed, trashList, restore, delete, allItems, dataWithPermissions, filterRecords
 from common.permissions_scopes import HolidayPermissions, ReminderPermissions, RolePermissions
 from users.models import Reminder, Holiday, Action, Permission, Role, UserNotification
-from common.custom import CustomPageNumberPagination
+from common.actions import allItems, dataWithPermissions, filterRecords
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import addPermissionsToRole
-from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from common.Repository import Repository
+from rest_framework import status
 from users.api.serializers import (
     ReminderSerializer,
     HolidaySerializer,
@@ -20,10 +20,10 @@ from users.api.serializers import (
 from rest_framework import generics
 
 
-class HolidayViewSet(viewsets.ModelViewSet):
+class HolidayViewSet(Repository):
+    model = Holiday
     queryset = Holiday.objects.all()
     serializer_class = HolidaySerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (HolidayPermissions,)
 
 
@@ -45,10 +45,10 @@ class PermmissionListAPIView(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class NotificationViewSet(viewsets.ModelViewSet):
+class NotificationViewSet(Repository):
+    model = UserNotification
     queryset = UserNotification.objects.all()
     serializer_class = UserNotificationSerializer
-    pagination_class = CustomPageNumberPagination
 
     def list(self, request):
         queryset = self.get_queryset().filter(
@@ -68,10 +68,10 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Response()
 
 
-class ReminderViewSet(viewsets.ModelViewSet):
+class ReminderViewSet(Repository):
+    model = Reminder
     queryset = Reminder.objects.all().order_by("-updated_at")
     serializer_class = ReminderSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (ReminderPermissions,)
 
     def list(self, request):
@@ -88,15 +88,12 @@ class ReminderViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    def destroy(self, request, pk=None):
-        return delete(self, request, Reminder)
 
-
-class RoleViewSet(viewsets.ModelViewSet):
+class RoleViewSet(Repository):
+    model = Role
     queryset = Role.objects.filter(
         deleted_at__isnull=True).order_by("-updated_at")
     serializer_class = RoleSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (RolePermissions,)
     serializer_action_classes = {
         "trashed": RoleTrashedSerializer
@@ -110,6 +107,8 @@ class RoleViewSet(viewsets.ModelViewSet):
         queryset = filterRecords(queryset, request,  table=Role)
         if request.GET.get("items_per_page") == "-1":
             return allItems(RoleListSerializer, queryset)
+        if request.GET.get("items_per_page") == "-2":
+            return allItems(self.get_serializer, queryset)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(
@@ -125,7 +124,7 @@ class RoleViewSet(viewsets.ModelViewSet):
             updated_by=data["created_by"],
         )
         addPermissionsToRole(data['permissions'], new_role)
-        serializer = RoleSerializer(new_role)
+        serializer = RoleSerializer(new_role, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
@@ -141,35 +140,8 @@ class RoleViewSet(viewsets.ModelViewSet):
         serializer = RoleSerializer(role, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-    def destroy(self, request, pk=None):
-        return delete(self, request, Role)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Role, order_by="-updated_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Role)
-
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Role)
-
     @action(detail=False, methods=["get"])
     def auth_user(self, request, pk=None):
         user = request.user
         serializer = RoleSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()

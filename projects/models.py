@@ -131,13 +131,14 @@ class State(models.Model):
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=30, null=True, blank=True)
+    name = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    p_start_date = models.DateTimeField(null=True, blank=True)
-    p_end_date = models.DateTimeField(null=True, blank=True)
-    a_start_date = models.DateTimeField(null=True, blank=True)
-    a_end_date = models.DateTimeField(null=True, blank=True)
-    banner = models.CharField(max_length=120, null=True, blank=True)
+    p_start_date = models.DateField(null=True, blank=True)
+    p_end_date = models.DateField(null=True, blank=True)
+    a_start_date = models.DateField(null=True, blank=True)
+    a_end_date = models.DateField(null=True, blank=True)
+    banner = models.ImageField(
+        upload_to="project_banners", blank=True, null=True)
     department = models.ForeignKey(
         Department, related_name="department", on_delete=models.SET_NULL, null=True)
 
@@ -248,6 +249,7 @@ class Income(models.Model):
     description = models.TextField(blank=True, null=True)
     amount = models.DecimalField(
         max_digits=19, decimal_places=2, blank=True, null=True)
+    date = models.DateField()
 
     class Types(models.TextChoices):
         initial_cost = "initial_cost"
@@ -293,6 +295,7 @@ class Payment(models.Model):
         Income, on_delete=models.SET_NULL, null=True, related_name='payments')
     source = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=19, decimal_places=2)
+    date = models.DateField()
 
     class PaymentMethods(models.TextChoices):
         cash = "cash"
@@ -380,54 +383,36 @@ class FocalPoint(models.Model):
         return self.contact_name + " " + self.contact_last_name
 
 
-class ProjectRole(models.Model):
+class SubAction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    code = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=64, unique=True)
-    project = models.ForeignKey(
-        Project, related_name="project_role", on_delete=models.CASCADE)
-    users = models.ManyToManyField(
-        'users.User', related_name="prole_users")
-    created_by = models.ForeignKey(
-        'users.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="prole_created_by",
-    )
-    updated_by = models.ForeignKey(
-        'users.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="prole_updated_by",
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="project_role_deleted_by",
-    )
 
     def __str__(self):
         return self.name
 
 
-# class ProjectPermission(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     action = models.ForeignKey(
-#         "users.Action", on_delete=models.CASCADE, related_name="project_action")
-#     sub_action = models.ForeignKey(
-#         "users.SubAction", on_delete=models.CASCADE, related_name="project_sub_action")
-#     proles = models.ManyToManyField(
-#         ProjectRole, related_name="permissions_roles")
+class Action(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64, unique=True)
+    codename = models.CharField(max_length=64, unique=True)
+    model = models.CharField(max_length=64, unique=True)
+    order = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.name
 
 
-# class RolePermissionList(models.Model):
-#     prole = models.ForeignKey(
-#         ProjectRole, on_delete=models.CASCADE, related_name="prole_permissions")
-#     permissions_list = models.JSONField(blank=True, null=True)
+class ProjectPermission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    action = models.ForeignKey(
+        Action, on_delete=models.CASCADE, related_name="project_action")
+    sub_action = models.ForeignKey(
+        SubAction, on_delete=models.CASCADE, related_name="project_sub_action")
+    project = models.ForeignKey(
+        Project, related_name="project_role", on_delete=models.CASCADE)
+    users = models.ManyToManyField(
+        "users.User", related_name="project_permissions")
 
 
 class Stage(models.Model):

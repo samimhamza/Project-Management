@@ -1,6 +1,6 @@
-from itertools import product
+from django.contrib.contenttypes.fields import GenericRelation
+from projects.models import Country, Attachment
 from django.db import models
-from projects.models import Country
 import uuid
 
 
@@ -34,15 +34,12 @@ class Service(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128, null=True, blank=True)
+    name = models.CharField(max_length=128)
     developed_by = models.CharField(max_length=128, blank=True, null=True)
     details = models.TextField(blank=True, null=True)
     photo = models.ImageField(
@@ -72,61 +69,37 @@ class Product(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class Feature(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128, null=True, blank=True)
+    name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
+
     class Types(models.TextChoices):
-        main = "main" 
-        additional = "additional" 
+        main = "main"
+        additional = "additional"
 
     type = models.CharField(
         max_length=24, choices=Types.choices, default="main"
     )
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="feature_created_by"
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="feature_updated_by"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="feature_deleted_by",
-    )
+    product = models.ForeignKey(
+        Product, null=True, on_delete=models.CASCADE, related_name="product_features")
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.name
 
 
 class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=32, blank=True, null=True)
     whatsapp = models.CharField(max_length=64, blank=True, null=True)
+    profile = models.ImageField(
+        upload_to="client_profiles", blank=True, null=True)
     country = models.ForeignKey(
         Country,
         on_delete=models.SET_NULL,
@@ -139,7 +112,7 @@ class Client(models.Model):
         Service, through="ClientService", related_name="%(class)ss"
     )
     features = models.ManyToManyField(
-        Feature, through="ClientProduct", related_name="%(class)ss"
+        Feature, through="ClientFeature", related_name="%(class)ss"
     )
 
     class HearAboutUs(models.TextChoices):
@@ -152,10 +125,10 @@ class Client(models.Model):
         snapchat_ads = "snapchat_ads"
         twitter_ads = "twitter_ads"
         tiktok_ads = "tiktok_ads"
-        other_social_media_ads = "ther_social_media_ads"
+        other_social_media_ads = "other_social_media_ads"
         email = "email"
         radio = "radio"
-        tv = "TV"
+        tv = "tv"
         newspaper = "newspaper"
         word_of_mouth = "word_of_mouth"
         other = "other"
@@ -232,10 +205,7 @@ class Client(models.Model):
     )
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "No Name"
+        return self.first_name
 
 
 class ClientService(models.Model):
@@ -245,50 +215,33 @@ class ClientService(models.Model):
     client = models.ForeignKey(
         Client, null=True, on_delete=models.SET_NULL, related_name='clientService_client')
     details = models.TextField(blank=True, null=True)
+    attachments = GenericRelation(
+        Attachment,
+        content_type_field="content_type",
+        object_id_field="object_id",
+        related_query_name='comments'
+    )
 
     def __str__(self):
-        if self.details:
-            return self.details
+        if self.client:
+            return self.client.first_name
         else:
-            return "No Details"
+            return self.details
 
 
 class PricePlan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    plan_name = models.CharField(max_length=128, null=True, blank=True)
+    plan_name = models.CharField(max_length=128)
     plan_price = models.FloatField(max_length=120, null=True, blank=True)
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="price_plan_created_by"
-    )
-    updated_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="price_plan_updated_by"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    feature = models.ForeignKey(Feature, null=True, on_delete=models.SET_NULL)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    deleted_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="price_plan_deleted_by",
-    )
+    duration = models.IntegerField()
+    feature = models.ForeignKey(
+        Feature, null=True, on_delete=models.CASCADE, related_name="price_plans")
 
     def __str__(self):
-        if self.plan_name:
-            return self.plan_name
-        else:
-            return "No Name"
+        return self.plan_name
 
 
-class ClientProduct(models.Model):
+class ClientFeature(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     feature = models.ForeignKey(Feature, null=True, on_delete=models.SET_NULL)
     plan = models.CharField(max_length=32, blank=True, null=True)
@@ -300,7 +253,12 @@ class ClientProduct(models.Model):
     client = models.ForeignKey(Client, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return "No Name"
+        if self.client:
+            return self.client.first_name + " " \
+                + (self.feature.name if self.feature else "") + \
+                " " + self.plan if self.plan else ""
+        else:
+            return "No Client"
 
 
 class Requirement(models.Model):
@@ -316,20 +274,23 @@ class Requirement(models.Model):
 
     status = models.CharField(
         max_length=32, choices=statusChoices.choices, default="pending")
-    goals_and_expectation = models.TextField(blank=True, null=True)
+    goals_and_expectation = models.JSONField(blank=True, null=True)
     budget = models.FloatField(max_length=255, blank=True, null=True)
     currency = models.CharField(max_length=32, blank=True, null=True)
-    project_timeline = models.CharField(max_length=255, blank=True, null=True)
+    project_timeline_start = models.DateField(blank=True, null=True)
+    project_timeline_end = models.DateField(blank=True, null=True)
     frequently_of_receive_progress_report = models.TextField(
         blank=True, null=True)
     what_are_we_delivering = models.TextField(blank=True, null=True)
     what_are_we_not_delivering = models.TextField(blank=True, null=True)
-    target_audience = models.TextField(blank=True, null=True)
-    technologies = models.TextField(blank=True, null=True)
-    functionalities = models.TextField(blank=True, null=True)
-    tools = models.TextField(blank=True, null=True)
-    data_storing_requirements = models.TextField(blank=True, null=True)
-    restrictions = models.TextField(blank=True, null=True)
+    target_audience = models.JSONField(blank=True, null=True)
+    target_gender = models.JSONField(blank=True, null=True)
+    target_age = models.JSONField(blank=True, null=True)
+    technologies = models.JSONField(blank=True, null=True)
+    functionalities = models.JSONField(blank=True, null=True)
+    tools = models.JSONField(blank=True, null=True)
+    data_storing_requirements = models.JSONField(blank=True, null=True)
+    restrictions = models.JSONField(blank=True, null=True)
     confidentiality = models.TextField(blank=True, null=True)
     how_many_people_use_this = models.IntegerField(blank=True, null=True)
     created_by = models.ForeignKey(

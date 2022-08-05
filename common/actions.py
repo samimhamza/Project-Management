@@ -1,7 +1,8 @@
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
+from projects.api.serializers import AttachmentSerializer, ProjectNameListSerializer
 from expenses.api.serializers import LessFieldExpenseSerializer
 from .team_actions import get_leader_by_id, get_total_users
-from projects.api.serializers import AttachmentSerializer
+from users.api.teams.serializers import TeamListSerializer
 from users.models import Team, Permission, Action, Role
 from common.permissions import checkCustomPermissions
 from projects.models import Project, Attachment
@@ -19,8 +20,7 @@ import os
 
 
 def convertBase64ToImage(base64file):
-    if(base64file and base64file != ""):
-
+    if base64file and base64file != "" and ';base64,' in base64file:
         format, imgstr = base64file.split(';base64,')
         ext = format.split('/')[-1]
         name = str(uuid.uuid4())+'.' + ext
@@ -157,6 +157,8 @@ def delete(self, request, table, imageField=None):
                 if os.path.isfile('media/'+str(getattr(table, imageField))):
                     os.remove('media/'+str(getattr(table, imageField)))
             item.delete()
+    if len(ids) == 0:
+        return Response({'detail': "Invalid Id"}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'deleted_ids': ids}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -185,15 +187,36 @@ def allItems(serializerName, queryset, request=None):
 
 
 def expensesOfProject(self, request, queryset):
+    actualCount = None
+    estimateCount = None
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
+    if request.GET.get("type"):
+        queryset = queryset.filter(type=request.GET.get("type"))
+        if request.GET.get("type") == "actual":
+            actualCount = queryset.count()
+        else:
+            estimateCount = queryset.count()
+
+    if actualCount is None:
+        actualCount = Expense.objects.filter(
+            project=request.GET.get("project_id"), type="actual").count()
+
+    if estimateCount is None:
+        estimateCount = Expense.objects.filter(
+            project=request.GET.get("project_id"), type="estimate").count()
+
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldExpenseSerializer, queryset)
-    serializer = self.get_serializer(queryset, many=True)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
     for data in serializer.data:
         data = getAttachments(
             request, data, data['id'], "expense_attachments_v")
-    return Response(serializer.data)
+    data = self.get_paginated_response(serializer.data).data
+    data['actualCount'] = actualCount
+    data['estimateCount'] = estimateCount
+    return Response(data)
 
 
 def dataWithPermissions(self, field):
@@ -219,25 +242,19 @@ def dataWithPermissions(self, field):
     return Response(data, status=status.HTTP_200_OK)
 
 
-def addAttachment(self, request):
-    try:
-        item = self.get_object()
-        data = request.data
-        attachment_obj = Attachment.objects.create(
-            content_object=item,
-            attachment=data['file'],
-            name=data['file'],
-            uploaded_by=request.user
-        )
-        attachment_obj.size = attachment_obj.fileSize()
-        attachment_obj.save()
-        serializer = AttachmentSerializer(
-            attachment_obj, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except:
-        return Response(
-            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-        )
+def addAttachment(request, item):
+    data = request.data
+    attachment_obj = Attachment.objects.create(
+        content_object=item,
+        attachment=data['file'],
+        name=data['file'],
+        uploaded_by=request.user
+    )
+    attachment_obj.size = attachment_obj.fileSize()
+    attachment_obj.save()
+    serializer = AttachmentSerializer(
+        attachment_obj, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 def deleteAttachments(self, request):
@@ -249,38 +266,21 @@ def deleteAttachments(self, request):
         )
 
 
-def clientProductsFormatter(clientData):
-    products = []
-    for clientfeature in clientData['features']:
-        feature = clientfeature['feature']
-        del clientfeature['feature']
-        feature.update(clientfeature)
-        product = feature['product']
-        del feature['product']
-        hasProduct = False
-        for x in products:
-            if x["id"] == product["id"]:
-                hasProduct = True
-                x["features"].append(feature)
-                break
-        if hasProduct == False:
-            product["features"] = []
-            product["features"].append(feature)
-            products.append(product)
-
-    del clientData['features']
-    clientData['products'] = []
-    clientData['products'] = products
-    return clientData
+def teamsOfUser(self, request, queryset):
+    user_id = request.GET.get("user_id")
+    queryset = queryset.filter(users=user_id).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(TeamListSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)
 
 
-def clientServicesFormatter(clientData):
-    services = []
-    for service in clientData['services']:
-        service_obj = service['service']
-        del service['service']
-        client_service = service
-        service_obj.update(client_service)
-        services.append(service_obj)
-    clientData['services'] = services
-    return clientData
+def projectsOfUser(self, request, queryset):
+    user_id = request.GET.get("user_id")
+    queryset = queryset.filter(users=user_id).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(ProjectNameListSerializer, queryset)
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)

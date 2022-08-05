@@ -1,48 +1,53 @@
 [
 	{
 		"fields": {
-			"name": "project_incomes",
-			"codename": "pi",
-			"model": "Project Incomes"
+			"name": "projects",
+			"codename": "p",
+			"model": "Projects",
+			"order": 1
 		},
 		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "m", "name": "Member" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
 		"fields": {
-			"name": "project_focal_points",
-			"codename": "pf",
-			"model": "Project Focal Points"
+			"name": "project_tasks",
+			"codename": "pt",
+			"model": "Project Tasks",
+			"order": 2
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-	{
-		"fields": {
-			"name": "project_payments",
-			"codename": "pp",
-			"model": "Project Payments"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
+			{ "code": "u", "name": "Update" },
+			{ "code": "m", "name": "Member" },
+			{ "code": "e", "name": "Export" }
 		]
 	},
 	{
 		"fields": {
 			"name": "project_attachments",
 			"codename": "pa",
-			"model": "Project Attachments"
+			"model": "Project Attachments",
+			"order": 3
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "do", "name": "Download" }
+		]
+	},
+	{
+		"fields": {
+			"name": "task_attachments",
+			"codename": "tat",
+			"model": "Task Attachments",
+			"order": 4
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -55,7 +60,8 @@
 		"fields": {
 			"name": "project_comments",
 			"codename": "pco",
-			"model": "Project Comments"
+			"model": "Project Comments",
+			"order": 5
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -64,35 +70,24 @@
 	},
 	{
 		"fields": {
-			"name": "expense_attachments",
-			"codename": "ea",
-			"model": "Expense Attachments"
+			"name": "project_incomes",
+			"codename": "pi",
+			"model": "Project Incomes",
+			"order": 6
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
-			{ "code": "do", "name": "Download" }
+			{ "code": "u", "name": "Update" }
 		]
 	},
 	{
 		"fields": {
-			"name": "income_attachments",
-			"codename": "ia",
-			"model": "Income Attachments"
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "do", "name": "Download" }
-		]
-	},
-	{
-		"fields": {
-			"name": "project_tasks",
-			"codename": "pt",
-			"model": "Project Tasks"
+			"name": "project_focal_points",
+			"codename": "pf",
+			"model": "Project Focal Points",
+			"order": 7
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -105,13 +100,57 @@
 		"fields": {
 			"name": "project_expenses",
 			"codename": "pe",
-			"model": "Project Expenses"
+			"model": "Project Expenses",
+			"order": 8
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
 			{ "code": "d", "name": "Delete" },
 			{ "code": "v", "name": "View" },
 			{ "code": "u", "name": "Update" }
+		]
+	},
+	{
+		"fields": {
+			"name": "project_payments",
+			"codename": "pp",
+			"model": "Project Payments",
+			"order": 9
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "u", "name": "Update" }
+		]
+	},
+
+	{
+		"fields": {
+			"name": "income_attachments",
+			"codename": "ia",
+			"model": "Income Attachments",
+			"order": 10
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "do", "name": "Download" }
+		]
+	},
+	{
+		"fields": {
+			"name": "expense_attachments",
+			"codename": "ea",
+			"model": "Expense Attachments",
+			"order": 11
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "d", "name": "Delete" },
+			{ "code": "v", "name": "View" },
+			{ "code": "do", "name": "Download" }
 		]
 	}
 ]

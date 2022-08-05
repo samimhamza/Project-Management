@@ -1,113 +1,59 @@
-from dataclasses import field
-from pyexpat import features
-from clients.models import (Client, ClientService, ClientProduct,
-                            Service, Product, PricePlan, Feature, Requirement)
+from clients.models import ClientFeature, PricePlan, Feature, Requirement
+from users.api.serializers import UserWithProfileSerializer
 from rest_framework import serializers
 
 
-class ServiceSerializer(serializers.ModelSerializer):
+class ClientFeatureSerializer(serializers.ModelSerializer):
+
     class Meta:
-        model = Service
+        model = ClientFeature
         fields = "__all__"
 
-
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = "__all__"
-
-
-class ClientDetailedSerializer(serializers.ModelSerializer):
-    services = serializers.SerializerMethodField()
-    features = serializers.SerializerMethodField()
-    requirement = serializers.SerializerMethodField()
-
-    def get_services(self, client):
-        qs = ClientService.objects.filter(client=client)
-        serializer = ClientServiceListSerializer(instance=qs, many=True)
-        return serializer.data
-
-    def get_features(self, client):
-        qs = ClientProduct.objects.filter(client=client)
-        serializers = ClientProductCustomSerializer(instance=qs, many=True)
-        return serializers.data
-
-    def get_requirement(self, client):
-        qs = Requirement.objects.get(client=client)
-        serializers = RequirementSerializer(instance=qs)
-        return serializers.data
-    class Meta:
-        model = Client
-        fields = "__all__"
-
-
-
-class ServiceCustomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Service
-        fields = ["name","description"]
-
-class ClientServiceListSerializer(serializers.ModelSerializer):
-    service = ServiceCustomSerializer()
-
-    class Meta:
-        model = ClientService
-        fields = ["id","service", "details"]
-class ClientServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ClientService
-        fields = "__all__"
-
-
-class ClientProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ClientProduct
-        fields = "__all__"
-
-class ProductSerializer(serializers.ModelSerializer):
-    features = serializers.SerializerMethodField()
-
-    def get_features(self, product):
-        qs = Feature.objects.filter(product=product)
-        serializers = FeatureCustomSerializer(instance=qs, many=True)
-        return serializers.data
-    class Meta:
-        model = Product
-        fields = "__all__"
-
-
-class FeatureSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
-    class Meta:
-        model = Feature
-        fields = "__all__"
 
 class FeatureCustomSerializer(serializers.ModelSerializer):
-    price_plan = serializers.SerializerMethodField()
+    price_plans = serializers.SerializerMethodField()
 
-    def get_price_plan(self, feature):
+    def get_price_plans(self, feature):
         qs = PricePlan.objects.filter(feature=feature)
         serializers = PricePlanSerializer(instance=qs, many=True)
         return serializers.data
+
     class Meta:
         model = Feature
         fields = "__all__"
-class ClientProductCustomSerializer(serializers.ModelSerializer):
-    feature = FeatureSerializer()
-    class Meta:
-        model = ClientProduct
-        exclude = ('id','client', )
-        # fields = ["plan","on_request_price","on_request_date","purchased_price","purchased_date","end_date","feature"]
-
 
 
 class PricePlanSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = PricePlan
         fields = "__all__"
 
 
+class PricePlanListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PricePlan
+        fields = ["id", "plan_name", "plan_price"]
+
+
+class FeatureListSerializer(serializers.ModelSerializer):
+    price_plans = serializers.SerializerMethodField()
+
+    def get_price_plans(self, feature):
+        qs = PricePlan.objects.filter(feature=feature)
+        serializers = PricePlanListSerializer(instance=qs, many=True)
+        return serializers.data
+
+    class Meta:
+        model = Feature
+        fields = ["id", "name", "type", "price_plans"]
+
+
 class RequirementSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = Requirement
         fields = "__all__"

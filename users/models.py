@@ -9,6 +9,7 @@ class User(AbstractUser):
         upload_to="user_profiles", blank=True, null=True)
     phone = models.CharField(max_length=32, blank=True, null=True)
     whatsapp = models.CharField(max_length=64, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
@@ -41,7 +42,7 @@ class User(AbstractUser):
 class Team(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -209,8 +210,6 @@ class Permission(models.Model):
         Role, related_name="permissions_roles")
     users = models.ManyToManyField(
         User, related_name="permissions_users")
-    proles = models.ManyToManyField(
-        'projects.ProjectRole', related_name="projects_permissions")
 
 
 class UserPermissionList(models.Model):

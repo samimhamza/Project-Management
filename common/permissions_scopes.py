@@ -35,8 +35,8 @@ class ProjectPermissions(CustomPermissions):
         'add_users': 'projects_c',
         'teams': 'projects_v',
         'add_teams': 'projects_c',
-        'excluded_users': "users_v",
-        'excluded_teams': "teams_v",
+        'excluded_users': "projects_u",
+        'excluded_teams': "projects_u",
         'delete_users': 'projects_u',
         'delete_teams': 'projects_u',
         'add_attachments': 'project_attachments_c',
@@ -77,7 +77,10 @@ class UserPermissions(CustomPermissions):
         'restore': 'users_d',
         'trashed': 'users_d',
         'all': 'users_v',
-        'check_uniqueness': 'users_c'
+        'check_uniqueness': 'users_c',
+        'teams': 'users_v',
+        'tasks_projects': 'users_v',
+        'projects': 'users_v'
     }
 
 
@@ -255,7 +258,8 @@ class ClientPermissions(CustomPermissions):
         'destroy': 'clients_d',
         'restore': 'clients_d',
         'trashed': 'clients_d',
-        'all': 'clients_v'
+        'all': 'clients_v',
+        'check_uniqueness': 'clients_u'
     }
 
 

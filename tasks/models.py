@@ -36,11 +36,11 @@ class Comment(models.Model):
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, null=True)
+        "self", on_delete=models.SET_NULL, null=True, related_name="childs")
     project = models.ForeignKey(
         Project, on_delete=models.SET_NULL, null=True, related_name="tasks"
     )
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=128)
     description = models.TextField(blank=True, null=True)
     p_start_date = models.DateTimeField(blank=True, null=True)
     p_end_date = models.DateTimeField(blank=True, null=True)
@@ -76,14 +76,14 @@ class Task(models.Model):
     )
 
     class Types(models.TextChoices):
-        dependent = "dependent"
-        independent = "independent"
+        stage = "stage"
+        sub_stage = "sub_stage"
+        task = "task"
 
     type = models.CharField(
-        max_length=24, choices=Types.choices, default="independent")
+        max_length=24, choices=Types.choices, default="task")
+
     dependencies = models.JSONField(blank=True, null=True)
-    sub_stage = models.ForeignKey(
-        "projects.SubStage", related_name="%(class)s", on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,

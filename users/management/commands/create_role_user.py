@@ -18,6 +18,6 @@ class Command(BaseCommand):
         user = kwargs['user']
         user_obj = User.objects.get(pk=user)
         role_obj = Role.objects.get(name=role)
-        user_obj.roles_users.set([role_obj])
+        user_obj.roles_users.add(role_obj)
         user_obj.save()
         addPermissionList(user_obj)

@@ -35,6 +35,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "company_email",
             "company_location",
             "users",
+            "department",
+            "banner",
             "created_at",
             "updated_at",
             "created_by",
@@ -47,6 +49,13 @@ class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ["id", "name"]
+
+
+class ProjectDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name", "progress", "p_start_date",
+                  "p_end_date", "a_start_date", "a_end_date", "status", "description"]
 
 
 class ProjectTrashedSerializer(serializers.ModelSerializer):

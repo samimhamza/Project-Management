@@ -1,14 +1,13 @@
-from common.actions import delete, withTrashed, trashList, restore, allItems, filterRecords
 from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
+from common.actions import allItems, filterRecords, teamsOfUser
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import TeamPermissions
 from rest_framework.generics import get_object_or_404
-from common.custom import CustomPageNumberPagination
 from users.models import User, Team, TeamUser
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from common.Repository import Repository
 from users.api.teams.serializers import (
     TeamListSerializer,
     TeamUserSerializer,
@@ -19,13 +18,14 @@ from users.api.teams.serializers import (
 )
 from projects.models import Project
 from django.db import transaction
+from rest_framework import status
 
 
-class TeamViewSet(viewsets.ModelViewSet):
+class TeamViewSet(Repository):
+    model = Team
     queryset = Team.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = TeamListSerializer
-    pagination_class = CustomPageNumberPagination
     permission_classes = (TeamPermissions,)
     serializer_action_classes = {
         "retrieve": TeamRetieveSerializer,
@@ -45,8 +45,12 @@ class TeamViewSet(viewsets.ModelViewSet):
         )
         columns = ['name']
         queryset = filterRecords(queryset, request, columns, table=Team)
+        if request.GET.get("user_id"):
+            return teamsOfUser(self, request, queryset)
         if request.GET.get("items_per_page") == "-1":
             return allItems(TeamNamesSerializer, queryset)
+        if request.GET.get("items_per_page") == "-2":
+            return allItems(self.get_serializer, queryset)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
@@ -66,9 +70,13 @@ class TeamViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
+        if "description" in data:
+            description = data["description"]
+        else:
+            description = ""
         new_team = Team.objects.create(
             name=data["name"],
-            description=data["description"],
+            description=description,
             created_by=data["created_by"],
             updated_by=data["created_by"],
         )
@@ -77,7 +85,6 @@ class TeamViewSet(viewsets.ModelViewSet):
             TeamUser.objects.create(
                 user=user, team=new_team, is_leader=True, position="Leader"
             )
-        new_team.save()
         serializer = TeamListSerializer(new_team)
         data = serializer.data
         data["total_users"] = get_total(new_team)
@@ -99,32 +106,18 @@ class TeamViewSet(viewsets.ModelViewSet):
         data["leader"] = get_leader(team)
         return Response(data, status=status.HTTP_202_ACCEPTED)
 
-    def destroy(self, request, pk=None):
-        return delete(self, request, Team)
-
-    @action(detail=False, methods=["get"])
-    def all(self, request):
-        return withTrashed(self, Team, order_by="-created_at")
-
-    @action(detail=False, methods=["get"])
-    def trashed(self, request):
-        return trashList(self, Team)
-
-    # for multi and single restore
-    @action(detail=False, methods=["put"])
-    def restore(self, request, pk=None):
-        return restore(self, request, Team)
-
     # Custom Actions
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         team = self.get_object()
         users = User.objects.filter(deleted_at__isnull=True, teams=team)
         page = self.paginate_queryset(users)
-        serializer = UserWithProfileSerializer(page, many=True)
+        serializer = UserWithProfileSerializer(
+            page, many=True, context={"request": request})
         for user in serializer.data:
             team_user = TeamUser.objects.get(user=user['id'], team=team)
-            team_user_serializer = TeamUserSerializer(team_user)
+            team_user_serializer = TeamUserSerializer(
+                team_user)
             user['is_leader'] = team_user_serializer.data['is_leader']
             user['position'] = team_user_serializer.data['position']
         return self.get_paginated_response(serializer.data)
@@ -195,17 +188,3 @@ class TeamViewSet(viewsets.ModelViewSet):
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-
-    # return different Serializers for different actions
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class()
-
-    # return different Querysets from different actions
-    def get_queryset(self):
-        try:
-            return self.queryset_actions[self.action]
-        except (KeyError, AttributeError):
-            return super().get_queryset()
