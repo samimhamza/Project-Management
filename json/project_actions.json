@@ -70,10 +70,22 @@
 	},
 	{
 		"fields": {
+			"name": "task_comments",
+			"codename": "tc",
+			"model": "Task Comments",
+			"order": 6
+		},
+		"sub_actions": [
+			{ "code": "c", "name": "Create" },
+			{ "code": "v", "name": "View" }
+		]
+	},
+	{
+		"fields": {
 			"name": "project_incomes",
 			"codename": "pi",
 			"model": "Project Incomes",
-			"order": 6
+			"order": 7
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -87,7 +99,7 @@
 			"name": "project_focal_points",
 			"codename": "pf",
 			"model": "Project Focal Points",
-			"order": 7
+			"order": 8
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -101,7 +113,7 @@
 			"name": "project_expenses",
 			"codename": "pe",
 			"model": "Project Expenses",
-			"order": 8
+			"order": 9
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -115,7 +127,7 @@
 			"name": "project_payments",
 			"codename": "pp",
 			"model": "Project Payments",
-			"order": 9
+			"order": 10
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -130,7 +142,7 @@
 			"name": "income_attachments",
 			"codename": "ia",
 			"model": "Income Attachments",
-			"order": 10
+			"order": 11
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -144,7 +156,7 @@
 			"name": "expense_attachments",
 			"codename": "ea",
 			"model": "Expense Attachments",
-			"order": 11
+			"order": 12
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },

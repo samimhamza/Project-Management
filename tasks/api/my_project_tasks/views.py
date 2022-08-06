@@ -1,6 +1,6 @@
-from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
-from common.actions import (delete, addAttachment,
-                            deleteAttachments, getAttachments, filterRecords, un_authorized)
+from common.comments import comments, destroy, listComments, createComments, updateComments
+from common.actions import (
+    addAttachment, deleteAttachments, getAttachments, filterRecords, un_authorized)
 from tasks.actions import (
     delete_dependencies, excluded_users, progress, tasksOfProject, create, update)
 from tasks.api.serializers import (
@@ -121,18 +121,16 @@ class ProjectCommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
 
     def list(self, request):
-        return listComments(self, request)
+        return comments(self, listComments, request, "project_comments_v")
 
     def create(self, request):
-        return createComments(self, request)
+        return comments(self, createComments, request, "project_comments_c")
 
     def update(self, request, pk=None):
         return updateComments(self, request, pk)
 
     def destroy(self, request, pk=None):
-        response = delete(self, request, Comment)
-        broadcastDeleteComment(response.data)
-        return response
+        return destroy(self, request)
 
 
 class TaskCommentViewSet(viewsets.ModelViewSet):
@@ -142,15 +140,13 @@ class TaskCommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request):
-        return listComments(self, request)
+        return comments(self, listComments, request, "task_comments_v")
 
     def create(self, request):
-        return createComments(self, request)
+        return comments(self, createComments, request, "task_comments_c")
 
     def update(self, request, pk=None):
         return updateComments(self, request, pk)
 
     def destroy(self, request, pk=None):
-        response = delete(self, request, Comment)
-        broadcastDeleteComment(response.data)
-        return response
+        return destroy(self, request)
