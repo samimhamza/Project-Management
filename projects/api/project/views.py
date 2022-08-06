@@ -1,10 +1,9 @@
 from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
-                              broadcastDeleteProject, addStagesToProject, list, update,
-                              retrieve, add_users, add_teams, users, teams,
-                              delete_users, delete_teams, member_actions)
+                              addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,
+                              delete_users, delete_teams, member_actions, destroy)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
-from common.actions import (delete, addAttachment,
-                            deleteAttachments, convertBase64ToImage)
+from common.actions import (
+    addAttachment, deleteAttachments, convertBase64ToImage)
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
 from rest_framework.response import Response
@@ -71,12 +70,7 @@ class ProjectViewSet(Repository):
         return update(self, request, project)
 
     def destroy(self, request, pk=None):
-        response = delete(self, request, Project)
-        ids = []
-        for id in response.data['deleted_ids']:
-            ids.append(str(id))
-        broadcastDeleteProject({'deleted_ids': ids})
-        return response
+        return destroy(self, request)
 
     # Custom Actions
     @ action(detail=True, methods=["get"])

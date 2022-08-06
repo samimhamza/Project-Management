@@ -1,5 +1,5 @@
 from common.actions import (convertBase64ToImage, getAttachments,
-                            countStatuses, filterRecords, allItems, projectsOfUser, un_authorized)
+                            countStatuses, filterRecords, allItems, projectsOfUser, un_authorized, delete)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
@@ -178,6 +178,15 @@ def retrieve(self, request, project, showPermission=False):
     if showPermission:
         data["permissions"] = getProjectPermissions(request.user, project)
     return Response(data)
+
+
+def destroy(self, request):
+    response = delete(self, request, Project)
+    ids = []
+    for id in response.data['deleted_ids']:
+        ids.append(str(id))
+    broadcastDeleteProject({'deleted_ids': ids})
+    return response
 
 
 # ProjectViewSet and MyProjectViewSet users action

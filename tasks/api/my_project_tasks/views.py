@@ -114,7 +114,7 @@ class MyTaskViewSet(Repository):
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class ProjectCommentViewSet(viewsets.ModelViewSet):
+class MyProjectCommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = CustomPageNumberPagination
@@ -133,7 +133,7 @@ class ProjectCommentViewSet(viewsets.ModelViewSet):
         return destroy(self, request)
 
 
-class TaskCommentViewSet(viewsets.ModelViewSet):
+class MyTaskCommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = CustomPageNumberPagination

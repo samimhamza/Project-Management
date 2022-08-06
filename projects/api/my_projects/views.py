@@ -1,4 +1,4 @@
-from projects.actions import (excluded_members, excluded_teams, excluded_users, list, update,
+from projects.actions import (destroy, excluded_members, excluded_teams, excluded_users, list, update,
                               retrieve, add_users, add_teams, my_project_member_actions, users, teams,
                               delete_users, delete_teams, attachments)
 from common.actions import (addAttachment, deleteAttachments, un_authorized)
@@ -48,9 +48,15 @@ class MyProjectViewSet(Repository):
             return un_authorized()
 
     def destroy(self, request, pk=None):
-        return un_authorized()
+        if len(request.data["ids"]) > 0:
+            return un_authorized()
+        if checkProjectScope(request.user, "projects_d", pk):
+            return destroy(self, request)
+        else:
+            return un_authorized()
 
     # Custom Actions
+
     @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         try:
