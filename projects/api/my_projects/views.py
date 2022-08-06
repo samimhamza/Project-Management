@@ -55,8 +55,6 @@ class MyProjectViewSet(Repository):
         else:
             return un_authorized()
 
-    # Custom Actions
-
     @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         try:
@@ -91,7 +89,7 @@ class MyProjectViewSet(Repository):
 
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
-        attachments(addAttachment, "project_attachments_c", request, pk)
+        return attachments(addAttachment, "project_attachments_c", request, pk)
 
     @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
