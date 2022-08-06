@@ -1,5 +1,3 @@
-from common.tasks_actions import (tasksOfProject, tasksResponse, checkAttributes, excludedDependencies,
-                                  assignToUsers, taskProgress, prepareData, broadcastProgress, projectProgress)
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
