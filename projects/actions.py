@@ -1,5 +1,5 @@
 from common.actions import (convertBase64ToImage, getAttachments,
-                            countStatuses, filterRecords, allItems, projectsOfUser)
+                            countStatuses, filterRecords, allItems, projectsOfUser, un_authorized)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
@@ -262,9 +262,7 @@ def attachments(method, scope, request, pk):
         if checkProjectScope(request.user, project, scope):
             return method(request, project)
         else:
-            return Response({
-                "detail": "You do not have permission to perform this action."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return un_authorized()
     except:
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
@@ -280,9 +278,7 @@ def excluded_members(method, request, pk):
     if checkProjectScope(request.user, project, "project_m"):
         return method(request, pk)
     else:
-        return Response({
-            "detail": "You do not have permission to perform this action."
-        }, status=status.HTTP_403_FORBIDDEN)
+        return un_authorized()
 
 
 # ProjectViewSet and MyProjectViewSet excluded_users
@@ -324,9 +320,7 @@ def my_project_member_actions(method, request, pk):
         if checkProjectScope(request.user, project, "projectd_m"):
             return method(request, project)
         else:
-            return Response({
-                "detail": "You do not have permission to perform this action."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return un_authorized()
     except:
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST

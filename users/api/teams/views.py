@@ -1,4 +1,4 @@
-from common.team_actions import get_total_users, get_total, get_leader_by_id, get_leader
+from .actions import get_total_users, get_total, get_leader_by_id, get_leader
 from common.actions import allItems, filterRecords, teamsOfUser
 from projects.api.serializers import ProjectNameListSerializer
 from users.api.serializers import UserWithProfileSerializer

@@ -1,10 +1,10 @@
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from projects.api.serializers import AttachmentSerializer, ProjectNameListSerializer
+from common.permissions import checkCustomPermissions, checkProjectScope
 from expenses.api.serializers import LessFieldExpenseSerializer
-from .team_actions import get_leader_by_id, get_total_users
+from users.api.teams.actions import get_leader_by_id, get_total_users
 from users.api.teams.serializers import TeamListSerializer
 from users.models import Team, Permission, Action, Role
-from common.permissions import checkCustomPermissions
 from projects.models import Project, Attachment
 from django.core.files.base import ContentFile
 from rest_framework.response import Response
@@ -30,10 +30,14 @@ def convertBase64ToImage(base64file):
     return ''
 
 
-def getAttachments(request, data, id, permission):
+def getAttachments(request, data, id, permission, project=None):
     # custom permission checking for attachments scopes
-    attachments_permission = checkCustomPermissions(
-        request, permission)
+    if project is None:
+        attachments_permission = checkCustomPermissions(
+            request, permission)
+    else:
+        attachments_permission = checkProjectScope(
+            request.user, project, "task_attachments_v")
     if attachments_permission:
         attachments = Attachment.objects.filter(object_id=id)
         data['attachments'] = AttachmentSerializer(
@@ -284,3 +288,9 @@ def projectsOfUser(self, request, queryset):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
+
+
+def un_authorized():
+    return Response({
+        "detail": "You do not have permission to perform this action."
+    }, status=status.HTTP_403_FORBIDDEN)

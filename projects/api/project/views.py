@@ -1,7 +1,7 @@
-from common.project_actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
-                                    broadcastDeleteProject, addStagesToProject, list, update,
-                                    retrieve, add_users, add_teams, users, teams,
-                                    delete_users, delete_teams, member_actions)
+from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
+                              broadcastDeleteProject, addStagesToProject, list, update,
+                              retrieve, add_users, add_teams, users, teams,
+                              delete_users, delete_teams, member_actions)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from common.actions import (delete, addAttachment,
                             deleteAttachments, convertBase64ToImage)

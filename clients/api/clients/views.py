@@ -1,5 +1,4 @@
-from asyncio import exceptions
-from common.client_actions import clientProductsFormatter, clientServicesFormatter, setProducts, setServices
+from clients.actions import clientProductsFormatter, clientServicesFormatter, setProducts, setServices
 from common.actions import (filterRecords, allItems, convertBase64ToImage)
 from .serializers import (ClientSerializer, ClientDetailedSerializer,
                           ClientListSerializer, ClientTrashedSerializer)

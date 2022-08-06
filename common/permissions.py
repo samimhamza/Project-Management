@@ -19,8 +19,8 @@ def checkScope(user, scope):
         return False
 
 
-def checkProjectScope(user, project, scope):
-    permissionScopes = getProjectPermissions(user, project)
+def checkProjectScope(user, project, scope, project_id=None):
+    permissionScopes = getProjectPermissions(user, project, project_id)
     if scope in permissionScopes:
         return True
     else:

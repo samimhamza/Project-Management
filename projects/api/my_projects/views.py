@@ -1,7 +1,7 @@
-from common.project_actions import (excluded_members, excluded_teams, excluded_users, list, update,
-                                    retrieve, add_users, add_teams, my_project_member_actions, users, teams,
-                                    delete_users, delete_teams, attachments)
-from common.actions import (addAttachment, deleteAttachments)
+from projects.actions import (excluded_members, excluded_teams, excluded_users, list, update,
+                              retrieve, add_users, add_teams, my_project_member_actions, users, teams,
+                              delete_users, delete_teams, attachments)
+from common.actions import (addAttachment, deleteAttachments, un_authorized)
 from projects.api.project.serializers import ProjectSerializer
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import checkProjectScope
@@ -35,9 +35,7 @@ class MyProjectViewSet(Repository):
         return retrieve(self, request, project, showPermission=True)
 
     def create(self, request):
-        return Response({
-            "detail": "You do not have permission to perform this action."
-        }, status=status.HTTP_403_FORBIDDEN)
+        return un_authorized()
 
     def update(self, request, pk=None):
         try:
@@ -47,14 +45,10 @@ class MyProjectViewSet(Repository):
         if checkProjectScope(request.user, project, "projects_u"):
             return update(self, request, project)
         else:
-            return Response({
-                "detail": "You do not have permission to perform this action."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return un_authorized()
 
     def destroy(self, request, pk=None):
-        return Response({
-            "detail": "You do not have permission to perform this action."
-        }, status=status.HTTP_403_FORBIDDEN)
+        return un_authorized()
 
     # Custom Actions
     @ action(detail=True, methods=["get"])
@@ -103,9 +97,7 @@ class MyProjectViewSet(Repository):
         if checkProjectScope(request.user, project, "project_attachments_d"):
             return deleteAttachments(self, request)
         else:
-            return Response({
-                "detail": "You do not have permission to perform this action."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return un_authorized()
 
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
