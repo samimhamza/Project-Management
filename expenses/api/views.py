@@ -122,7 +122,13 @@ class ExpenseViewSet(Repository):
 
     @ action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
-        return addAttachment(self, request)
+        try:
+            expense = self.get_object()
+            return addAttachment(request, expense)
+        except:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @ action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):

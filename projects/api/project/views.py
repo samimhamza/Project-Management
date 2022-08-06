@@ -1,19 +1,14 @@
-from asyncio.windows_events import NULL
-from unittest import result
-from common.project_actions import (shareTo, notification, getRevokeNotification, broadcastProject,
-                                    broadcastDeleteProject, addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,countStatuses)
-from projects.api.project.serializers import ProjectSerializer,ProjectReportSerializer, ProjectTrashedSerializer
-from common.actions import (delete, filterRecords, addAttachment,
-                            deleteAttachments, convertBase64ToImage)
-from users.api.teams.serializers import LessFieldsTeamSerializer
-from common.client_actions import projectTiming
-from users.api.serializers import UserWithProfileSerializer
+from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
+                              addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,
+                              delete_users, delete_teams, member_actions, destroy, projectTiming)
+from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer,ProjectReportSerializer
+from common.actions import (
+    addAttachment, deleteAttachments, convertBase64ToImage,countStatuses)
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
-from users.models import User, Team
 from rest_framework import status
 
 
@@ -75,12 +70,7 @@ class ProjectViewSet(Repository):
         return update(self, request, project)
 
     def destroy(self, request, pk=None):
-        response = delete(self, request, Project)
-        ids = []
-        for id in response.data['deleted_ids']:
-            ids.append(str(id))
-        broadcastDeleteProject({'deleted_ids': ids})
-        return response
+        return destroy(self, request)
 
     # Custom Actions
     @ action(detail=True, methods=["get"])
@@ -95,57 +85,29 @@ class ProjectViewSet(Repository):
 
     @ action(detail=True, methods=["post"])
     def add_users(self, request, pk=None):
-        try:
-            project = self.get_object()
-            return add_users(request, project)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return member_actions(self, add_users, request)
 
     @ action(detail=True, methods=["post"])
     def add_teams(self, request, pk=None):
-        try:
-            project = self.get_object()
-            return add_teams(request, project)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return member_actions(self, add_teams, request)
 
     @ action(detail=True, methods=["delete"])
     def delete_users(self, request, pk=None):
-        try:
-            project = self.get_object()
-            data = request.data
-            for user in data['ids']:
-                project.users.remove(user)
-            notification(getRevokeNotification, project,
-                         request, 'pk__in', data['ids'])
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return member_actions(self, delete_users, request)
 
     @ action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
+        return member_actions(self, delete_teams, request)
+
+    @action(detail=True, methods=["post"])
+    def add_attachments(self, request, pk=None):
         try:
             project = self.get_object()
-            data = request.data
-            for team in data['ids']:
-                project.teams.remove(team)
-            notification(getRevokeNotification,
-                         project, request, 'teams__in', data['ids'])
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return addAttachment(request, project)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-
-    @ action(detail=True, methods=["post"])
-    def add_attachments(self, request, pk=None):
-        return addAttachment(self, request)
 
     @ action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
@@ -153,19 +115,11 @@ class ProjectViewSet(Repository):
 
     @ action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
-        users = User.objects.filter(
-            deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
-        serializer = UserWithProfileSerializer(
-            users, many=True,  context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return excluded_users(request, pk)
 
     @ action(detail=True, methods=["get"])
     def excluded_teams(self, request, pk=None):
-        teams = Team.objects.filter(deleted_at__isnull=True).exclude(
-            projects__id=pk).order_by("-created_at")
-        serializer = LessFieldsTeamSerializer(
-            teams, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return excluded_teams(request, pk)
 
     @ action(detail=False, methods=["get"])
     def projects_status(self, request, pk=None):
@@ -187,4 +141,3 @@ class ProjectViewSet(Repository):
             projects,many=True, context={"request": request})
 
         return Response(projectTiming(serializer.data))
-

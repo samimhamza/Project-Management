@@ -1,5 +1,7 @@
 from .actions import allItems, filterRecords, convertBase64ToImage
 from tasks.api.serializers import CommentSerializer
+from common.permissions import checkProjectScope
+from common.actions import un_authorized, delete
 from projects.models import Project, Attachment
 from rest_framework.response import Response
 from common.pusher import pusher_client
@@ -38,14 +40,6 @@ def commentsOfTable(self, request, id):
     return self.get_paginated_response(serializer.data)
 
 
-def latestcommentsOfTable(self, request, id):
-    queryset = Comment.objects.filter(
-        object_id=id).order_by("-created_at")
-    page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
-    return self.get_paginated_response(serializer.data)
-
-
 def checkCommnetable(request):
     if request.data.get("task_id"):
         return Task.objects.get(pk=request.data.get("task_id"))
@@ -59,8 +53,6 @@ def listComments(self, request):
     queryset = filterRecords(queryset, request)
     if request.GET.get("id"):
         id = request.GET.get("id")
-        if request.GET.get("latest"):
-            return latestcommentsOfTable(self, request, id)
         return commentsOfTable(self, request, id)
     return Response([])
 
@@ -95,3 +87,17 @@ def updateComments(self, request, pk):
     serializer = CommentSerializer(comment,  context={"request": request})
     broadcastComment(comment.object_id, serializer.data, update=True)
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def comments(self, method, request, permission):
+    id = request.GET.get("id")
+    if checkProjectScope(request.user, None, permission, id):
+        return method(self, request)
+    else:
+        return un_authorized()
+
+
+def destroy(self, request):
+    response = delete(self, request, Comment)
+    broadcastDeleteComment(response.data)
+    return response

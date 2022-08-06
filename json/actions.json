@@ -3,7 +3,7 @@
 		"fields": {
 			"name": "departments",
 			"codename": "d",
-			"model": "Department",
+			"model": "Departments",
 			"order": 1
 		},
 		"sub_actions": [

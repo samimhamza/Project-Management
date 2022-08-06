@@ -1,15 +1,13 @@
-from common.project_actions import (
-    notification, getRevokeNotification, list, update, retrieve, add_users, add_teams, members, users, teams)
-from common.actions import (addAttachment, deleteAttachments)
-from users.api.teams.serializers import LessFieldsTeamSerializer
+from projects.actions import (destroy, excluded_members, excluded_teams, excluded_users, list, update,
+                              retrieve, add_users, add_teams, my_project_member_actions, users, teams,
+                              delete_users, delete_teams, attachments)
+from common.actions import (addAttachment, deleteAttachments, un_authorized)
 from projects.api.project.serializers import ProjectSerializer
-from users.api.serializers import UserWithProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import checkProjectScope
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
-from users.models import User, Team
 from projects.models import Project
 from rest_framework import status
 
@@ -27,7 +25,7 @@ class MyProjectViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset().filter(users=request.user)
-        return list(self, request, queryset)
+        return list(self, request, queryset, showPermissions=True)
 
     def retrieve(self, request, pk=None):
         try:
@@ -37,28 +35,26 @@ class MyProjectViewSet(Repository):
         return retrieve(self, request, project, showPermission=True)
 
     def create(self, request):
-        return Response({
-            "detail": "You do not have permission to perform this action."
-        }, status=status.HTTP_403_FORBIDDEN)
+        return un_authorized()
 
     def update(self, request, pk=None):
         try:
             project = Project.objects.get(pk=pk, users=request.user)
         except Project.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        if checkProjectScope(request.user, project, "project_u"):
+        if checkProjectScope(request.user, project, "projects_u"):
             return update(self, request, project)
         else:
-            return Response({
-                "detail": "You do not have permission to perform this action."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return un_authorized()
 
     def destroy(self, request, pk=None):
-        return Response({
-            "detail": "You do not have permission to perform this action."
-        }, status=status.HTTP_403_FORBIDDEN)
+        if len(request.data["ids"]) > 0:
+            return un_authorized()
+        if checkProjectScope(request.user, "projects_d", pk):
+            return destroy(self, request)
+        else:
+            return un_authorized()
 
-    # Custom Actions
     @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         try:
@@ -77,62 +73,40 @@ class MyProjectViewSet(Repository):
 
     @action(detail=True, methods=["post"])
     def add_users(self, request, pk=None):
-        return members(add_users, request, pk)
+        return my_project_member_actions(add_users, request, pk)
 
     @action(detail=True, methods=["post"])
     def add_teams(self, request, pk=None):
-        return members(add_teams, request, pk)
+        return my_project_member_actions(add_teams, request, pk)
 
     @action(detail=True, methods=["delete"])
     def delete_users(self, request, pk=None):
-        try:
-            project = self.get_object()
-            data = request.data
-            for user in data['ids']:
-                project.users.remove(user)
-            notification(getRevokeNotification, project,
-                         request, 'pk__in', data['ids'])
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return my_project_member_actions(delete_users, request, pk)
 
     @action(detail=True, methods=["delete"])
     def delete_teams(self, request, pk=None):
-        try:
-            project = self.get_object()
-            data = request.data
-            for team in data['ids']:
-                project.teams.remove(team)
-            notification(getRevokeNotification,
-                         project, request, 'teams__in', data['ids'])
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        return my_project_member_actions(delete_teams, request, pk)
 
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
-        return addAttachment(self, request)
+        return attachments(addAttachment, "project_attachments_c", request, pk)
 
     @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
-        return deleteAttachments(self, request)
+        try:
+            project = Project.objects.only(
+                'id').get(pk=pk, users=request.user)
+        except Project.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if checkProjectScope(request.user, project, "project_attachments_d"):
+            return deleteAttachments(self, request)
+        else:
+            return un_authorized()
 
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
-        users = User.objects.filter(
-            deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
-        serializer = UserWithProfileSerializer(
-            users, many=True,  context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return excluded_members(excluded_users, request, pk)
 
     @action(detail=True, methods=["get"])
     def excluded_teams(self, request, pk=None):
-        teams = Team.objects.filter(deleted_at__isnull=True).exclude(
-            projects__id=pk).order_by("-created_at")
-        serializer = LessFieldsTeamSerializer(
-            teams, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return excluded_members(excluded_teams, request, pk)

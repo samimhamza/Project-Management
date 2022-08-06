@@ -1,11 +1,14 @@
-from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer
-from common.my_project_permissions import getTaskPermissions
+from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer, TaskSerializer
+from users.api.serializers import UserWithProfileSerializer
+from tasks.api.serializers import ProgressSerializer
 from common.notification import sendNotification
-from .actions import allItems, countStatuses
+from common.actions import allItems, countStatuses
 from rest_framework.response import Response
 from common.pusher import pusher_client
 from tasks.models import Task, UserTask
 from projects.models import Project
+from rest_framework import status
+from users.models import User
 import math
 
 
@@ -176,9 +179,6 @@ def tasksOfProject(self, request, queryset):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(
         page, many=True, context={"request": request})
-    for task in serializer.data:
-        task["permissions"] = getTaskPermissions(
-            request.user, None, project_id)
     return tasksResponse(self, serializer, project_id)
 
 
@@ -257,3 +257,81 @@ def revoke(request, task, users):
     deleted_users = list(map(user, deleted_task_users))
     sendNotification(request, deleted_users, data)
     deleted_task_users.delete()
+
+
+def create(request):
+    [name, parent, project, start_date, end_date, description,
+     priority, task_status, progress, creator] = checkAttributes(request)
+    new_Task = Task.objects.create(
+        parent=parent,
+        name=name,
+        p_start_date=start_date,
+        p_end_date=end_date,
+        description=description,
+        project=project,
+        created_by=creator,
+        updated_by=creator,
+        priority=priority,
+        progress=progress,
+        status=task_status,
+    )
+    new_Task.save()
+    serializer = TaskSerializer(new_Task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def update(self, request, task):
+    if "dependencies" in request.data:
+        if task.dependencies is not None:
+            task.dependencies = task.dependencies + \
+                list(set(request.data.get("dependencies")) -
+                     set(task.dependencies))
+        else:
+            task.dependencies = request.data.get("dependencies")
+    if "users" in request.data:
+        users = User.objects.filter(pk__in=request.data.get('users'))
+        assignToUsers(request, task, users)
+
+    for key, value in request.data.items():
+        if key != "users" and key != "dependencies" and key != "id" and key != "progress":
+            setattr(task, key, value)
+    task.updated_by = request.user
+    task.save()
+    serializer = self.get_serializer(task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def excluded_users(self, task):
+    users = User.objects.filter(
+        project_users=task.project).exclude(users=task)
+    serializer = UserWithProfileSerializer(users, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def delete_dependencies(request, task):
+    task.dependencies.remove(request.data.get('id'))
+    task.save()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def progress(request, task):
+    data = request.data
+    try:
+        user = User.objects.get(pk=data['user_id'])
+    except User.DoesNotExist:
+        return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        userTask = UserTask.objects.get(user=user, task=task)
+    except UserTask.DoesNotExist:
+        return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
+    if Task.objects.filter(parent=task).exists():
+        return Response({'error': "Task has Sub tasks, please remove sub tasks first!"}, status=status.HTTP_400_BAD_REQUEST)
+    userTask.progress = data['progress']
+    userTask.save()
+    taskProgress(task)
+    projectProgress(task.project)
+    serializer = ProgressSerializer(
+        userTask)
+    serializerData = prepareData(serializer, task)
+    broadcastProgress(serializerData)
+    return Response(serializerData)

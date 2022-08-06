@@ -1,5 +1,5 @@
 from common.actions import (convertBase64ToImage, getAttachments,
-                            countStatuses, filterRecords, allItems, projectsOfUser)
+                            countStatuses, filterRecords, allItems, projectsOfUser, un_authorized, delete)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
@@ -116,7 +116,8 @@ def addStagesToProject(project, department, request):
             )
 
 
-def list(self, request, queryset):
+# ProjectViewSet and MyProjectViewSet list function
+def list(self, request, queryset, showPermissions=False):
     queryset = filterRecords(queryset, request, table=Project)
     if request.GET.get("items_per_page") == "-1":
         return allItems(ProjectNameListSerializer, queryset)
@@ -128,9 +129,14 @@ def list(self, request, queryset):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(
         page, many=True, context={"request": request})
+    if showPermissions:
+        for project in serializer.data:
+            project["permissions"] = getProjectPermissions(
+                request.user, None, project["id"])
     return self.get_paginated_response(serializer.data)
 
 
+# ProjectViewSet and MyProjectViewSet update function
 def update(self, request, project):
     data = request.data
     if request.data.get("users") is not None:
@@ -154,6 +160,7 @@ def update(self, request, project):
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
+# ProjectViewSet and MyProjectViewSet retrieve function
 def retrieve(self, request, project, showPermission=False):
     serializer = self.get_serializer(project)
     data = serializer.data
@@ -173,6 +180,16 @@ def retrieve(self, request, project, showPermission=False):
     return Response(data)
 
 
+def destroy(self, request):
+    response = delete(self, request, Project)
+    ids = []
+    for id in response.data['deleted_ids']:
+        ids.append(str(id))
+    broadcastDeleteProject({'deleted_ids': ids})
+    return response
+
+
+# ProjectViewSet and MyProjectViewSet users action
 def users(self, request, project):
     users = User.objects.filter(project_users=project)
     if request.query_params.get('content'):
@@ -187,6 +204,7 @@ def users(self, request, project):
     return self.get_paginated_response(serializer.data)
 
 
+# ProjectViewSet and MyProjectViewSet teams action
 def teams(self, request, project):
     teams = Team.objects.filter(projects=project)
     if request.query_params.get('content'):
@@ -225,18 +243,93 @@ def add_teams(request, project):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def members(method, request, pk):
+def delete_users(request, project):
+    data = request.data
+    for user in data['ids']:
+        project.users.remove(user)
+    notification(getRevokeNotification, project,
+                 request, 'pk__in', data['ids'])
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def delete_teams(request, project):
+    data = request.data
+    for team in data['ids']:
+        project.teams.remove(team)
+    notification(getRevokeNotification,
+                 project, request, 'teams__in', data['ids'])
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def attachments(method, scope, request, pk):
     try:
         try:
-            project = Project.objects.get(pk=pk, users=request.user)
+            project = Project.objects.only(
+                'id').get(pk=pk, users=request.user)
+        except Project.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if checkProjectScope(request.user, project, scope):
+            return method(request, project)
+        else:
+            return un_authorized()
+    except:
+        return Response(
+            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+def excluded_members(method, request, pk):
+    try:
+        project = Project.objects.only(
+            'id').get(pk=pk, users=request.user)
+    except Project.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    if checkProjectScope(request.user, project, "project_m"):
+        return method(request, pk)
+    else:
+        return un_authorized()
+
+
+# ProjectViewSet and MyProjectViewSet excluded_users
+def excluded_users(request, pk):
+    users = User.objects.filter(
+        deleted_at__isnull=True).exclude(project_users=pk).order_by("-created_at")
+    serializer = UserWithProfileSerializer(
+        users, many=True,  context={"request": request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ProjectViewSet and MyProjectViewSet excluded_teams
+def excluded_teams(request, pk):
+    teams = Team.objects.filter(deleted_at__isnull=True).exclude(
+        projects__id=pk).order_by("-created_at")
+    serializer = LessFieldsTeamSerializer(
+        teams, many=True, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ProjectViewSet Member Actions
+def member_actions(self, method, request):
+    try:
+        project = self.get_object()
+        return method(request, project)
+    except:
+        return Response(
+            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+# MyProjectViewSet Member Actions
+def my_project_member_actions(method, request, pk):
+    try:
+        try:
+            project = Project.objects.only('id').get(pk=pk, users=request.user)
         except Project.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         if checkProjectScope(request.user, project, "projectd_m"):
             return method(request, project)
         else:
-            return Response({
-                "detail": "You do not have permission to perform this action."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return un_authorized()
     except:
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
