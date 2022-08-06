@@ -1,5 +1,5 @@
 from http import client
-from clients.models import ClientFeature,  PricePlan, Feature, Requirement, ClientService,Client
+from clients.models import ClientFeature,  PricePlan, Feature, Requirement, ClientService, Client
 from clients.api.serializers import (
     ClientFeatureSerializer, ClientFeature, RequirementSerializer, PricePlanSerializer)
 from clients.api.clients.serializers import ClientServiceSerializer
@@ -64,7 +64,7 @@ class RequirementViewSet(Repository):
             if key != "client":
                 setattr(requirement, key, value)
         requirement.updated_by = request.user
-        requirement.client=client
+        requirement.client = client
         requirement.save()
         serializer = self.get_serializer(requirement)
         return Response(serializer.data, status=202)
