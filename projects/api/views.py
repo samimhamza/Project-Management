@@ -1,7 +1,8 @@
 from common.permissions_scopes import (
     IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions)
 from common.actions import (allItems, filterRecords,
-                            addAttachment, deleteAttachments, getAttachments)
+                            addAttachment, deleteAttachments, getAttachments, unAuthorized, checkProjectScope)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
@@ -30,6 +31,34 @@ from projects.models import (
     State,
     Project
 )
+
+
+def locationAction(self, project, data):
+    location, created = Location.objects.get_or_create(project=project)
+    location.address_line_one = data['address_line_one']
+    location.address_line_two = data['address_line_two']
+    location.city = data['city']
+    try:
+        if data["state_id"] is not None:
+            state = State.objects.only('id').get(pk=data['state_id'])
+        else:
+            state = None
+    except:
+        state = None
+    location.state = state
+    location.save()
+
+    try:
+        if data["country_id"] is not None:
+            country = Country.objects.only('id').get(pk=data['country_id'])
+        else:
+            country = None
+    except Country.DoesNotExist:
+        country = None
+    state.country = country
+    state.save()
+    serializer = self.get_serializer(location)
+    return Response(serializer.data, status=201)
 
 
 class CountryListAPIView(generics.ListAPIView):
@@ -67,19 +96,31 @@ class LocationCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        project = Project.objects.get(pk=data['project_id'])
-        location, created = Location.objects.get_or_create(project=project)
-        location.address_line_one = data['address_line_one']
-        location.address_line_two = data['address_line_two']
-        location.city = data['city']
-        state = State.objects.only('id').get(pk=data['state_id'])
-        location.state = state
-        location.save()
-        country = Country.objects.only('id').get(pk=data['country_id'])
-        state.country = country
-        state.save()
-        serializer = self.get_serializer(location)
-        return Response(serializer.data, status=201)
+        try:
+            project = Project.objects.get(pk=data['project_id'])
+        except Project.DoesNotExist:
+            return Response({"error": "Project does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        if checkProjectScope(request.user, project, "projects_u"):
+            return locationAction(self, project, data)
+        else:
+            return unAuthorized()
+
+
+class MyLocationCreateAPIView(generics.CreateAPIView):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        try:
+            project = Project.objects.get(pk=data['project_id'])
+        except Project.DoesNotExist:
+            return Response({"error": "Project does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        if checkProjectScope(request.user, project, "projects_u"):
+            return locationAction(self, project, data)
+        else:
+            return unAuthorized()
 
 
 class PaymentViewSet(Repository):

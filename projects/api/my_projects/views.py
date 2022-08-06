@@ -1,7 +1,7 @@
 from projects.actions import (destroy, excluded_members, excluded_teams, excluded_users, list, update,
                               retrieve, add_users, add_teams, my_project_member_actions, users, teams,
                               delete_users, delete_teams, attachments)
-from common.actions import (addAttachment, deleteAttachments, un_authorized)
+from common.actions import (addAttachment, deleteAttachments, unAuthorized)
 from projects.api.project.serializers import ProjectSerializer
 from rest_framework.permissions import IsAuthenticated
 from common.permissions import checkProjectScope
@@ -35,7 +35,7 @@ class MyProjectViewSet(Repository):
         return retrieve(self, request, project, showPermission=True)
 
     def create(self, request):
-        return un_authorized()
+        return unAuthorized()
 
     def update(self, request, pk=None):
         try:
@@ -45,15 +45,15 @@ class MyProjectViewSet(Repository):
         if checkProjectScope(request.user, project, "projects_u"):
             return update(self, request, project)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     def destroy(self, request, pk=None):
         if len(request.data["ids"]) > 0:
-            return un_authorized()
+            return unAuthorized()
         if checkProjectScope(request.user, "projects_d", pk):
             return destroy(self, request)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
@@ -101,7 +101,7 @@ class MyProjectViewSet(Repository):
         if checkProjectScope(request.user, project, "project_attachments_d"):
             return deleteAttachments(self, request)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):

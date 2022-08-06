@@ -290,7 +290,7 @@ def projectsOfUser(self, request, queryset):
     return self.get_paginated_response(serializer.data)
 
 
-def un_authorized():
+def unAuthorized():
     return Response({
         "detail": "You do not have permission to perform this action."
     }, status=status.HTTP_403_FORBIDDEN)

@@ -11,6 +11,7 @@ from projects.api.views import (
     LocationCreateAPIView,
     CountryListAPIView,
     StateListAPIView,
+    MyLocationCreateAPIView
 )
 
 router = DefaultRouter()
@@ -26,6 +27,7 @@ router.register(r"departments", DepartmentViewSet,
 
 urlpatterns = [
     path('locations/', LocationCreateAPIView.as_view(), name='locations'),
+    path('my_locations/', MyLocationCreateAPIView.as_view(), name='my_locations'),
     path('countries/', CountryListAPIView.as_view(), name='countries'),
     path('states/', StateListAPIView.as_view(), name='states'),
     re_path(r'', include((router.urls))),
