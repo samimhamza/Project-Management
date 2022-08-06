@@ -286,7 +286,7 @@ def excluded_members(method, request, pk):
             'id').get(pk=pk, users=request.user)
     except Project.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-    if checkProjectScope(request.user, project, "project_m"):
+    if checkProjectScope(request.user, project, "projects_m"):
         return method(request, pk)
     else:
         return unAuthorized()
@@ -328,7 +328,7 @@ def my_project_member_actions(method, request, pk):
             project = Project.objects.only('id').get(pk=pk, users=request.user)
         except Project.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        if checkProjectScope(request.user, project, "projectd_m"):
+        if checkProjectScope(request.user, project, "projects_m"):
             return method(request, project)
         else:
             return unAuthorized()
@@ -347,16 +347,16 @@ def projectTiming(projects):
         pro_obj['normal'] = 0
         pro_obj['earlier'] = 0
         pro_obj['notclear'] = 0
-        pro_obj['total_tasks'] = len(project['tasks']);
+        pro_obj['total_tasks'] = len(project['tasks'])
 
         for task in project['tasks']:
-            if task['p_start_date'] is None or task['p_end_date'] is None or task['a_start_date'] is None or task['a_end_date'] is None :
-                pro_obj['notclear'] = pro_obj['notclear'] + 1;
+            if task['p_start_date'] is None or task['p_end_date'] is None or task['a_start_date'] is None or task['a_end_date'] is None:
+                pro_obj['notclear'] = pro_obj['notclear'] + 1
             else:
                 workday = businesstimedelta.WorkDayRule(
                     start_time=datetime.time(8),
                     end_time=datetime.time(17),
-                    working_days=[0, 1, 2, 3, 4,5])
+                    working_days=[0, 1, 2, 3, 4, 5])
                 lunchbreak = businesstimedelta.LunchTimeRule(
                     start_time=datetime.time(12),
                     end_time=datetime.time(13),
@@ -364,15 +364,17 @@ def projectTiming(projects):
 
                 businesshrs = businesstimedelta.Rules([workday, lunchbreak])
                 taskModel = Task.objects.get(id=task['id'])
-                planDiff = businesshrs.difference(taskModel.p_start_date , taskModel.p_end_date)
-                actualDiff = businesshrs.difference(taskModel.a_start_date , taskModel.a_end_date)
+                planDiff = businesshrs.difference(
+                    taskModel.p_start_date, taskModel.p_end_date)
+                actualDiff = businesshrs.difference(
+                    taskModel.a_start_date, taskModel.a_end_date)
 
                 if planDiff.hours < actualDiff.hours:
-                    pro_obj['overdue'] = pro_obj['overdue'] + 1;
+                    pro_obj['overdue'] = pro_obj['overdue'] + 1
                 elif planDiff.hours > actualDiff.hours:
-                    pro_obj['earlier'] = pro_obj['earlier'] + 1;
+                    pro_obj['earlier'] = pro_obj['earlier'] + 1
                 elif planDiff.hours == actualDiff.hours:
-                    pro_obj['normal'] = pro_obj['normal'] + 1;
+                    pro_obj['normal'] = pro_obj['normal'] + 1
 
         result.append(pro_obj)
     return result
