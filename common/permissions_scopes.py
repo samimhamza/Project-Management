@@ -40,7 +40,9 @@ class ProjectPermissions(CustomPermissions):
         'delete_users': 'projects_u',
         'delete_teams': 'projects_u',
         'add_attachments': 'project_attachments_c',
-        'delete_attachments': 'project_attachments_d'
+        'delete_attachments': 'project_attachments_d',
+        'projects_status': 'projects_v',
+        'project_timing': 'projects_v',
     }
 
 

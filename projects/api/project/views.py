@@ -1,9 +1,12 @@
+from asyncio.windows_events import NULL
+from unittest import result
 from common.project_actions import (shareTo, notification, getRevokeNotification, broadcastProject,
-                                    broadcastDeleteProject, addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams)
-from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
+                                    broadcastDeleteProject, addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,countStatuses)
+from projects.api.project.serializers import ProjectSerializer,ProjectReportSerializer, ProjectTrashedSerializer
 from common.actions import (delete, filterRecords, addAttachment,
                             deleteAttachments, convertBase64ToImage)
 from users.api.teams.serializers import LessFieldsTeamSerializer
+from common.client_actions import projectTiming
 from users.api.serializers import UserWithProfileSerializer
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
@@ -163,3 +166,25 @@ class ProjectViewSet(Repository):
         serializer = LessFieldsTeamSerializer(
             teams, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @ action(detail=False, methods=["get"])
+    def projects_status(self, request, pk=None):
+        countables = [
+            'pending', 'status', 'pending',
+            'in_progress', 'status', 'in_progress',
+            'completed', 'status', 'completed',
+            'issue_faced', 'status', 'issue_faced',
+            'failed', 'status', 'failed',
+            'cancelled', 'status', 'cancelled'
+        ]
+        statusTotals = countStatuses(Project, countables)
+        return Response(statusTotals)
+
+    @ action(detail=False, methods=["get"])
+    def project_timing(self, request, pk=None):
+        projects = Project.objects.filter(deleted_at__isnull=True)
+        serializer = ProjectReportSerializer(
+            projects,many=True, context={"request": request})
+
+        return Response(projectTiming(serializer.data))
+

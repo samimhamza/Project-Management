@@ -1,8 +1,11 @@
+from asyncio import tasks
 from users.api.serializers import UserWithProfileSerializer
+from tasks.api.serializers import TaskReportSerializer
 from projects.api.serializers import LocationSerializer
 from rest_framework import serializers
 from projects.models import Project
 from users.models import User
+from tasks.models import Task
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -44,6 +47,23 @@ class ProjectSerializer(serializers.ModelSerializer):
             "deleted_at",
         ]
 
+
+class ProjectReportSerializer(serializers.ModelSerializer):
+    tasks = serializers.SerializerMethodField()
+
+    def get_tasks(self, project):
+        qs = Task.objects.filter(
+            deleted_at__isnull=True, project=project)
+        serializer = TaskReportSerializer(
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
+        return serializer.data
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
+            "tasks"
+        ]
 
 class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:
