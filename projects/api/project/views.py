@@ -1,9 +1,9 @@
 from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
                               addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,
-                              delete_users, delete_teams, member_actions, destroy)
-from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
+                              delete_users, delete_teams, member_actions, destroy, projectTiming)
+from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer,ProjectReportSerializer
 from common.actions import (
-    addAttachment, deleteAttachments, convertBase64ToImage)
+    addAttachment, deleteAttachments, convertBase64ToImage,countStatuses)
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
 from rest_framework.response import Response
@@ -120,3 +120,24 @@ class ProjectViewSet(Repository):
     @ action(detail=True, methods=["get"])
     def excluded_teams(self, request, pk=None):
         return excluded_teams(request, pk)
+
+    @ action(detail=False, methods=["get"])
+    def projects_status(self, request, pk=None):
+        countables = [
+            'pending', 'status', 'pending',
+            'in_progress', 'status', 'in_progress',
+            'completed', 'status', 'completed',
+            'issue_faced', 'status', 'issue_faced',
+            'failed', 'status', 'failed',
+            'cancelled', 'status', 'cancelled'
+        ]
+        statusTotals = countStatuses(Project, countables)
+        return Response(statusTotals)
+
+    @ action(detail=False, methods=["get"])
+    def project_timing(self, request, pk=None):
+        projects = Project.objects.filter(deleted_at__isnull=True)
+        serializer = ProjectReportSerializer(
+            projects,many=True, context={"request": request})
+
+        return Response(projectTiming(serializer.data))
