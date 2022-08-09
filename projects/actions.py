@@ -13,8 +13,9 @@ from users.models import User, Team
 from projects.models import Project
 from rest_framework import status
 from tasks.models import Task
-import businesstimedelta
 import datetime
+import pytz
+import businesstimedelta
 import os
 
 
@@ -347,7 +348,7 @@ def projectTiming(projects):
         pro_obj['normal'] = 0
         pro_obj['earlier'] = 0
         pro_obj['notclear'] = 0
-        pro_obj['total_tasks'] = len(project['tasks']);
+        pro_obj['total_tasks'] = len(project['tasks'])
 
         for task in project['tasks']:
             if task['p_start_date'] is None or task['p_end_date'] is None or task['a_start_date'] is None or task['a_end_date'] is None :
