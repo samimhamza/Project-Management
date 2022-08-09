@@ -1,3 +1,6 @@
+from typing import Type
+from unittest import result
+from projects.models import Income
 from common.actions import (allItems, filterRecords, expensesOfProject,
                             addAttachment, deleteAttachments, getAttachments)
 from expenses.models import Expense, ExpenseItem, Category
@@ -5,6 +8,7 @@ from common.permissions_scopes import ExpensePermissions
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from expenses.actions import totalExpenseAndIncome;
 from common.Repository import Repository
 from expenses.api.serializers import (
     CategorySerializer,
@@ -13,12 +17,14 @@ from expenses.api.serializers import (
     LessFieldExpenseSerializer,
     ExpenseTrashedSerializer,
     ExpenseItemSerializer,
+    ExpenseItemReportSerializer,
     ExpenseItemTrashedSerializer,
     CategoryListSerializer
 )
 from projects.models import Project
 from rest_framework import status
 from users.models import User
+from datetime import datetime
 
 
 class CategoryViewSet(Repository):
@@ -133,6 +139,14 @@ class ExpenseViewSet(Repository):
     @ action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
+    
+    
+    @ action(detail=False, methods=["post"])
+    def income_expense_reports(self, request, pk=None):
+        expenses = ExpenseItem.objects.filter(deleted_at__isnull=True,expense__type='actual')
+        incomes = Income.objects.filter(deleted_at__isnull=True)
+        results = totalExpenseAndIncome(expenses,incomes,request.data['year'])
+        return Response(results)
 
 
 class ExpenseItemViewSet(Repository):
@@ -174,3 +188,5 @@ class ExpenseItemViewSet(Repository):
         new_Task.save()
         serializer = ExpenseItemSerializer(new_Task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+

@@ -79,6 +79,15 @@ class IncomeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class IncomeReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Income
+        fields = [
+            "id",
+            "amount",
+            "date"
+        ]
+
 class ProjectNameListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project

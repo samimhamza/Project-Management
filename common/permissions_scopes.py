@@ -190,7 +190,8 @@ class ExpensePermissions(CustomPermissions):
         'trashed': 'project_expenses_d',
         'all': 'project_expenses_v',
         'add_attachments': 'expense_attachments_c',
-        'delete_attachments': 'expense_attachments_d'
+        'delete_attachments': 'expense_attachments_d',
+        'income_expense_reports': 'project_expenses_v',
     }
 
 

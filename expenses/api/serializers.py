@@ -21,6 +21,11 @@ class ExpenseItemSerializer(serializers.ModelSerializer):
         model = ExpenseItem
         fields = "__all__"
 
+class ExpenseItemReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpenseItem
+        fields = ["id","quantity","cost","updated_at"]
+
 
 # class ExpenseSerializer(serializers.ModelSerializer):
 #     items = serializers.SerializerMethodField()
