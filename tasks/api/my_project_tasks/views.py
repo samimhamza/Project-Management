@@ -1,6 +1,6 @@
 from common.comments import comments, destroy, listComments, createComments, updateComments
 from common.actions import (
-    addAttachment, deleteAttachments, getAttachments, filterRecords, un_authorized)
+    addAttachment, deleteAttachments, getAttachments, filterRecords, unAuthorized)
 from tasks.actions import (
     delete_dependencies, excluded_users, progress, tasksOfProject, create, update)
 from tasks.api.serializers import (
@@ -37,8 +37,8 @@ class MyTaskViewSet(Repository):
                 queryset = filterRecords(queryset, request, table=Task)
                 return tasksOfProject(self, request, queryset)
             else:
-                return un_authorized()
-        return un_authorized()
+                return unAuthorized()
+        return unAuthorized()
 
     def retrieve(self, request, pk=None):
         task = self.get_object()
@@ -50,20 +50,20 @@ class MyTaskViewSet(Repository):
                                   "task_attachments_v", project=task.project)
             return Response(data)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     def create(self, request):
         if checkProjectScope(request.user, None, "project_tasks_c", project_id=request.data.get("project")):
             return create(request)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     def update(self, request, pk=None):
         task = self.get_object()
         if checkProjectScope(request.user, task.project, "project_tasks_u"):
             return update(self, request, task)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
@@ -71,7 +71,7 @@ class MyTaskViewSet(Repository):
         if checkProjectScope(request.user, task.project, "project_tasks_v"):
             return excluded_users(self, task)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
@@ -79,7 +79,7 @@ class MyTaskViewSet(Repository):
         if checkProjectScope(request.user, task.project, "project_tasks_u"):
             return delete_dependencies(request, task)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     @action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
@@ -88,7 +88,7 @@ class MyTaskViewSet(Repository):
             if checkProjectScope(request.user, task.project, "task_attachments_c"):
                 return addAttachment(request, task)
             else:
-                return un_authorized()
+                return unAuthorized()
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
@@ -100,7 +100,7 @@ class MyTaskViewSet(Repository):
         if checkProjectScope(request.user, task.project, "task_attachments_d"):
             return deleteAttachments(self, request)
         else:
-            return un_authorized()
+            return unAuthorized()
 
     @action(detail=True, methods=["put"])
     def progress(self, request, pk=None):
@@ -109,7 +109,7 @@ class MyTaskViewSet(Repository):
             if checkProjectScope(request.user, task.project, "project_tasks_u"):
                 return progress(request, task)
             else:
-                return un_authorized()
+                return unAuthorized()
         except:
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

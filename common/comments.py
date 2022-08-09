@@ -1,7 +1,7 @@
 from .actions import allItems, filterRecords, convertBase64ToImage
 from tasks.api.serializers import CommentSerializer
 from common.permissions import checkProjectScope
-from common.actions import un_authorized, delete
+from common.actions import unAuthorized, delete
 from projects.models import Project, Attachment
 from rest_framework.response import Response
 from common.pusher import pusher_client
@@ -94,7 +94,7 @@ def comments(self, method, request, permission):
     if checkProjectScope(request.user, None, permission, id):
         return method(self, request)
     else:
-        return un_authorized()
+        return unAuthorized()
 
 
 def destroy(self, request):
