@@ -1,8 +1,7 @@
 from common.actions import (allItems, filterRecords, expensesOfProject,
                             addAttachment, deleteAttachments, getAttachments)
 from expenses.models import Expense, ExpenseItem, Category
-from common.permissions_scopes import ExpensePermissions
-from expenses.actions import totalExpenseAndIncome
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -18,17 +17,16 @@ from expenses.api.serializers import (
     CategoryListSerializer
 )
 from projects.models import Project
-from projects.models import Income
 from rest_framework import status
 from users.models import User
 
 
-class CategoryViewSet(Repository):
+class MyCategoryViewSet(Repository):
     model = Category
     queryset = Category.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = CategorySerializer
-    permission_classes = (ExpensePermissions,)
+    permission_classes = (IsAuthenticated,)
     serializer_action_classes = {
         "trashed": CategoryTrashedSerializer
     }
@@ -47,12 +45,12 @@ class CategoryViewSet(Repository):
         return self.get_paginated_response(serializer.data)
 
 
-class ExpenseViewSet(Repository):
+class MyExpenseViewSet(Repository):
     model = Expense
     queryset = Expense.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseSerializer
-    permission_classes = (ExpensePermissions,)
+    permission_classes = (IsAuthenticated,)
     serializer_action_classes = {
         "trashed": ExpenseTrashedSerializer
     }
@@ -136,22 +134,13 @@ class ExpenseViewSet(Repository):
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
 
-    @ action(detail=False, methods=["post"])
-    def income_expense_reports(self, request, pk=None):
-        expenses = ExpenseItem.objects.filter(
-            deleted_at__isnull=True, expense__type='actual')
-        incomes = Income.objects.filter(deleted_at__isnull=True)
-        results = totalExpenseAndIncome(
-            expenses, incomes, request.data['year'])
-        return Response(results)
 
-
-class ExpenseItemViewSet(Repository):
+class MyExpenseItemViewSet(Repository):
     model = ExpenseItem
     queryset = ExpenseItem.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
     serializer_class = ExpenseItemSerializer
-    permission_classes = (ExpensePermissions,)
+    permission_classes = (IsAuthenticated,)
     serializer_action_classes = {
         "trashed": ExpenseItemTrashedSerializer
     }
