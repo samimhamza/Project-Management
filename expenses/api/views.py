@@ -17,7 +17,6 @@ from expenses.api.serializers import (
     LessFieldExpenseSerializer,
     ExpenseTrashedSerializer,
     ExpenseItemSerializer,
-    ExpenseItemReportSerializer,
     ExpenseItemTrashedSerializer,
     CategoryListSerializer
 )
