@@ -13,8 +13,9 @@ from users.models import User, Team
 from projects.models import Project
 from rest_framework import status
 from tasks.models import Task
-import businesstimedelta
 import datetime
+import pytz
+import businesstimedelta
 import os
 
 
@@ -337,18 +338,27 @@ def my_project_member_actions(method, request, pk):
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
 
+def abbr(text = None):
+    if(text is not None):
+        abbr = ''
+        x = text.split()
+        if len(x) >= 2:
+            for i in x:
+                abbr += i[0]
+        elif len(x) == 1:
+            count = 0
+            for j in x[0]:
+                abbr += j
+                count = count+1
+                if count == 3:
+                    break
+        return abbr.upper()
+    return ''
 
 def projectTiming(projects):
     result = []
     for project in projects:
-        pro_obj = {}
-        pro_obj['name'] = project['name']
-        pro_obj['overdue'] = 0
-        pro_obj['normal'] = 0
-        pro_obj['earlier'] = 0
-        pro_obj['notclear'] = 0
-        pro_obj['total_tasks'] = len(project['tasks'])
-
+        pro_obj = {"name":project['name'],"abbr":abbr(project['name']), "overdue":0,"normal":0,"earlier":0,"notclear":0,"total_tasks":len(project['tasks'])}
         for task in project['tasks']:
             if task['p_start_date'] is None or task['p_end_date'] is None or task['a_start_date'] is None or task['a_end_date'] is None:
                 pro_obj['notclear'] = pro_obj['notclear'] + 1
