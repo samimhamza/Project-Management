@@ -21,28 +21,11 @@ class ExpenseItemSerializer(serializers.ModelSerializer):
         model = ExpenseItem
         fields = "__all__"
 
+
 class ExpenseItemReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseItem
-        fields = ["id","quantity","cost","updated_at"]
-
-
-# class ExpenseSerializer(serializers.ModelSerializer):
-#     items = serializers.SerializerMethodField()
-#     category = CategorySerializer()
-#     created_by = UserWithProfileSerializer(read_only=True)
-#     updated_by = UserWithProfileSerializer(read_only=True)
-#     expense_by = UserWithProfileSerializer()
-
-#     def get_items(self, expense):
-#         qs = ExpenseItem.objects.filter(
-#             deleted_at__isnull=True, expense=expense)
-#         serializer = ExpenseItemSerializer(instance=qs, many=True)
-#         return serializer.data
-
-#     class Meta:
-#         model = Expense
-#         fields = "__all__"
+        fields = ["id", "quantity", "cost", "updated_at"]
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
