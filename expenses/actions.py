@@ -73,7 +73,6 @@ def totalExpenseAndIncome(expenses, incomes, year):
             "value": 0
         }
     ]
-
     count = 1
     for d in data:
         d['expense'] = totalExpenseByMonth(expenses, year, count)
