@@ -327,7 +327,7 @@ def progress(request, task):
         userTask = UserTask.objects.get(user=user, task=task)
     except UserTask.DoesNotExist:
         return Response({'error': "Task has not assigned to this user"}, status=status.HTTP_400_BAD_REQUEST)
-    if Task.objects.filter(parent=task).exists():
+    if Task.objects.filter(parent=task, deleted_at__isnull=True).exists():
         return Response({'error': "Task has Sub tasks, please remove sub tasks first!"}, status=status.HTTP_400_BAD_REQUEST)
     userTask.progress = data['progress']
     userTask.save()
