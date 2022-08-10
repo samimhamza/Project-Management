@@ -48,23 +48,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProjectReportSerializer(serializers.ModelSerializer):
-    tasks = serializers.SerializerMethodField()
-
-    def get_tasks(self, project):
-        qs = Task.objects.filter(
-            deleted_at__isnull=True, project=project)
-        serializer = TaskReportSerializer(
-            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
-        return serializer.data
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
-            "tasks"
-        ]
-
 class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project

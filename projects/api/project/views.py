@@ -1,9 +1,9 @@
 from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
                               addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,
                               delete_users, delete_teams, member_actions, destroy, projectTiming)
-from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer,ProjectReportSerializer
+from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from common.actions import (
-    addAttachment, deleteAttachments, convertBase64ToImage,countStatuses)
+    addAttachment, deleteAttachments, convertBase64ToImage, countStatuses)
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
 from rest_framework.response import Response
@@ -137,7 +137,4 @@ class ProjectViewSet(Repository):
     @ action(detail=False, methods=["get"])
     def project_timing(self, request, pk=None):
         projects = Project.objects.filter(deleted_at__isnull=True)
-        serializer = ProjectReportSerializer(
-            projects,many=True, context={"request": request})
-
-        return Response(projectTiming(serializer.data))
+        return Response(projectTiming(projects))

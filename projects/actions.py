@@ -338,7 +338,8 @@ def my_project_member_actions(method, request, pk):
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-def abbr(text = None):
+
+def abbr(text=None):
     if(text is not None):
         abbr = ''
         x = text.split()
@@ -355,12 +356,14 @@ def abbr(text = None):
         return abbr.upper()
     return ''
 
+
 def projectTiming(projects):
     result = []
     for project in projects:
-        pro_obj = {"name":project['name'],"abbr":abbr(project['name']), "overdue":0,"normal":0,"earlier":0,"notclear":0,"total_tasks":len(project['tasks'])}
-        for task in project['tasks']:
-            if task['p_start_date'] is None or task['p_end_date'] is None or task['a_start_date'] is None or task['a_end_date'] is None:
+        pro_obj = {"name": project.name, "abbr": abbr(
+            project.name), "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": project.tasks.count()}
+        for task in project.tasks.all():
+            if task.p_start_date is None or task.p_end_date is None or task.a_start_date is None or task.a_end_date is None:
                 pro_obj['notclear'] = pro_obj['notclear'] + 1
             else:
                 workday = businesstimedelta.WorkDayRule(
@@ -373,7 +376,7 @@ def projectTiming(projects):
                     working_days=[0, 1, 2, 3, 4, 5])
 
                 businesshrs = businesstimedelta.Rules([workday, lunchbreak])
-                taskModel = Task.objects.get(id=task['id'])
+                taskModel = Task.objects.get(id=task.id)
                 planDiff = businesshrs.difference(
                     taskModel.p_start_date, taskModel.p_end_date)
                 actualDiff = businesshrs.difference(

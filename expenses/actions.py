@@ -1,7 +1,3 @@
-from expenses.api.serializers import ExpenseItemReportSerializer
-from projects.api.serializers import IncomeReportSerializer
-
-
 def totalExpenseAndIncome(expenses, incomes, year):
     data = [
         {
@@ -11,7 +7,7 @@ def totalExpenseAndIncome(expenses, incomes, year):
             "value": 0
         },
         {
-            "name": "FAB",
+            "name": "FEB",
             "income": 0,
             "expense": 0,
             "value": 0
@@ -91,19 +87,15 @@ def totalExpenseAndIncome(expenses, incomes, year):
 
 def totalExpenseByMonth(items, year, month):
     items = items.filter(updated_at__year=year, updated_at__month=month)
-    serializer = ExpenseItemReportSerializer(items, many=True)
-    datas = serializer.data
     total = 0
-    for item in datas:
-        total += float(item['quantity']) * float(item['cost'])
+    for item in items:
+        total += float(item.quantity) * float(item.cost)
     return total
 
 
 def totalIncomeByMonth(items, year, month):
     items = items.filter(updated_at__year=year, updated_at__month=month)
-    serializer = IncomeReportSerializer(items, many=True)
-    datas = serializer.data
     total = 0
-    for item in datas:
-        total += float(item['amount'])
+    for item in items:
+        total += float(item.amount)
     return total

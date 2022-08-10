@@ -132,11 +132,11 @@ class ExpenseViewSet(Repository):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @ action(detail=True, methods=["delete"])
+    @action(detail=True, methods=["delete"])
     def delete_attachments(self, request, pk=None):
         return deleteAttachments(self, request)
 
-    @ action(detail=False, methods=["post"])
+    @action(detail=False, methods=["get"])
     def income_expense_reports(self, request, pk=None):
         expenses = ExpenseItem.objects.filter(
             deleted_at__isnull=True, expense__type='actual')
