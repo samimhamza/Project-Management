@@ -1,8 +1,8 @@
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer, TaskSerializer
+from common.actions import allItems, countStatuses, getAttachments
 from users.api.serializers import UserWithProfileSerializer
 from tasks.api.serializers import ProgressSerializer
 from common.notification import sendNotification
-from common.actions import allItems, countStatuses
 from rest_framework.response import Response
 from common.pusher import pusher_client
 from tasks.models import Task, UserTask
@@ -280,7 +280,7 @@ def create(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def update(self, request, task):
+def update(self, request, task, project=None):
     if "dependencies" in request.data:
         if task.dependencies is not None:
             task.dependencies = task.dependencies + \
@@ -298,7 +298,10 @@ def update(self, request, task):
     task.updated_by = request.user
     task.save()
     serializer = self.get_serializer(task, context={"request": request})
-    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    data = serializer.data
+    data = getAttachments(request, data,
+                          task.id, "task_attachments_v", project=project)
+    return Response(data, status=status.HTTP_202_ACCEPTED)
 
 
 def excluded_users(self, task):

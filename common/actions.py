@@ -58,9 +58,10 @@ def countStatuses(table, countables, project_id=None):
         totals[countables[x]] = itemTotal
     return totals
 
+
 def countTime(table, countables, project_id=None):
     totals = {}
-    return totals;
+    return totals
 
 
 def filterRecords(queryset, request, columns=[], **kwargs):

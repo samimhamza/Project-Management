@@ -61,7 +61,7 @@ class MyTaskViewSet(Repository):
     def update(self, request, pk=None):
         task = self.get_object()
         if checkProjectScope(request.user, task.project, "project_tasks_u"):
-            return update(self, request, task)
+            return update(self, request, task, task.project)
         else:
             return unAuthorized()
 
