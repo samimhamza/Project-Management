@@ -140,10 +140,10 @@ class MyTaskCommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request):
-        return comments(self, listComments, request, "task_comments_v")
+        return comments(self, listComments, request, "task_comments_v", "task")
 
     def create(self, request):
-        return comments(self, createComments, request, "task_comments_c")
+        return comments(self, createComments, request, "task_comments_c", "task")
 
     def update(self, request, pk=None):
         return updateComments(self, request, pk)
