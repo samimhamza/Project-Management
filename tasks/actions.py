@@ -60,6 +60,8 @@ def updateProgress(task):
             totalProgress += user.progress
         totalProgress = totalProgress / len(users)
     task.progress = int(totalProgress)
+    if task.progress == 100:
+        task.status == "completed"
     task.save()
 
 
@@ -297,12 +299,20 @@ def update(self, request, task, project=None):
             if task.progress == 100:
                 task.status = "completed"
             else:
-                return Response({"detail": "Cannot set Task to completed when progress is not 100"},
+                return Response({"detail": "Cannot complete task when progress is not 100!"},
                                 status=status.HTTP_400_BAD_REQUEST)
         else:
             task.status = request.data["status"]
+
+    if "a_end_date" in request.data:
+        if task.progress == 100 or request.data["a_end_date"] is None:
+            task.a_end_date = request.data["a_end_date"]
+        else:
+            return Response({"detail": "Cannot add actual end date when Task is not completed!"},
+                            status=status.HTTP_400_BAD_REQUEST)
     for key, value in request.data.items():
-        if key != "users" and key != "dependencies" and key != "id" and key != "progress" and key != "status":
+        if key != "users" and key != "dependencies" and key != "id"\
+                and key != "progress" and key != "status" and key != "a_end_date":
             setattr(task, key, value)
     task.updated_by = request.user
     task.save()
@@ -350,15 +360,16 @@ def progress(request, task):
 
 
 def calculateUserPerformance(users):
-    serializer = UserReportSerializer(users,many=True)
+    serializer = UserReportSerializer(users, many=True)
     users = serializer.data
 
     result = []
     for user in users:
-        user_obj = {"name": user['username'], "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": len(user['tasks'])}
+        user_obj = {"name": user['username'], "overdue": 0, "normal": 0,
+                    "earlier": 0, "notclear": 0, "total_tasks": len(user['tasks'])}
         for userTask in user['tasks']:
-            t= userTask['task']
-            if all([t['p_start_date'], t['p_end_date'],t['a_start_date'], t['a_end_date']]) is False:
+            t = userTask['task']
+            if all([t['p_start_date'], t['p_end_date'], t['a_start_date'], t['a_end_date']]) is False:
                 user_obj['notclear'] = user_obj['notclear'] + 1
             else:
                 businesshrs = bussinessHours()
@@ -366,14 +377,9 @@ def calculateUserPerformance(users):
                 planDiff = businesshrs.difference(
                     taskModel.p_start_date, taskModel.p_end_date)
                 actualDiff = businesshrs.difference(
-                    taskModel.a_start_date, taskModel.a_end_date)  
-                taskTimingCalculator(user_obj,planDiff.hours,actualDiff.hours)
+                    taskModel.a_start_date, taskModel.a_end_date)
+                taskTimingCalculator(
+                    user_obj, planDiff.hours, actualDiff.hours)
 
         result.append(user_obj)
     return result
-
-
-
-
-
-
