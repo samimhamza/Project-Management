@@ -46,6 +46,27 @@ class CategoryViewSet(Repository):
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    def create(self, request):
+        data = request.data
+        creator = request.user
+        category = Category.objects.create(
+            name=data["name"],
+            created_by=creator,
+            updated_by=creator,
+        )
+        category.save()
+        serializer = self.get_serializer(category)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        category = self.get_object()
+        for key, value in request.data.items():
+            setattr(category, key, value)
+        category.updated_by = request.user
+        category.save()
+        serializer = self.get_serializer(category)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
 
 class ExpenseViewSet(Repository):
     model = Expense
@@ -143,8 +164,9 @@ class ExpenseViewSet(Repository):
             incomes = ''
             if request.query_params.get('project_id'):
                 expenses = ExpenseItem.objects.filter(
-                    deleted_at__isnull=True, expense__type='actual',expense__project=request.GET['project_id'])
-                incomes = Income.objects.filter(deleted_at__isnull=True,project=request.GET['project_id'])
+                    deleted_at__isnull=True, expense__type='actual', expense__project=request.GET['project_id'])
+                incomes = Income.objects.filter(
+                    deleted_at__isnull=True, project=request.GET['project_id'])
             else:
                 expenses = ExpenseItem.objects.filter(
                     deleted_at__isnull=True, expense__type='actual')
