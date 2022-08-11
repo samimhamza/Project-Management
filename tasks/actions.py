@@ -59,6 +59,8 @@ def updateProgress(task):
             totalProgress += user.progress
         totalProgress = totalProgress / len(users)
     task.progress = int(totalProgress)
+    if task.progress == 100:
+        task.status == "completed"
     task.save()
 
 
@@ -296,12 +298,20 @@ def update(self, request, task, project=None):
             if task.progress == 100:
                 task.status = "completed"
             else:
-                return Response({"detail": "Cannot set Task to completed when progress is not 100"},
+                return Response({"detail": "Cannot complete task when progress is not 100!"},
                                 status=status.HTTP_400_BAD_REQUEST)
         else:
             task.status = request.data["status"]
+
+    if "a_end_date" in request.data:
+        if task.progress == 100 or request.data["a_end_date"] is None:
+            task.a_end_date = request.data["a_end_date"]
+        else:
+            return Response({"detail": "Cannot add actual end date when Task is not completed!"},
+                            status=status.HTTP_400_BAD_REQUEST)
     for key, value in request.data.items():
-        if key != "users" and key != "dependencies" and key != "id" and key != "progress" and key != "status":
+        if key != "users" and key != "dependencies" and key != "id"\
+                and key != "progress" and key != "status" and key != "a_end_date":
             setattr(task, key, value)
     task.updated_by = request.user
     task.save()
