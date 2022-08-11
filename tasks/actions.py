@@ -292,9 +292,17 @@ def update(self, request, task, project=None):
     if "users" in request.data:
         users = User.objects.filter(pk__in=request.data.get('users'))
         assignToUsers(request, task, users)
-
+    if "status" in request.data:
+        if request.data["status"] == "completed":
+            if task.progress == 100:
+                task.status = "completed"
+            else:
+                return Response({"detail": "Cannot set Task to completed when progress is not 100"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            task.status = request.data["status"]
     for key, value in request.data.items():
-        if key != "users" and key != "dependencies" and key != "id" and key != "progress":
+        if key != "users" and key != "dependencies" and key != "id" and key != "progress" and key != "status":
             setattr(task, key, value)
     task.updated_by = request.user
     task.save()
