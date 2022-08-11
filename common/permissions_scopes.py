@@ -16,7 +16,8 @@ class TaskPermissions(CustomPermissions):
         'excluded_users': 'project_tasks_u',
         'add_attachments': 'task_attachments_c',
         'delete_attachments': 'task_attachments_d',
-        'progress': 'project_tasks_u'
+        'progress': 'project_tasks_u',
+        'employee_task_report':'project_tasks_v'
     }
 
 

@@ -67,7 +67,6 @@ class UserTaskSerializer(serializers.ModelSerializer):
         model = UserTask
         fields = ["description", "progress", "type", "user"]
 
-
 class ProgressSerializer(serializers.ModelSerializer):
     task = LessTaskSerializer()
 

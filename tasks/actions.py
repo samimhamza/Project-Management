@@ -1,5 +1,6 @@
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer, TaskSerializer
 from users.api.serializers import UserWithProfileSerializer
+from users.api.serializers import UserReportSerializer
 from tasks.api.serializers import ProgressSerializer
 from common.notification import sendNotification
 from common.actions import allItems, countStatuses
@@ -9,7 +10,11 @@ from tasks.models import Task, UserTask
 from projects.models import Project
 from rest_framework import status
 from users.models import User
+import businesstimedelta
+import datetime
 import math
+import pytz
+import os
 
 
 def broadcastProgress(data):
@@ -335,3 +340,41 @@ def progress(request, task):
     serializerData = prepareData(serializer, task)
     broadcastProgress(serializerData)
     return Response(serializerData)
+
+
+def calculateUserPerformance(users):
+    serializer = UserReportSerializer(users,many=True)
+    users = serializer.data
+    result = []
+    
+    for user in users:
+        user_obj = {"name": user['username'], "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": len(user['tasks'])}
+        for userTask in user['tasks']:
+            if userTask['task']['p_start_date'] is None or userTask['task']['p_end_date'] is None or userTask['task']['a_start_date'] is None or userTask['task']['a_end_date'] is None:
+                user_obj['notclear'] = user_obj['notclear'] + 1
+            else:
+                workday = businesstimedelta.WorkDayRule(
+                    start_time=datetime.time(8),
+                    end_time=datetime.time(17),
+                    working_days=[0, 1, 2, 3, 4, 5])
+                lunchbreak = businesstimedelta.LunchTimeRule(
+                    start_time=datetime.time(12),
+                    end_time=datetime.time(13),
+                    working_days=[0, 1, 2, 3, 4, 5])
+
+                businesshrs = businesstimedelta.Rules([workday, lunchbreak])
+                taskModel = Task.objects.get(id=userTask['task']['id'])
+                planDiff = businesshrs.difference(
+                    taskModel.p_start_date, taskModel.p_end_date)
+                actualDiff = businesshrs.difference(
+                    taskModel.a_start_date, taskModel.a_end_date)
+
+                if planDiff.hours < actualDiff.hours:
+                    user_obj['overdue'] = user_obj['overdue'] + 1
+                elif planDiff.hours > actualDiff.hours:
+                    user_obj['earlier'] = user_obj['earlier'] + 1
+                elif planDiff.hours == actualDiff.hours:
+                    user_obj['normal'] = user_obj['normal'] + 1
+
+        result.append(user_obj)
+    return result
