@@ -133,12 +133,15 @@ class ProjectViewSet(Repository):
             'cancelled', 'status', 'cancelled'
         ]
         if request.query_params.get('project_id'):
-            statusTotals = countStatuses(Task, countables,request.GET['project_id'])
+            return Response(countStatuses(Task, countables,request.GET['project_id']))
         else:
-            statusTotals = countStatuses(Project, countables)
-        return Response(statusTotals)
+            return Response(countStatuses(Project, countables))
 
     @ action(detail=False, methods=["get"])
     def project_timing(self, request, pk=None):
-        projects = Project.objects.filter(deleted_at__isnull=True).order_by("-created_at")[:10]
+        projects = ''
+        if request.query_params.get('project_id'):
+            projects = Project.objects.filter(id=request.GET['project_id'])
+        else:
+            projects = Project.objects.filter(deleted_at__isnull=True).order_by("-created_at")[:10]
         return Response(projectTiming(projects))
