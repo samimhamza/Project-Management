@@ -13,10 +13,14 @@ from rest_framework import status
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import Q
+import businesstimedelta
+import datetime
 import datetime
 import base64
 import uuid
 import os
+
+
 
 
 def convertBase64ToImage(base64file):
@@ -299,3 +303,25 @@ def unAuthorized():
     return Response({
         "detail": "You do not have permission to perform this action."
     }, status=status.HTTP_403_FORBIDDEN)
+
+
+
+def bussinessHours():
+    workday = businesstimedelta.WorkDayRule(
+        start_time=datetime.time(8),
+        end_time=datetime.time(17),
+        working_days=[0, 1, 2, 3, 4, 5])
+    lunchbreak = businesstimedelta.LunchTimeRule(
+        start_time=datetime.time(12),
+        end_time=datetime.time(13),
+        working_days=[0, 1, 2, 3, 4, 5])
+    return businesstimedelta.Rules([workday, lunchbreak])
+
+def taskTimingCalculator(obj,planHour,actualHour):
+    if planHour < actualHour:
+        obj['overdue'] = obj['overdue'] + 1
+    elif planHour > actualHour:
+        obj['earlier'] = obj['earlier'] + 1
+    elif planHour == actualHour:
+        obj['normal'] = obj['normal'] + 1
+    return obj

@@ -1,5 +1,5 @@
 from common.actions import (convertBase64ToImage, getAttachments,
-                            countStatuses, filterRecords, allItems, projectsOfUser, unAuthorized, delete)
+                            countStatuses, filterRecords, allItems, projectsOfUser, unAuthorized, delete, bussinessHours, taskTimingCalculator)
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
@@ -13,9 +13,6 @@ from users.models import User, Team
 from projects.models import Project
 from rest_framework import status
 from tasks.models import Task
-import datetime
-import pytz
-import businesstimedelta
 import os
 
 
@@ -363,31 +360,16 @@ def projectTiming(projects):
         pro_obj = {"name": project.name, "abbr": abbr(
             project.name), "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": project.tasks.count()}
         for task in project.tasks.all():
-            if task.p_start_date is None or task.p_end_date is None or task.a_start_date is None or task.a_end_date is None:
+            if all([task.p_start_date, task.p_end_date, task.a_start_date,task.a_end_date]) is False:
                 pro_obj['notclear'] = pro_obj['notclear'] + 1
             else:
-                workday = businesstimedelta.WorkDayRule(
-                    start_time=datetime.time(8),
-                    end_time=datetime.time(17),
-                    working_days=[0, 1, 2, 3, 4, 5])
-                lunchbreak = businesstimedelta.LunchTimeRule(
-                    start_time=datetime.time(12),
-                    end_time=datetime.time(13),
-                    working_days=[0, 1, 2, 3, 4, 5])
-
-                businesshrs = businesstimedelta.Rules([workday, lunchbreak])
-                taskModel = Task.objects.get(id=task.id)
+                businesshrs = bussinessHours()
                 planDiff = businesshrs.difference(
-                    taskModel.p_start_date, taskModel.p_end_date)
+                    task.p_start_date, task.p_end_date)
                 actualDiff = businesshrs.difference(
-                    taskModel.a_start_date, taskModel.a_end_date)
-
-                if planDiff.hours < actualDiff.hours:
-                    pro_obj['overdue'] = pro_obj['overdue'] + 1
-                elif planDiff.hours > actualDiff.hours:
-                    pro_obj['earlier'] = pro_obj['earlier'] + 1
-                elif planDiff.hours == actualDiff.hours:
-                    pro_obj['normal'] = pro_obj['normal'] + 1
+                    task.a_start_date, task.a_end_date)
+                taskTimingCalculator(pro_obj,planDiff.hours,actualDiff.hours)
 
         result.append(pro_obj)
     return result
+
