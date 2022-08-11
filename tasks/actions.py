@@ -1,6 +1,7 @@
 from tasks.api.serializers import LessFieldsTaskSerializer, ParentTaskSerializer, TaskSerializer
-from common.actions import allItems, countStatuses, getAttachments
+from common.actions import allItems, countStatuses, getAttachments, bussinessHours, taskTimingCalculator
 from users.api.serializers import UserWithProfileSerializer
+from users.api.serializers import UserReportSerializer
 from tasks.api.serializers import ProgressSerializer
 from common.notification import sendNotification
 from rest_framework.response import Response
@@ -356,3 +357,33 @@ def progress(request, task):
     serializerData = prepareData(serializer, task)
     broadcastProgress(serializerData)
     return Response(serializerData)
+
+
+def calculateUserPerformance(users):
+    serializer = UserReportSerializer(users,many=True)
+    users = serializer.data
+
+    result = []
+    for user in users:
+        user_obj = {"name": user['username'], "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": len(user['tasks'])}
+        for userTask in user['tasks']:
+            t= userTask['task']
+            if all([t['p_start_date'], t['p_end_date'],t['a_start_date'], t['a_end_date']]) is False:
+                user_obj['notclear'] = user_obj['notclear'] + 1
+            else:
+                businesshrs = bussinessHours()
+                taskModel = Task.objects.get(id=t['id'])
+                planDiff = businesshrs.difference(
+                    taskModel.p_start_date, taskModel.p_end_date)
+                actualDiff = businesshrs.difference(
+                    taskModel.a_start_date, taskModel.a_end_date)  
+                taskTimingCalculator(user_obj,planDiff.hours,actualDiff.hours)
+
+        result.append(user_obj)
+    return result
+
+
+
+
+
+

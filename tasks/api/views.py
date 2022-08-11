@@ -1,8 +1,9 @@
+from users.models import User
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from tasks.actions import (
-    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update)
+    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUserPerformance)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from common.actions import (
     delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
@@ -12,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.Repository import Repository
 from tasks.models import Task, Comment
+
 
 
 class TaskViewSet(Repository):
@@ -90,6 +92,11 @@ class TaskViewSet(Repository):
             return progress(request, task)
         except:
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['get'])
+    def employee_task_report(self, request, pk=None):
+        users = User.objects.all()
+        return Response(calculateUserPerformance(users))
 
 
 class ProjectCommentViewSet(viewsets.ModelViewSet):
