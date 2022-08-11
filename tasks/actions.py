@@ -360,15 +360,16 @@ def progress(request, task):
 
 
 def calculateUserPerformance(users):
-    serializer = UserReportSerializer(users,many=True)
+    serializer = UserReportSerializer(users, many=True)
     users = serializer.data
 
     result = []
     for user in users:
-        user_obj = {"name": user['username'], "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": len(user['tasks'])}
+        user_obj = {"name": user['username'], "overdue": 0, "normal": 0,
+                    "earlier": 0, "notclear": 0, "total_tasks": len(user['tasks'])}
         for userTask in user['tasks']:
-            t= userTask['task']
-            if all([t['p_start_date'], t['p_end_date'],t['a_start_date'], t['a_end_date']]) is False:
+            t = userTask['task']
+            if all([t['p_start_date'], t['p_end_date'], t['a_start_date'], t['a_end_date']]) is False:
                 user_obj['notclear'] = user_obj['notclear'] + 1
             else:
                 businesshrs = bussinessHours()
@@ -376,14 +377,9 @@ def calculateUserPerformance(users):
                 planDiff = businesshrs.difference(
                     taskModel.p_start_date, taskModel.p_end_date)
                 actualDiff = businesshrs.difference(
-                    taskModel.a_start_date, taskModel.a_end_date)  
-                taskTimingCalculator(user_obj,planDiff.hours,actualDiff.hours)
+                    taskModel.a_start_date, taskModel.a_end_date)
+                taskTimingCalculator(
+                    user_obj, planDiff.hours, actualDiff.hours)
 
         result.append(user_obj)
     return result
-
-
-
-
-
-
