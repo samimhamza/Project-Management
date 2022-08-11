@@ -15,7 +15,6 @@ from common.Repository import Repository
 from tasks.models import Task, Comment
 
 
-
 class TaskViewSet(Repository):
     model = Task
     queryset = Task.objects.filter(
