@@ -139,9 +139,17 @@ class ExpenseViewSet(Repository):
     @ action(detail=False, methods=["get"])
     def income_expense_reports(self, request, pk=None):
         if request.query_params.get('year'):
-            expenses = ExpenseItem.objects.filter(
-                deleted_at__isnull=True, expense__type='actual')
-            incomes = Income.objects.filter(deleted_at__isnull=True)
+            expenses = ''
+            incomes = ''
+            if request.query_params.get('project_id'):
+                expenses = ExpenseItem.objects.filter(
+                    deleted_at__isnull=True, expense__type='actual',expense__project=request.GET['project_id'])
+                incomes = Income.objects.filter(deleted_at__isnull=True,project=request.GET['project_id'])
+            else:
+                expenses = ExpenseItem.objects.filter(
+                    deleted_at__isnull=True, expense__type='actual')
+                incomes = Income.objects.filter(deleted_at__isnull=True)
+
             results = totalExpenseAndIncome(
                 expenses, incomes, request.GET['year'])
             return Response(results)

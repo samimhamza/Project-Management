@@ -1,3 +1,4 @@
+from tasks.models import Task
 from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
                               addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,
                               delete_users, delete_teams, member_actions, destroy, projectTiming)
@@ -131,7 +132,10 @@ class ProjectViewSet(Repository):
             'failed', 'status', 'failed',
             'cancelled', 'status', 'cancelled'
         ]
-        statusTotals = countStatuses(Project, countables)
+        if request.query_params.get('project_id'):
+            statusTotals = countStatuses(Task, countables,request.GET['project_id'])
+        else:
+            statusTotals = countStatuses(Project, countables)
         return Response(statusTotals)
 
     @ action(detail=False, methods=["get"])
