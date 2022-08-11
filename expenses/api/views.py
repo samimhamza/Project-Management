@@ -1,5 +1,5 @@
 from common.actions import (allItems, filterRecords, expensesOfProject,
-                            addAttachment, deleteAttachments, getAttachments)
+                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense)
 from expenses.models import Expense, ExpenseItem, Category
 from common.permissions_scopes import ExpensePermissions
 from expenses.actions import totalExpenseAndIncome
@@ -195,8 +195,10 @@ class ExpenseItemViewSet(Repository):
     def list(self, request):
         queryset = self.get_queryset()
         queryset = filterRecords(queryset, request, table=ExpenseItem)
+        if request.GET.get("expense_id"):
+            return expenseItemsOfExpense(self, request, queryset)
         if request.GET.get("items_per_page") == "-1":
-            return allItems(ExpenseItemSerializer, queryset)
+            return allItems(self.get_serializer, queryset)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)

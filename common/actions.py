@@ -21,8 +21,6 @@ import uuid
 import os
 
 
-
-
 def convertBase64ToImage(base64file):
     if base64file and base64file != "" and ';base64,' in base64file:
         format, imgstr = base64file.split(';base64,')
@@ -305,7 +303,6 @@ def unAuthorized():
     }, status=status.HTTP_403_FORBIDDEN)
 
 
-
 def bussinessHours():
     workday = businesstimedelta.WorkDayRule(
         start_time=datetime.time(8),
@@ -317,7 +314,8 @@ def bussinessHours():
         working_days=[0, 1, 2, 3, 4, 5])
     return businesstimedelta.Rules([workday, lunchbreak])
 
-def taskTimingCalculator(obj,planHour,actualHour):
+
+def taskTimingCalculator(obj, planHour, actualHour):
     if planHour < actualHour:
         obj['overdue'] = obj['overdue'] + 1
     elif planHour > actualHour:
@@ -325,3 +323,20 @@ def taskTimingCalculator(obj,planHour,actualHour):
     elif planHour == actualHour:
         obj['normal'] = obj['normal'] + 1
     return obj
+
+
+def expenseItemsOfExpense(self, request, queryset):
+    total = 0
+    queryset = queryset.filter(expense=request.GET.get(
+        "expense_id")).order_by("-created_at")
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(self.get_serializer, queryset)
+    page = self.paginate_queryset(queryset)
+    data = self.get_serializer(page, many=True).data
+    for item in data:
+        item["total"] = int(item["quantity"]) * float(item["cost"])
+        total += item["total"]
+
+    data = self.get_paginated_response(data).data
+    data['total_expense'] = total
+    return Response(data)
