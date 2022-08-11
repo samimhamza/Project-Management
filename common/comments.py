@@ -89,12 +89,18 @@ def updateComments(self, request, pk):
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-def comments(self, method, request, permission):
+def comments(self, method, request, permission, type="project"):
     id = request.GET.get("id")
-    if checkProjectScope(request.user, None, permission, id):
-        return method(self, request)
-    else:
+    if type == "project":
+        if checkProjectScope(request.user, None, permission, id):
+            return method(self, request)
         return unAuthorized()
+    elif type == "task":
+        task = Task.objects.get(pk=id)
+        if checkProjectScope(request.user, task.project, permission):
+            return method(self, request)
+        return unAuthorized()
+    return unAuthorized()
 
 
 def destroy(self, request):

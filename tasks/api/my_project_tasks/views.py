@@ -61,7 +61,7 @@ class MyTaskViewSet(Repository):
     def update(self, request, pk=None):
         task = self.get_object()
         if checkProjectScope(request.user, task.project, "project_tasks_u"):
-            return update(self, request, task)
+            return update(self, request, task, task.project)
         else:
             return unAuthorized()
 
@@ -140,10 +140,10 @@ class MyTaskCommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request):
-        return comments(self, listComments, request, "task_comments_v")
+        return comments(self, listComments, request, "task_comments_v", "task")
 
     def create(self, request):
-        return comments(self, createComments, request, "task_comments_c")
+        return comments(self, createComments, request, "task_comments_c", "task")
 
     def update(self, request, pk=None):
         return updateComments(self, request, pk)
