@@ -90,12 +90,13 @@ class ExpenseViewSet(Repository):
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldExpenseSerializer, queryset)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(
+            queryset, many=True, context={"request": request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         expense = self.get_object()
-        serializer = self.get_serializer(expense)
+        serializer = self.get_serializer(expense, context={"request": request})
         data = serializer.data
         data = getAttachments(request, data, expense.id,
                               "expense_attachments_v")
@@ -124,7 +125,8 @@ class ExpenseViewSet(Repository):
             updated_by=creator,
         )
         new_Task.save()
-        serializer = self.get_serializer(new_Task)
+        serializer = self.get_serializer(
+            new_Task, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -141,7 +143,7 @@ class ExpenseViewSet(Repository):
                 setattr(expense, key, value)
         expense.updated_by = request.user
         expense.save()
-        serializer = self.get_serializer(expense)
+        serializer = self.get_serializer(expense, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     @ action(detail=True, methods=["post"])
@@ -202,11 +204,13 @@ class ExpenseItemViewSet(Repository):
             return allItems(self.get_serializer, queryset)
 
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = self.get_serializer(
+            page, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
 
     def create(self, request):
         data = request.data
+        creator = request.user
         if data['expense']:
             expense = Expense.objects.only('id').get(pk=data['expense'])
         else:
@@ -217,7 +221,19 @@ class ExpenseItemViewSet(Repository):
             cost=data["cost"],
             unit=data["unit"],
             quantity=data['quantity'],
+            created_by=creator,
+            updated_by=creator,
         )
         new_Task.save()
-        serializer = ExpenseItemSerializer(new_Task)
+        serializer = self.get_serializer(
+            new_Task, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        item = self.get_object()
+        for key, value in request.data.items():
+            setattr(item, key, value)
+        item.updated_by = request.user
+        item.save()
+        serializer = self.get_serializer(item, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

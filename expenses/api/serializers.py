@@ -17,6 +17,10 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 
 class ExpenseItemSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    delted_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = ExpenseItem
         fields = "__all__"
@@ -32,8 +36,9 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
     def get_items(self, expense):
         qs = ExpenseItem.objects.filter(
-            deleted_at__isnull=True, expense=expense)
-        serializer = ExpenseItemSerializer(instance=qs, many=True)
+            deleted_at__isnull=True, expense=expense).order_by('-created_at')
+        serializer = ExpenseItemSerializer(
+            instance=qs, many=True, context={"request": self.context['request']})
         return serializer.data
 
     class Meta:

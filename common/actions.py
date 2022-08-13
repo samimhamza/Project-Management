@@ -220,7 +220,8 @@ def expensesOfProject(self, request, queryset):
     if request.GET.get("items_per_page") == "-1":
         return allItems(LessFieldExpenseSerializer, queryset)
     page = self.paginate_queryset(queryset)
-    serializer = self.get_serializer(page, many=True)
+    serializer = self.get_serializer(
+        page, many=True, context={"request": request})
     for data in serializer.data:
         data = getAttachments(
             request, data, data['id'], "expense_attachments_v")
@@ -332,7 +333,8 @@ def expenseItemsOfExpense(self, request, queryset):
     if request.GET.get("items_per_page") == "-1":
         return allItems(self.get_serializer, queryset)
     page = self.paginate_queryset(queryset)
-    data = self.get_serializer(page, many=True).data
+    data = self.get_serializer(page, many=True, context={
+                               "request": request}).data
     for item in data:
         item["total"] = int(item["quantity"]) * float(item["cost"])
         total += item["total"]

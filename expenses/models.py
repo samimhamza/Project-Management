@@ -94,6 +94,18 @@ class ExpenseItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="expense_item_created_by",
+    )
+    updated_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="expense_item_updated_by",
+    )
     deleted_by = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
