@@ -133,8 +133,9 @@ class ExpenseViewSet(Repository):
         if "category" in data:
             category = Category.objects.only('id').get(pk=data['category'])
             expense.category = category
-        expense_by = get_object_or_404(User, pk=data['expense_by'])
-        expense.expense_by = expense_by
+        if "expense_by" in data:
+            expense_by = get_object_or_404(User, pk=data['expense_by'])
+            expense.expense_by = expense_by
         for key, value in request.data.items():
             if key != "category" and key != "id":
                 setattr(expense, key, value)
