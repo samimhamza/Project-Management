@@ -1,7 +1,3 @@
-from dataclasses import field
-from pyexpat import model
-from tasks.models import Task
-from tasks.models import UserTask
 from users.models import (User,  Reminder, Holiday, Notification,
                           TeamUser, Action, SubAction, Permission, UserPermissionList, Role, UserNotification)
 
@@ -49,33 +45,6 @@ class UserSerializer(serializers.ModelSerializer):
             "updated_at",
             "deleted_at",
         ]
-
-class TaskReportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = ["id","p_start_date","p_end_date","a_start_date","a_end_date"]
-
-class UserTaskReportSerializer(serializers.ModelSerializer):
-    task = TaskReportSerializer()
-    class Meta:
-        model = UserTask
-        fields = ["description", "progress", "type","task"]
-
-class UserReportSerializer(serializers.ModelSerializer):
-    tasks = serializers.SerializerMethodField()
-    def get_tasks(self, user):
-        qs = UserTask.objects.filter(user=user,type="assign")
-        serializer = UserTaskReportSerializer(instance=qs, many=True)
-        return serializer.data
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "username",
-            "tasks"
-        ]
-
-
 class AuthUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
