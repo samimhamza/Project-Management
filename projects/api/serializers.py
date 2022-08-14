@@ -84,7 +84,7 @@ class IncomeSerializer(serializers.ModelSerializer):
 
     def get_payments(self, income):
         qs = Payment.objects.filter(
-            deleted_at__isnull=True, income=income)
+            deleted_at__isnull=True, income=income).order_by('-date')
         serializer = PaymentSerializer(instance=qs, many=True, context={
                                        "request": self.context['request']})
         return serializer.data
