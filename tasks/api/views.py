@@ -1,9 +1,9 @@
-from users.models import User
+from projects.models import Project
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from tasks.actions import (
-    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUserPerformance)
+    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUsersPerformance)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from common.actions import (
     delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.Repository import Repository
 from tasks.models import Task, Comment
+from users.models import User
 
 
 class TaskViewSet(Repository):
@@ -94,8 +95,16 @@ class TaskViewSet(Repository):
 
     @action(detail=False, methods=['get'])
     def employee_task_report(self, request, pk=None):
-        users = User.objects.all()
-        return Response(calculateUserPerformance(users))
+        users = ''
+        if request.query_params.get('project_id'):
+            user_ids = Project.objects.filter(pk = request.GET['project_id']).values_list('users')
+            users = User.objects.filter(pk__in=user_ids)
+            return Response(calculateUsersPerformance(users,request.GET['project_id']))
+        else:
+            user_ids = Project.objects.values_list('users')
+            users = User.objects.filter(pk__in=user_ids)
+            return Response(calculateUsersPerformance(users))
+
 
 
 class ProjectCommentViewSet(viewsets.ModelViewSet):

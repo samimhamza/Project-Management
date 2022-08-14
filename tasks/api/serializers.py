@@ -36,29 +36,6 @@ class LessTaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ["id", "progress", "project"]
 
-
-class TaskReportSerializer(serializers.ModelSerializer):
-    p_start_date = serializers.DateTimeField(
-        format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)
-    p_end_date = serializers.DateTimeField(
-        format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)
-    a_start_date = serializers.DateTimeField(
-        format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)
-    a_end_date = serializers.DateTimeField(
-        format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)
-
-    class Meta:
-        model = Task
-        fields = [
-            "id",
-            "name",
-            "p_start_date",
-            "p_end_date",
-            "a_start_date",
-            "a_end_date",
-        ]
-
-
 class ParentTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
