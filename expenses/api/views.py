@@ -3,7 +3,6 @@ from common.actions import (allItems, filterRecords, expensesOfProject,
 from expenses.models import Expense, ExpenseItem, Category
 from common.permissions_scopes import ExpensePermissions
 from expenses.actions import totalExpenseAndIncome
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
@@ -113,7 +112,11 @@ class ExpenseViewSet(Repository):
             project = Project.objects.only('id').get(pk=data['project'])
         else:
             project = None
-        expense_by = get_object_or_404(User, pk=data['expense_by'])
+        try:
+            expense_by = User.objects.only('id').get(pk=data['expense_by'])
+        except User.DoesNotExist:
+            return Response({"error": "User does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+
         new_Task = Expense.objects.create(
             category=category,
             title=data["title"],
@@ -133,13 +136,19 @@ class ExpenseViewSet(Repository):
         expense = self.get_object()
         data = request.data
         if "category" in data:
-            category = Category.objects.only('id').get(pk=data['category'])
-            expense.category = category
+            try:
+                category = Category.objects.only('id').get(pk=data['category'])
+                expense.category = category
+            except Category.DoesNotExist:
+                return Response({"error": "Category does not exist!"}, status=status.HTTP_404_NOT_FOUND)
         if "expense_by" in data:
-            expense_by = get_object_or_404(User, pk=data['expense_by'])
-            expense.expense_by = expense_by
+            try:
+                expense_by = User.objects.only('id').get(pk=data['expense_by'])
+                expense.expense_by = expense_by
+            except User.DoesNotExist:
+                return Response({"error": "User does not exist!"}, status=status.HTTP_404_NOT_FOUND)
         for key, value in request.data.items():
-            if key != "category" and key != "id":
+            if key != "category" and key != "id" and key != "expense_by":
                 setattr(expense, key, value)
         expense.updated_by = request.user
         expense.save()
