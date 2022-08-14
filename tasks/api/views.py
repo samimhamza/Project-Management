@@ -98,11 +98,11 @@ class TaskViewSet(Repository):
         users = ''
         if request.query_params.get('project_id'):
             user_ids = Project.objects.filter(pk = request.GET['project_id']).values_list('users')
-            users = User.objects.filter(pk__in=user_ids)
+            users = User.objects.filter(deleted_at__isnull=True,pk__in=user_ids)
             return Response(calculateUsersPerformance(users,request.GET['project_id']))
         else:
             user_ids = Project.objects.values_list('users')
-            users = User.objects.filter(pk__in=user_ids)
+            users = User.objects.filter(deleted_at__isnull=True,pk__in=user_ids)
             return Response(calculateUsersPerformance(users))
 
 
