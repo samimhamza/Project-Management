@@ -1,11 +1,8 @@
-from asyncio import tasks
 from users.api.serializers import UserWithProfileSerializer
-from tasks.api.serializers import TaskReportSerializer
 from projects.api.serializers import LocationSerializer
 from rest_framework import serializers
 from projects.models import Project
 from users.models import User
-from tasks.models import Task
 
 
 class ProjectSerializer(serializers.ModelSerializer):

@@ -21,7 +21,6 @@ from projects.api.serializers import (
 )
 from rest_framework import generics
 from rest_framework import status
-from datetime import datetime
 from projects.models import (
     Country,
     Location,
@@ -142,7 +141,8 @@ class PaymentViewSet(Repository):
         income = Payment.objects.create(
             source=data["source"],
             amount=data["amount"],
-            date=datetime.now().date(),
+            date=data["date"],
+            payment_method=data["payment_method"],
             income=income,
             created_by=data["created_by"],
             updated_by=data["created_by"],
@@ -151,6 +151,15 @@ class PaymentViewSet(Repository):
         serializer = self.get_serializer(
             income)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        payment = self.get_object()
+        for key, value in request.data.items():
+            setattr(payment, key, value)
+        payment.updated_by = request.user
+        payment.save()
+        serializer = self.get_serializer(payment, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
 class IncomeViewSet(Repository):
@@ -170,18 +179,20 @@ class IncomeViewSet(Repository):
             queryset = queryset.filter(project=request.GET.get(
                 "project_id")).order_by("-created_at")
             page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(
+                page, many=True, context={"request": request})
             for data in serializer.data:
                 data = getAttachments(
                     request, data, data['id'], 'income_attachments_v')
             return self.get_paginated_response(serializer.data)
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = self.get_serializer(
+            page, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         income = self.get_object()
-        serializer = self.get_serializer(income)
+        serializer = self.get_serializer(income, context={"request": request})
         data = serializer.data
         data = getAttachments(
             request, data, data['id'], 'income_attachments_v')
@@ -205,7 +216,7 @@ class IncomeViewSet(Repository):
         )
         income.save()
         serializer = self.get_serializer(
-            income)
+            income, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -214,7 +225,7 @@ class IncomeViewSet(Repository):
             setattr(income, key, value)
         income.updated_by = request.user
         income.save()
-        serializer = IncomeSerializer(income)
+        serializer = self.get_serializer(income, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=["post"])

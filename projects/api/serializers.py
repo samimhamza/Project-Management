@@ -12,6 +12,15 @@ from projects.models import (
 )
 
 
+class ProjectNameListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
+        ]
+
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
@@ -60,6 +69,10 @@ class FocalPointSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
+    created_by = UserWithProfileSerializer(read_only=True)
+    updated_by = UserWithProfileSerializer(read_only=True)
+    deleted_by = UserWithProfileSerializer(read_only=True)
+
     class Meta:
         model = Payment
         fields = "__all__"
@@ -67,11 +80,13 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class IncomeSerializer(serializers.ModelSerializer):
     payments = serializers.SerializerMethodField()
+    project = ProjectNameListSerializer()
 
     def get_payments(self, income):
         qs = Payment.objects.filter(
             deleted_at__isnull=True, income=income)
-        serializer = PaymentSerializer(instance=qs, many=True)
+        serializer = PaymentSerializer(instance=qs, many=True, context={
+                                       "request": self.context['request']})
         return serializer.data
 
     class Meta:
@@ -86,14 +101,6 @@ class IncomeReportSerializer(serializers.ModelSerializer):
             "id",
             "amount",
             "date"
-        ]
-
-class ProjectNameListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = [
-            "id",
-            "name",
         ]
 
 
