@@ -1,7 +1,7 @@
 from common.permissions_scopes import (
     IncomePermissions, FocalPointPermissions, LocationPermissions, PaymentPermissions)
-from common.actions import (allItems, filterRecords,
-                            addAttachment, deleteAttachments, getAttachments, unAuthorized, checkProjectScope)
+from common.actions import (allItems, filterRecords, addAttachment, deleteAttachments,
+                            getAttachments, unAuthorized, checkProjectScope, convertBase64ToImage)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -261,3 +261,30 @@ class FocalPointViewSet(Repository):
             return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def create(self, request):
+        data = request.data
+        data["created_by"] = request.user
+        try:
+            project = Project.objects.only(
+                'id').get(pk=data["project"])
+        except Project.DoesNotExist:
+            return Response({"error": "Project does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        profile = convertBase64ToImage(data["profile"])
+        new_focalPoint = FocalPoint.objects.create(
+            project=project,
+            profile=profile,
+            contact_name=data["contact_name"],
+            contact_last_name=data["contact_last_name"],
+            phone=data["phone"],
+            email=data["email"],
+            whatsapp=data["whatsapp"],
+            position=data["position"],
+            prefer_communication_way=data["prefer_communication_way"],
+            created_by=data["created_by"],
+            updated_by=data["created_by"],
+        )
+        new_focalPoint.save()
+        serializer = self.get_serializer(
+            new_focalPoint, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
