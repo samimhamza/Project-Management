@@ -92,9 +92,10 @@ class ClientViewSet(Repository):
             client.country = country
             
         for key, value in request.data.items():
-            if key != "country" and key != "products" and key != "services":
+            if key != "country" and key != "products" and key != "services" and key !="profile":
                 setattr(client, key, value)
         client.updated_by = request.user
+        client.profile = imageField
         client.save()
         setProducts(client, data)
         setServices(client, data)

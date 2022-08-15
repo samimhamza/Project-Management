@@ -1,5 +1,5 @@
 from common.actions import (allItems, filterRecords, expensesOfProject,
-                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense, fetchYears)
+                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense)
 from expenses.models import Expense, ExpenseItem, Category
 from common.permissions_scopes import ExpensePermissions
 from expenses.actions import totalExpenseAndIncome

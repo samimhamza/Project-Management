@@ -1,3 +1,7 @@
+from .models import Category
+from common.actions import filterRecords, allItems
+
+
 def totalExpenseAndIncome(expenses, incomes, year):
     data = [
         {
@@ -98,3 +102,14 @@ def totalIncomeByMonth(items, year, month):
     for item in items:
         total += float(item.amount)
     return total
+
+
+def categoryList(self, request, serializer_class):
+    queryset = self.get_queryset()
+    queryset = filterRecords(queryset, request, table=Category)
+    if request.GET.get("items_per_page") == "-1":
+        return allItems(serializer_class, queryset)
+
+    page = self.paginate_queryset(queryset)
+    serializer = self.get_serializer(page, many=True)
+    return self.get_paginated_response(serializer.data)

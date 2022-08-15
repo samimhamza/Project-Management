@@ -124,21 +124,6 @@
 	},
 	{
 		"fields": {
-			"name": "project_payments",
-			"codename": "pp",
-			"model": "Project Payments",
-			"order": 10
-		},
-		"sub_actions": [
-			{ "code": "c", "name": "Create" },
-			{ "code": "d", "name": "Delete" },
-			{ "code": "v", "name": "View" },
-			{ "code": "u", "name": "Update" }
-		]
-	},
-
-	{
-		"fields": {
 			"name": "income_attachments",
 			"codename": "ia",
 			"model": "Income Attachments",
