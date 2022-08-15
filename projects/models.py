@@ -335,6 +335,8 @@ class Payment(models.Model):
 class FocalPoint(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
+    profile = models.ImageField(
+        upload_to="focalpoint_profiles", blank=True, null=True)
     contact_name = models.CharField(max_length=64)
     contact_last_name = models.CharField(max_length=64, blank=True, null=True)
     email = models.EmailField()

@@ -1,5 +1,5 @@
 from common.actions import (allItems, filterRecords, expensesOfProject,
-                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense)
+                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense, fetchYears)
 from expenses.models import Expense, ExpenseItem, Category
 from common.permissions_scopes import ExpensePermissions
 from expenses.actions import totalExpenseAndIncome
@@ -172,8 +172,6 @@ class ExpenseViewSet(Repository):
     @ action(detail=False, methods=["get"])
     def income_expense_reports(self, request, pk=None):
         if request.query_params.get('year'):
-            expenses = ''
-            incomes = ''
             if request.query_params.get('project_id'):
                 expenses = ExpenseItem.objects.filter(
                     deleted_at__isnull=True, expense__type='actual', expense__project=request.GET['project_id'])
