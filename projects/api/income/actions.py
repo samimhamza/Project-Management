@@ -11,7 +11,7 @@ def checkAndReturn(user, project, scope, method):
         return unAuthorized()
 
 
-def incomeList(self, request, queryset, project):
+def incomeList(self, request, queryset, project=None):
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
     page = self.paginate_queryset(queryset)
