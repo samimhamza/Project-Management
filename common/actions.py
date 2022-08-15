@@ -362,5 +362,8 @@ def fetchYears():
         years.append(x)
         x +=1
     
+    if len(years) == 0:
+        years.append(datetime.datetime.now().year)
+
     return Response(years)
     
