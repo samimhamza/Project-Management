@@ -360,7 +360,7 @@ def projectTiming(projects):
         pro_obj = {"name": project.name, "abbr": abbr(
             project.name), "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": project.tasks.count()}
         for task in project.tasks.all():
-            if all([task.p_start_date, task.p_end_date, task.a_start_date,task.a_end_date]) is False:
+            if all([task.p_start_date, task.p_end_date, task.a_start_date, task.a_end_date]) is False:
                 pro_obj['notclear'] = pro_obj['notclear'] + 1
             else:
                 businesshrs = bussinessHours()
@@ -368,8 +368,7 @@ def projectTiming(projects):
                     task.p_start_date, task.p_end_date)
                 actualDiff = businesshrs.difference(
                     task.a_start_date, task.a_end_date)
-                taskTimingCalculator(pro_obj,planDiff.hours,actualDiff.hours)
+                taskTimingCalculator(pro_obj, planDiff.hours, actualDiff.hours)
 
         result.append(pro_obj)
     return result
-
