@@ -1,3 +1,4 @@
+import re
 from clients.actions import clientProductsFormatter, clientServicesFormatter, setProducts, setServices
 from common.actions import (filterRecords, allItems, convertBase64ToImage)
 from .serializers import (ClientSerializer, ClientDetailedSerializer,
@@ -78,6 +79,28 @@ class ClientViewSet(Repository):
         serializer = self.get_serializer(
             new_client, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        client = self.get_object()
+        data = request.data
+        imageField = convertBase64ToImage(data["profile"])
+        if request.data.get('country'):
+            try:
+                country = Country.objects.get(pk=request.data["country"])
+            except Country.DoesNotExist:
+                return Response({"error": "Country does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            client.country = country
+            
+        for key, value in request.data.items():
+            if key != "country" and key != "products" and key != "services":
+                setattr(client, key, value)
+        client.updated_by = request.user
+        client.save()
+        setProducts(client, data)
+        setServices(client, data)
+
+        serializer = self.get_serializer(client)
+        return Response(serializer.data, status=202)
 
     @action(detail=False, methods=["post"])
     def check_uniqueness(self, request):
