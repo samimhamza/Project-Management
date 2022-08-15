@@ -8,6 +8,7 @@ from tasks.models import Task
 from users.models import User, Team
 from clients.models import Client
 from expenses.models import ExpenseItem
+from common.actions import fetchYears
 
 
 
@@ -22,8 +23,10 @@ def counterTables(request):
         user_ids = Project.objects.filter(pk = request.GET['project_id']).values_list('users')
         team_ids = Project.objects.filter(pk = request.GET['project_id']).values_list('teams')
         incomes = Income.objects.filter(deleted_at__isnull=True, project = request.GET['project_id'])
-        expense = ExpenseItem.objects.filter(deleted_at__isnull=True, expense__project=request.GET['project_id'])
+        expense = ExpenseItem.objects.filter(deleted_at__isnull=True, expense__type="actual",expense__project=request.GET['project_id'])
         result.append(counter(Task.objects.filter(project = request.GET['project_id']),"Tasks","fi fi-rr-list-check"))
+        expenseEstimate = ExpenseItem.objects.filter(deleted_at__isnull=True, expense__type="estimate",expense__project=request.GET['project_id'])
+        result.append({"name":"Estimate","total": totalExpense(expenseEstimate), "icon": "fi fi-rr-money-bill-wave"})
         result.append(counter(Team.objects.filter(deleted_at__isnull=True,pk__in=team_ids),"Teams","fi fi-rr-users-alt"))
         result.append(counter(User.objects.filter(deleted_at__isnull=True,pk__in=user_ids),"Users","fi fi-rr-users"))
     else:
@@ -32,13 +35,15 @@ def counterTables(request):
         result.append(counter(User.objects.filter(deleted_at__isnull=True),"Users","fi fi-rr-users"))
         result.append(counter(Client.objects.filter(deleted_at__isnull=True),"Clients","fi fi-rr-portrait"))
         incomes = Income.objects.filter(deleted_at__isnull=True)
-        expense = ExpenseItem.objects.filter(deleted_at__isnull=True)
+        expense = ExpenseItem.objects.filter(deleted_at__isnull=True,expense__type="actual")
 
     result.insert(1,{"name":"expenses","total": totalExpense(expense), "icon": "fi fi-rr-money-bill-wave"})
     result.insert(1,{"name":"incomes","total": totalIncome(incomes), "icon":"fi fi-rr-sack-dollar"})
     return Response(result)
-    
 
+@api_view()
+def fetchYearsAPI(request):
+    return fetchYears()
 
 def counter(model, name, icon):
     result = {"name": name, "total":model.count(), "icon":icon}
