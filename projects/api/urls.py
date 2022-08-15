@@ -1,3 +1,4 @@
+from projects.api.income.views import PaymentViewSet, IncomeViewSet
 from projects.api.my_projects.views import MyProjectViewSet
 from projects.api.project.views import ProjectViewSet
 from .stage.views import StageViewSet, SubStageViewSet
@@ -5,8 +6,6 @@ from rest_framework.routers import DefaultRouter
 from .department.views import DepartmentViewSet
 from django.urls import path, include, re_path
 from projects.api.views import (
-    IncomeViewSet,
-    PaymentViewSet,
     FocalPointViewSet,
     LocationCreateAPIView,
     CountryListAPIView,
