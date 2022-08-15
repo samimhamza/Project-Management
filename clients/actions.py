@@ -42,6 +42,8 @@ def clientServicesFormatter(clientData):
 
 
 def setProducts(new_client, data):
+    old_client=ClientFeature.objects.filter(client=new_client)
+    old_client.delete()
     if "products" in data:
         for product in data['products']:
             for feature in product['features']:
