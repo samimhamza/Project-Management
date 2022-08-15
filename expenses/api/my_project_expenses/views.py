@@ -1,9 +1,10 @@
-from common.actions import (allItems, filterRecords, expensesOfProject,
-                            addAttachment, deleteAttachments, getAttachments, delete, checkAndReturn)
+from common.actions import (filterRecords, expensesOfProject, addAttachment,
+                            deleteAttachments, getAttachments, delete, checkProjectScope, unAuthorized, checkAndReturn)
+from expenses.actions import (
+    totalExpenseAndIncome, categoryList, categoryCreate, categoryActions, categoryUpdate, expenseRetrieve)
 from expenses.models import Expense, ExpenseItem, Category
 from rest_framework.permissions import IsAuthenticated
 from common.custom import CustomPageNumberPagination
-from expenses.actions import totalExpenseAndIncome, categoryList
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status, viewsets
@@ -36,32 +37,20 @@ class MyCategoryViewSet(viewsets.ModelViewSet):
     }
 
     def list(self, request):
-        return checkAndReturn(request.user, income.project, "project_expenses_v",
-                              categoryList(self, request, CategoryListSerializer))
+        return categoryActions(request, "project_expenses_v",
+                               categoryList(self, request, CategoryListSerializer))
 
     def create(self, request):
-        data = request.data
-        creator = request.user
-        category = Category.objects.create(
-            name=data["name"],
-            created_by=creator,
-            updated_by=creator,
-        )
-        category.save()
-        serializer = self.get_serializer(category)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return categoryActions(request, "project_expenses_c",
+                               categoryCreate(self, request))
 
     def update(self, request, pk=None):
-        category = self.get_object()
-        for key, value in request.data.items():
-            setattr(category, key, value)
-        category.updated_by = request.user
-        category.save()
-        serializer = self.get_serializer(category)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return categoryActions(request, "project_expenses_U",
+                               categoryUpdate(self, request))
 
     def destroy(self, request, pk=None):
-        return delete(self, request, Category)
+        return categoryActions(request, "project_expenses_U",
+                               delete(self, request, Category))
 
     def get_serializer_class(self):
         try:
@@ -90,25 +79,24 @@ class MyExpenseViewSet(viewsets.ModelViewSet):
     }
 
     def list(self, request):
-        queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Expense)
         if request.GET.get("project_id"):
-            return expensesOfProject(self, request, queryset)
-
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(LessFieldExpenseSerializer, queryset)
-
-        serializer = self.get_serializer(
-            queryset, many=True, context={"request": request})
-        return Response(serializer.data)
+            try:
+                project = Project.objects.get(pk=request.GET.get("project_id"))
+            except Project.DoesNotExist:
+                return unAuthorized()
+            if checkProjectScope(request.user, project, "project_expenses_v"):
+                queryset = self.get_queryset()
+                queryset = filterRecords(queryset, request, table=Income)
+                return expensesOfProject(self, request, queryset)
+            else:
+                return unAuthorized()
+        else:
+            return unAuthorized()
 
     def retrieve(self, request, pk=None):
         expense = self.get_object()
-        serializer = self.get_serializer(expense, context={"request": request})
-        data = serializer.data
-        data = getAttachments(request, data, expense.id,
-                              "expense_attachments_v")
-        return Response(data)
+        return checkAndReturn(request.user, expense.project, "project_expenses_v",
+                              expenseRetrieve(self, request, expense))
 
     def create(self, request):
         data = request.data

@@ -1,5 +1,8 @@
+from common.actions import filterRecords, allItems, checkAndReturn, unAuthorized, getAttachments
+from rest_framework.response import Response
+from rest_framework import status
 from .models import Category
-from common.actions import filterRecords, allItems
+from projects.models import Project
 
 
 def totalExpenseAndIncome(expenses, incomes, year):
@@ -104,6 +107,18 @@ def totalIncomeByMonth(items, year, month):
     return total
 
 
+def categoryActions(request, scope, method):
+    if request.GET.get("project_id"):
+        try:
+            project = Project.objects.get(pk=request.GET.get("project_id"))
+        except Project.DoesNotExist:
+            return unAuthorized()
+        return checkAndReturn(request.user, project, scope,
+                              method)
+    else:
+        return unAuthorized()
+
+
 def categoryList(self, request, serializer_class):
     queryset = self.get_queryset()
     queryset = filterRecords(queryset, request, table=Category)
@@ -113,3 +128,34 @@ def categoryList(self, request, serializer_class):
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
+
+
+def categoryCreate(self, request):
+    data = request.data
+    creator = request.user
+    category = Category.objects.create(
+        name=data["name"],
+        created_by=creator,
+        updated_by=creator,
+    )
+    category.save()
+    serializer = self.get_serializer(category)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def categoryUpdate(self, request):
+    category = self.get_object()
+    for key, value in request.data.items():
+        setattr(category, key, value)
+    category.updated_by = request.user
+    category.save()
+    serializer = self.get_serializer(category)
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def expenseRetrieve(self, request, expense):
+    serializer = self.get_serializer(expense, context={"request": request})
+    data = serializer.data
+    data = getAttachments(request, data, expense.id,
+                          "expense_attachments_v", expense.project)
+    return Response(data)

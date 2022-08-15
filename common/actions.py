@@ -39,7 +39,7 @@ def getAttachments(request, data, id, permission, project=None):
             request, permission)
     else:
         attachments_permission = checkProjectScope(
-            request.user, project, "task_attachments_v")
+            request.user, project, permission)
     if attachments_permission:
         attachments = Attachment.objects.filter(object_id=id)
         data['attachments'] = AttachmentSerializer(

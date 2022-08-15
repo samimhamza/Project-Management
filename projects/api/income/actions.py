@@ -20,7 +20,7 @@ def incomeRetrieve(self, request, income):
     serializer = self.get_serializer(income, context={"request": request})
     data = serializer.data
     data = getAttachments(
-        request, data, data['id'], 'income_attachments_v')
+        request, data, data['id'], 'income_attachments_v', income.project)
     return Response(data)
 
 
