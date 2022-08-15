@@ -30,6 +30,7 @@ from projects.models import (
     State,
     Project
 )
+import os
 
 
 def locationAction(self, project, data):
@@ -288,3 +289,28 @@ class FocalPointViewSet(Repository):
         serializer = self.get_serializer(
             new_focalPoint, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        focal_point = self.get_object()
+        data = request.data
+        if request.data.get("project"):
+            try:
+                project = Project.objects.only(
+                    'id').get(pk=data["project"])
+            except Project.DoesNotExist:
+                return Response({"error": "Project does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+            focal_point.project = project
+        if request.data.get("profile"):
+            imageField = convertBase64ToImage(data["profile"])
+            if imageField:
+                if os.path.isfile('media/'+str(focal_point.profile)):
+                    os.remove('media/'+str(focal_point.profile))
+                focal_point.profile = imageField
+        for key, value in data.items():
+            if key != "id" and key != "project" and key != "profile":
+                setattr(focal_point, key, value)
+        focal_point.updated_by = request.user
+        focal_point.save()
+        serializer = self.get_serializer(
+            focal_point, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
