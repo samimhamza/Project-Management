@@ -61,7 +61,7 @@ class ClientViewSet(Repository):
             whatsapp=data["whatsapp"],
             profile=imageField,
             country=country,
-            industry=data["industry"],
+            industry=data["industry"] if data["industry"] else "",
             company_name=data["company_name"],
             hear_about_us=data["hear_about_us"],
             lead_type=data["lead_type"],
