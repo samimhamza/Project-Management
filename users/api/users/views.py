@@ -36,8 +36,8 @@ class UserViewSet(Repository):
 
         if request.GET.get("items_per_page") == "-1":
             if request.GET.get("has_project"):
-                user_ids = Project.objects.values_list('users')
-                queryset = queryset.filter(pk__in=user_ids)
+                queryset = queryset.filter(
+                    project_users__isnull=False).distinct()
                 return allItems(UserWithProfileSerializer, queryset, request)
             return allItems(UserWithProfileSerializer, queryset, request)
         if request.GET.get("items_per_page") == "-2":
