@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 
 )
-from taskmanager.api.views import MyObtainTokenPairView, counterTables
+from taskmanager.api.views import MyObtainTokenPairView, counterTables, fetchYearsAPI
 
 urlpatterns = [
     # path("api/token/", TokenObtainPairView.as_view()),
@@ -16,6 +16,7 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view()),
     path("api/token/verify/", TokenVerifyView.as_view()),
     path("api/counter/", counterTables),
+    path("api/fetch-years/", fetchYearsAPI),
     path("admin/", admin.site.urls),
     path("api/", include("projects.api.urls")),
     path("api/", include("tasks.api.urls")),

@@ -1,3 +1,4 @@
+from projects.models import Income
 from users.api.serializers import PermissionActionSerializer, ActionSerializer, RoleListSerializer
 from projects.api.serializers import AttachmentSerializer, ProjectNameListSerializer
 from common.permissions import checkCustomPermissions, checkProjectScope
@@ -15,10 +16,10 @@ from django.db import transaction
 from django.db.models import Q
 import businesstimedelta
 import datetime
-import datetime
 import base64
 import uuid
 import os
+import json
 
 
 def convertBase64ToImage(base64file):
@@ -342,3 +343,25 @@ def expenseItemsOfExpense(self, request, queryset):
     data = self.get_paginated_response(data).data
     data['total_expense'] = total
     return Response(data)
+
+def fetchYears():
+    x1 = Income.objects.filter(deleted_at__isnull=True).order_by("created_at")[:1]
+    y1 = Expense.objects.filter(deleted_at__isnull=True).order_by("-updated_at")[:1]
+    x2 = Income.objects.filter(deleted_at__isnull=True).order_by("created_at")[:1]
+    y2 = Expense.objects.filter(deleted_at__isnull=True).order_by("-updated_at")[:1]
+
+    x1 = x1[0].created_at.year
+    x2 = x2[0].created_at.year
+    x = x1 if x1 < x2 else x2
+
+    y1 = y1[0].updated_at.year
+    y2 = y2[0].updated_at.year
+    y = y1 if y1 > y2 else y2
+
+    years = []
+    while x <= y:
+        years.append(x)
+        x +=1
+    
+    return Response(years)
+    

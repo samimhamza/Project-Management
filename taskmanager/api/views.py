@@ -8,6 +8,7 @@ from tasks.models import Task
 from users.models import User, Team
 from clients.models import Client
 from expenses.models import ExpenseItem
+from common.actions import fetchYears
 
 
 
@@ -37,8 +38,10 @@ def counterTables(request):
     result.insert(1,{"name":"expenses","total": totalExpense(expense), "icon": "fi fi-rr-money-bill-wave"})
     result.insert(1,{"name":"incomes","total": totalIncome(incomes), "icon":"fi fi-rr-sack-dollar"})
     return Response(result)
-    
 
+@api_view()
+def fetchYearsAPI(request):
+    return fetchYears()
 
 def counter(model, name, icon):
     result = {"name": name, "total":model.count(), "icon":icon}
