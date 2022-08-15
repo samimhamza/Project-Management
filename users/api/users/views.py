@@ -35,6 +35,10 @@ class UserViewSet(Repository):
         queryset = filterRecords(queryset, request, columns, table=User)
 
         if request.GET.get("items_per_page") == "-1":
+            if request.GET.get("has_project"):
+                user_ids = Project.objects.values_list('users')
+                queryset = queryset.filter(pk__in=user_ids)
+                return allItems(UserWithProfileSerializer, queryset, request)
             return allItems(UserWithProfileSerializer, queryset, request)
         if request.GET.get("items_per_page") == "-2":
             return allItems(self.get_serializer, queryset)
