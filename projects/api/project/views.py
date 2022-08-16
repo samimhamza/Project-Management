@@ -141,7 +141,7 @@ class ProjectViewSet(Repository):
     def project_timing(self, request, pk=None):
         projects = ''
         if request.query_params.get('project_id'):
-            projects = Project.objects.filter(id=request.GET['project_id'])
+            projects = Project.objects.filter(deleted_at__isnull=True,id=request.GET['project_id'])
         else:
             projects = Project.objects.filter(deleted_at__isnull=True).order_by("-created_at")[:10]
         return Response(projectTiming(projects))

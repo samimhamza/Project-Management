@@ -9,7 +9,7 @@ from common.Repository import Repository
 from clients.models import Client
 from rest_framework import status
 from projects.models import Country
-
+import os
 
 class ClientViewSet(Repository):
     model = Client
@@ -82,7 +82,13 @@ class ClientViewSet(Repository):
     def update(self, request, pk=None):
         client = self.get_object()
         data = request.data
-        imageField = convertBase64ToImage(data["profile"])
+        if request.data.get("profile"):
+            imageField = convertBase64ToImage(request.data.get("profile"))
+            if imageField:
+                if os.path.isfile('media/'+str(client.profile)):
+                    os.remove('media/'+str(client.profile))
+                client.profile = imageField
+       
         if request.data.get('country'):
             try:
                 country = Country.objects.get(pk=request.data["country"])
@@ -94,7 +100,6 @@ class ClientViewSet(Repository):
             if key != "country" and key != "products" and key != "services" and key != "profile":
                 setattr(client, key, value)
         client.updated_by = request.user
-        client.profile = imageField
         client.save()
         setProducts(client, data)
         setServices(client, data)
