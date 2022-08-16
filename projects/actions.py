@@ -359,7 +359,7 @@ def projectTiming(projects):
     for project in projects:
         pro_obj = {"name": project.name, "abbr": abbr(
             project.name), "overdue": 0, "normal": 0, "earlier": 0, "notclear": 0, "total_tasks": project.tasks.count()}
-        for task in project.tasks.all():
+        for task in project.tasks.filter(deleted_at__isnull=True):
             if all([task.p_start_date, task.p_end_date, task.a_start_date, task.a_end_date]) is False:
                 pro_obj['notclear'] = pro_obj['notclear'] + 1
             else:
