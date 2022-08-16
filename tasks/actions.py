@@ -384,3 +384,53 @@ def calculateUsersPerformance(users, project_id = None):
 
         result.append(user_obj)
     return result
+
+
+
+def taskProgressCalculator(task):
+    selfProgressCalculator(task)
+    id = task.parent_id
+    while id:
+        arrayTask = Task.objects.filter(deleted_at__isnull=True, pk=id)
+        pTask = arrayTask[0]
+        if pTask:
+            pTask.progress = parentProgressCalculator(pTask)
+            if pTask.progress == 100:
+                pTask.status = "completed"
+            else:
+                pTask.status = "in_progress"
+            pTask.save()
+        id = pTask.parent_id
+    return True
+
+def selfProgressCalculator(task):
+    userTasks = UserTask.objects.filter(task=task.pk)
+    totalProgress = 0
+    for ut in userTasks:
+        totalProgress += ut.progress
+
+    calculatedProgress = int(totalProgress / userTasks.count())
+    if calculatedProgress == 100:
+        task.status = "completed"
+    else:
+        task.status = "in_progress"
+    task.progress = calculatedProgress
+    task.save()
+    return True
+
+def parentProgressCalculator(task):
+    childTasks = Task.objects.filter(deleted_at__isnull=True, parent=task.pk)
+
+    total = 0
+    hours = 0
+    for t in childTasks:
+        if all([t.p_start_date, t.p_end_date]):
+            businesshrs = bussinessHours()
+            planDiff = businesshrs.difference(
+                t.p_start_date, t.p_end_date)
+            hours += planDiff.hours
+            total += planDiff.hours * t.progress
+            
+    return int(total/hours)
+
+

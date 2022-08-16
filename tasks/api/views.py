@@ -3,7 +3,7 @@ from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from tasks.actions import (
-    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUsersPerformance)
+    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUsersPerformance, taskProgressCalculator)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from common.actions import (
     delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
@@ -48,6 +48,7 @@ class TaskViewSet(Repository):
 
     def retrieve(self, request, pk=None):
         task = self.get_object()
+        return Response(taskProgressCalculator(task))
         serializer = self.get_serializer(
             task, context={"request": request})
         data = serializer.data
