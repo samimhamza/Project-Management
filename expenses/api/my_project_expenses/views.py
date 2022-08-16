@@ -1,7 +1,9 @@
-from expenses.actions import (expenseUpdate, expernseCreate, totalExpenseAndIncome,
-                              categoryList, categoryCreate, categoryActions, categoryUpdate, expenseRetrieve)
+from expenses.actions import (expenseItemCreate, expenseItemUpdate, expenseUpdate,
+                              expernseCreate, categoryList, incomeExpenseReport,
+                              categoryCreate, categoryActions, categoryUpdate, expenseRetrieve)
 from common.actions import (filterRecords, expensesOfProject, addAttachment,
-                            deleteAttachments, delete, checkProjectScope, unAuthorized, checkAndReturn)
+                            deleteAttachments, delete, checkProjectScope,
+                            unAuthorized, checkAndReturn)
 from expenses.models import Expense, ExpenseItem, Category
 from rest_framework.permissions import IsAuthenticated
 from common.custom import CustomPageNumberPagination
@@ -43,12 +45,11 @@ class MyCategoryViewSet(viewsets.ModelViewSet):
                                categoryCreate(self, request))
 
     def update(self, request, pk=None):
-        return categoryActions(request, "project_expenses_U",
+        return categoryActions(request, "project_expenses_u",
                                categoryUpdate(self, request))
 
     def destroy(self, request, pk=None):
-        return categoryActions(request, "project_expenses_U",
-                               delete(self, request, Category))
+        return delete(self, request, Category, permission="project_expenses_d")
 
     def get_serializer_class(self):
         try:
@@ -129,20 +130,17 @@ class MyExpenseViewSet(viewsets.ModelViewSet):
 
     @ action(detail=False, methods=["get"])
     def income_expense_reports(self, request, pk=None):
-        if request.query_params.get('year'):
-            if request.query_params.get('project_id'):
-                expenses = ExpenseItem.objects.filter(
-                    deleted_at__isnull=True, expense__type='actual', expense__project=request.GET['project_id'])
-                incomes = Income.objects.filter(
-                    deleted_at__isnull=True, project=request.GET['project_id'])
+        if request.GET.get('year'):
+            if request.GET.get('project_id'):
+                try:
+                    project = Project.objects.get(
+                        pk=request.GET.get("project_id"))
+                except Project.DoesNotExist:
+                    return Response({"detail": "Project does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                return checkAndReturn(request.user, project, "expense_attachments_d",
+                                      incomeExpenseReport(request))
             else:
-                expenses = ExpenseItem.objects.filter(
-                    deleted_at__isnull=True, expense__type='actual')
-                incomes = Income.objects.filter(deleted_at__isnull=True)
-
-            results = totalExpenseAndIncome(
-                expenses, incomes, request.GET['year'])
-            return Response(results)
+                return Response({"detail": "Project Id is not selected"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"detail": "Year is not selected"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -183,37 +181,21 @@ class MyExpenseItemViewSet(viewsets.ModelViewSet):
         return Response([])
 
     def create(self, request):
-        data = request.data
-        creator = request.user
-        if data['expense']:
-            expense = Expense.objects.only('id').get(pk=data['expense'])
+        if request.data['expense']:
+            expense = Expense.objects.only(
+                'id').get(pk=request.data['expense'])
         else:
-            expense = None
-        new_Task = ExpenseItem.objects.create(
-            expense=expense,
-            name=data["name"],
-            cost=data["cost"],
-            unit=data["unit"],
-            quantity=data['quantity'],
-            created_by=creator,
-            updated_by=creator,
-        )
-        new_Task.save()
-        serializer = self.get_serializer(
-            new_Task, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"detail": "Expense does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        return checkAndReturn(request.user, expense.project, "project_expenses_c",
+                              expenseItemCreate(self, request, expense))
 
     def update(self, request, pk=None):
         item = self.get_object()
-        for key, value in request.data.items():
-            setattr(item, key, value)
-        item.updated_by = request.user
-        item.save()
-        serializer = self.get_serializer(item, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return checkAndReturn(request.user, item.expense.project, "project_expenses_u",
+                              expenseItemUpdate(self, request, item))
 
     def destroy(self, request, pk=None):
-        return delete(self, request, ExpenseItem)
+        return delete(self, request, ExpenseItem, permission="project_expenses_d", specialCase='expense')
 
     def get_serializer_class(self):
         try:

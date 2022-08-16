@@ -1,5 +1,5 @@
-from expenses.actions import (
-    expenseRetrieve, expenseUpdate, expernseCreate, totalExpenseAndIncome, categoryList, categoryCreate, categoryUpdate)
+from expenses.actions import (expenseItemCreate, expenseItemUpdate, expenseRetrieve, expenseUpdate,
+                              expernseCreate, totalExpenseAndIncome, categoryList, categoryCreate, categoryUpdate)
 from common.actions import (allItems, filterRecords, expensesOfProject,
                             addAttachment, deleteAttachments, expenseItemsOfExpense)
 from expenses.models import Expense, ExpenseItem, Category
@@ -146,31 +146,13 @@ class ExpenseItemViewSet(Repository):
         return self.get_paginated_response(serializer.data)
 
     def create(self, request):
-        data = request.data
-        creator = request.user
-        if data['expense']:
-            expense = Expense.objects.only('id').get(pk=data['expense'])
+        if request.data['expense']:
+            expense = Expense.objects.only(
+                'id').get(pk=request.data['expense'])
         else:
-            expense = None
-        new_Task = ExpenseItem.objects.create(
-            expense=expense,
-            name=data["name"],
-            cost=data["cost"],
-            unit=data["unit"],
-            quantity=data['quantity'],
-            created_by=creator,
-            updated_by=creator,
-        )
-        new_Task.save()
-        serializer = self.get_serializer(
-            new_Task, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"detail": "Expense does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        expenseItemCreate(self, request, expense)
 
     def update(self, request, pk=None):
         item = self.get_object()
-        for key, value in request.data.items():
-            setattr(item, key, value)
-        item.updated_by = request.user
-        item.save()
-        serializer = self.get_serializer(item, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return expenseItemUpdate(self, request, item)

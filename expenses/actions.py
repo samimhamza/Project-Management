@@ -1,7 +1,7 @@
 from common.actions import filterRecords, allItems, checkAndReturn, unAuthorized, getAttachments
 from rest_framework.response import Response
-from .models import Category, Expense
-from projects.models import Project
+from .models import Category, Expense, ExpenseItem
+from projects.models import Project, Income
 from rest_framework import status
 from users.models import User
 
@@ -208,4 +208,41 @@ def expenseUpdate(self, request, expense):
     expense.updated_by = request.user
     expense.save()
     serializer = self.get_serializer(expense, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def incomeExpenseReport(request):
+    expenses = ExpenseItem.objects.filter(
+        deleted_at__isnull=True, expense__type='actual', expense__project=request.GET['project_id'])
+    incomes = Income.objects.filter(
+        deleted_at__isnull=True, project=request.GET['project_id'])
+    results = totalExpenseAndIncome(
+        expenses, incomes, request.GET['year'])
+    return Response(results)
+
+
+def expenseItemCreate(self, request, expense):
+    data = request.data
+    creator = request.user
+    new_Task = ExpenseItem.objects.create(
+        expense=expense,
+        name=data["name"],
+        cost=data["cost"],
+        unit=data["unit"],
+        quantity=data['quantity'],
+        created_by=creator,
+        updated_by=creator,
+    )
+    new_Task.save()
+    serializer = self.get_serializer(
+        new_Task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def expenseItemUpdate(self, request, item):
+    for key, value in request.data.items():
+        setattr(item, key, value)
+    item.updated_by = request.user
+    item.save()
+    serializer = self.get_serializer(item, context={"request": request})
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

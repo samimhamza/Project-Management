@@ -1,6 +1,6 @@
 from common.comments import comments, destroy, listComments, createComments, updateComments
 from common.actions import (
-    addAttachment, deleteAttachments, getAttachments, filterRecords, unAuthorized)
+    addAttachment, deleteAttachments, getAttachments, filterRecords, unAuthorized, delete)
 from tasks.actions import (
     delete_dependencies, excluded_users, progress, tasksOfProject, create, update)
 from tasks.api.serializers import (
@@ -11,11 +11,10 @@ from common.permissions import checkProjectScope
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
-from common.Repository import Repository
 from tasks.models import Task, Comment
 
 
-class MyTaskViewSet(Repository):
+class MyTaskViewSet(viewsets.ModelViewSet):
     model = Task
     queryset = Task.objects.filter(
         deleted_at__isnull=True).order_by("-created_at")
@@ -112,6 +111,9 @@ class MyTaskViewSet(Repository):
                 return unAuthorized()
         except:
             return Response({'error': "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Task, permission="project_tasks_d")
 
 
 class MyProjectCommentViewSet(viewsets.ModelViewSet):

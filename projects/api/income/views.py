@@ -202,18 +202,16 @@ class MyPaymentViewSet(viewsets.ModelViewSet):
             income = Income.objects.get(pk=data["income"])
         except Income.DoesNotExist:
             return Response({"error": "Income does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-        return checkAndReturn(request.user, income.project, "project_payments_c",
+        return checkAndReturn(request.user, income.project, "project_incomes_c",
                               paymentCreate(self, data, income))
 
     def update(self, request, pk=None):
         payment = self.get_object()
-        return checkAndReturn(request.user, payment.income.project, "project_payments_u",
+        return checkAndReturn(request.user, payment.income.project, "project_incomes_u",
                               paymentUpdate(self, request, payment))
 
     def destroy(self, request, pk=None):
-        payment = self.get_object()
-        return checkAndReturn(request.user, payment.income.project, "project_incomes_d",
-                              delete(self, request, Income))
+        return delete(self, request, Payment, permission="project_incomes_d", specialCase='income')
 
     def get_serializer_class(self):
         try:
