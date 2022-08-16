@@ -1,5 +1,5 @@
 from .serializers import ProductSerializer, ProductListSerializer, ProductTrashedSerializer
-from common.actions import (filterRecords, allItems, convertBase64ToImage)
+from common.actions import filterRecords, allItems, convertBase64ToImage, delete
 from rest_framework.response import Response
 from common.Repository import Repository
 from clients.models import Product, Feature, PricePlan
@@ -96,3 +96,6 @@ class ProductViewSet(Repository):
                 new_feature.save()
         serializer = self.get_serializer(product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Product, imageField="photo")

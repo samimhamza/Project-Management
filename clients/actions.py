@@ -64,6 +64,7 @@ def setProducts(new_client, data):
 
 
 def setServices(new_client, data):
+    old_client=ClientService.objects.filter(client=new_client)
     if "services" in data:
         for service in data['services']:
             try:

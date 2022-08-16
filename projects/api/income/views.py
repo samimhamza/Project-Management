@@ -165,9 +165,7 @@ class MyIncomeViewSet(viewsets.ModelViewSet):
                               deleteAttachments(self, request))
 
     def destroy(self, request, pk=None):
-        income = self.get_object()
-        return checkAndReturn(request.user, income.project, "project_incomes_d",
-                              delete(self, request, Income))
+        return delete(self, request, Income, permission="project_incomes_d")
 
     def get_serializer_class(self):
         try:
