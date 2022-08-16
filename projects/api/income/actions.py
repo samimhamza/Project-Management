@@ -1,17 +1,10 @@
-from common.actions import getAttachments, checkProjectScope, unAuthorized
+from common.actions import getAttachments
 from rest_framework.response import Response
 from projects.models import Income, Payment
 from rest_framework import status
 
 
-def checkAndReturn(user, project, scope, method):
-    if checkProjectScope(user, project, scope):
-        return method
-    else:
-        return unAuthorized()
-
-
-def incomeList(self, request, queryset, project):
+def incomeList(self, request, queryset, project=None):
     queryset = queryset.filter(project=request.GET.get(
         "project_id")).order_by("-created_at")
     page = self.paginate_queryset(queryset)
@@ -27,7 +20,7 @@ def incomeRetrieve(self, request, income):
     serializer = self.get_serializer(income, context={"request": request})
     data = serializer.data
     data = getAttachments(
-        request, data, data['id'], 'income_attachments_v')
+        request, data, data['id'], 'income_attachments_v', income.project)
     return Response(data)
 
 

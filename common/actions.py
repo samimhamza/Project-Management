@@ -39,7 +39,7 @@ def getAttachments(request, data, id, permission, project=None):
             request, permission)
     else:
         attachments_permission = checkProjectScope(
-            request.user, project, "task_attachments_v")
+            request.user, project, permission)
     if attachments_permission:
         attachments = Attachment.objects.filter(object_id=id)
         data['attachments'] = AttachmentSerializer(
@@ -343,9 +343,12 @@ def expenseItemsOfExpense(self, request, queryset):
     data['total_expense'] = total
     return Response(data)
 
+
 def fetchYears():
-    x1 = Income.objects.filter(deleted_at__isnull=True).order_by("created_at")[:1]
-    y1 = Income.objects.filter(deleted_at__isnull=True).order_by("-updated_at")[:1]
+    x1 = Income.objects.filter(
+        deleted_at__isnull=True).order_by("created_at")[:1]
+    y1 = Income.objects.filter(
+        deleted_at__isnull=True).order_by("-updated_at")[:1]
     x2 = Expense.objects.filter(deleted_at__isnull=True).order_by("date")[:1]
     y2 = Expense.objects.filter(deleted_at__isnull=True).order_by("-date")[:1]
 
@@ -360,10 +363,16 @@ def fetchYears():
     years = []
     while x <= y:
         years.append(x)
-        x +=1
-    
+        x += 1
+
     if len(years) == 0:
         years.append(datetime.datetime.now().year)
 
     return Response(years)
-    
+
+
+def checkAndReturn(user, project, scope, method):
+    if checkProjectScope(user, project, scope):
+        return method
+    else:
+        return unAuthorized()

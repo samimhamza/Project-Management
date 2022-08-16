@@ -1,8 +1,8 @@
 from common.actions import (allItems, filterRecords, expensesOfProject,
-                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense, fetchYears)
+                            addAttachment, deleteAttachments, getAttachments, expenseItemsOfExpense)
 from expenses.models import Expense, ExpenseItem, Category
 from common.permissions_scopes import ExpensePermissions
-from expenses.actions import totalExpenseAndIncome
+from expenses.actions import totalExpenseAndIncome, categoryList, categoryCreate, categoryUpdate
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
@@ -36,35 +36,13 @@ class CategoryViewSet(Repository):
     }
 
     def list(self, request):
-        queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Expense)
-        if request.GET.get("items_per_page") == "-1":
-            return allItems(CategoryListSerializer, queryset)
-
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        categoryList(self, request, CategoryListSerializer)
 
     def create(self, request):
-        data = request.data
-        creator = request.user
-        category = Category.objects.create(
-            name=data["name"],
-            created_by=creator,
-            updated_by=creator,
-        )
-        category.save()
-        serializer = self.get_serializer(category)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        categoryCreate(self, request)
 
     def update(self, request, pk=None):
-        category = self.get_object()
-        for key, value in request.data.items():
-            setattr(category, key, value)
-        category.updated_by = request.user
-        category.save()
-        serializer = self.get_serializer(category)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        categoryUpdate(self, request)
 
 
 class ExpenseViewSet(Repository):
@@ -85,10 +63,8 @@ class ExpenseViewSet(Repository):
         queryset = filterRecords(queryset, request, table=Expense)
         if request.GET.get("project_id"):
             return expensesOfProject(self, request, queryset)
-
         if request.GET.get("items_per_page") == "-1":
             return allItems(LessFieldExpenseSerializer, queryset)
-
         serializer = self.get_serializer(
             queryset, many=True, context={"request": request})
         return Response(serializer.data)
