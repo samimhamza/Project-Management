@@ -1,4 +1,4 @@
-from expenses.actions import (expenseItemCreate, expenseItemUpdate, expenseUpdate,
+from expenses.actions import (expenseItemCreate, expenseItemRetrieve, expenseItemUpdate, expenseUpdate,
                               expernseCreate, categoryList, incomeExpenseReport,
                               categoryCreate, categoryActions, categoryUpdate, expenseRetrieve)
 from common.actions import (filterRecords, expensesOfProject, addAttachment,
@@ -177,8 +177,10 @@ class MyExpenseItemViewSet(viewsets.ModelViewSet):
     def list(self, request):
         return Response([])
 
-    def retrieve(self, request):
-        return Response([])
+    def retrieve(self, request, pk=None):
+        item = self.get_object()
+        return checkAndReturn(request.user, item.expense.project, "project_expenses_v",
+                              expenseItemRetrieve(self, item))
 
     def create(self, request):
         if request.data['expense']:

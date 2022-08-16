@@ -246,3 +246,8 @@ def expenseItemUpdate(self, request, item):
     item.save()
     serializer = self.get_serializer(item, context={"request": request})
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def expenseItemRetrieve(self, item):
+    serializer = self.get_serializer(item)
+    return Response(serializer.data, status=200)

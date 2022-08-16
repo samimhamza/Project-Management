@@ -41,7 +41,7 @@ class Expense(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
     body = models.TextField(null=True, blank=True)
-    date = models.DateField()
+    date = models.DateField(null=True, blank=True)
     # cost = models.DecimalField(max_digits=19, decimal_places=2)
 
     class Types(models.TextChoices):
