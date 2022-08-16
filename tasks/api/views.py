@@ -1,3 +1,6 @@
+from urllib import response
+from .serializers import UserTaskSerializer
+from ..models import UserTask
 from projects.models import Project
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
@@ -48,7 +51,6 @@ class TaskViewSet(Repository):
 
     def retrieve(self, request, pk=None):
         task = self.get_object()
-        return Response(taskProgressCalculator(task))
         serializer = self.get_serializer(
             task, context={"request": request})
         data = serializer.data
@@ -61,7 +63,14 @@ class TaskViewSet(Repository):
     def update(self, request, pk=None):
         task = self.get_object()
         return update(self, request, task)
-
+    
+    def destroy(self, request, pk=None):
+        task = self.get_object()
+        parent = task.parent
+        res = delete(self, request, self.model)
+        taskProgressCalculator(parent,"parent")
+        return res
+    
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
         task = self.get_object()
