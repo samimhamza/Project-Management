@@ -1,5 +1,6 @@
-from common.actions import allItems, filterRecords, unAuthorized, checkProjectScope, convertBase64ToImage
 from common.permissions_scopes import FocalPointPermissions, LocationPermissions
+from common.actions import (allItems, filterRecords, unAuthorized,
+                            checkProjectScope, convertBase64ToImage, delete)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from common.Repository import Repository
@@ -184,3 +185,6 @@ class FocalPointViewSet(Repository):
         serializer = self.get_serializer(
             focal_point, context={"request": request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, FocalPoint, imageField="profile")

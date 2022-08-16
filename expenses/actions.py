@@ -1,8 +1,9 @@
 from common.actions import filterRecords, allItems, checkAndReturn, unAuthorized, getAttachments
 from rest_framework.response import Response
+from .models import Category, Expense, ExpenseItem
+from projects.models import Project, Income
 from rest_framework import status
-from .models import Category
-from projects.models import Project
+from users.models import User
 
 
 def totalExpenseAndIncome(expenses, incomes, year):
@@ -159,3 +160,89 @@ def expenseRetrieve(self, request, expense):
     data = getAttachments(request, data, expense.id,
                           "expense_attachments_v", expense.project)
     return Response(data)
+
+
+def expernseCreate(self, request, data, project):
+    if data["expense_by"]:
+        expense_by = User.objects.only('id').get(pk=data['expense_by'])
+    else:
+        expense_by = None
+    if data['category']:
+        category = Category.objects.only('id').get(pk=data['category'])
+    else:
+        category = None
+    creator = request.user
+    new_Task = Expense.objects.create(
+        category=category,
+        title=data["title"],
+        date=data["date"],
+        project=project,
+        expense_by=expense_by,
+        type=data["type"],
+        created_by=creator,
+        updated_by=creator,
+    )
+    new_Task.save()
+    serializer = self.get_serializer(
+        new_Task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def expenseUpdate(self, request, expense):
+    data = request.data
+    if "category" in data:
+        try:
+            category = Category.objects.only('id').get(pk=data['category'])
+            expense.category = category
+        except Category.DoesNotExist:
+            return Response({"error": "Category does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+    if "expense_by" in data:
+        try:
+            expense_by = User.objects.only('id').get(pk=data['expense_by'])
+            expense.expense_by = expense_by
+        except User.DoesNotExist:
+            return Response({"error": "User does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+    for key, value in request.data.items():
+        if key != "category" and key != "id" and key != "expense_by":
+            setattr(expense, key, value)
+    expense.updated_by = request.user
+    expense.save()
+    serializer = self.get_serializer(expense, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def incomeExpenseReport(request):
+    expenses = ExpenseItem.objects.filter(
+        deleted_at__isnull=True, expense__type='actual', expense__project=request.GET['project_id'])
+    incomes = Income.objects.filter(
+        deleted_at__isnull=True, project=request.GET['project_id'])
+    results = totalExpenseAndIncome(
+        expenses, incomes, request.GET['year'])
+    return Response(results)
+
+
+def expenseItemCreate(self, request, expense):
+    data = request.data
+    creator = request.user
+    new_Task = ExpenseItem.objects.create(
+        expense=expense,
+        name=data["name"],
+        cost=data["cost"],
+        unit=data["unit"],
+        quantity=data['quantity'],
+        created_by=creator,
+        updated_by=creator,
+    )
+    new_Task.save()
+    serializer = self.get_serializer(
+        new_Task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def expenseItemUpdate(self, request, item):
+    for key, value in request.data.items():
+        setattr(item, key, value)
+    item.updated_by = request.user
+    item.save()
+    serializer = self.get_serializer(item, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

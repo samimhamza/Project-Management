@@ -1,9 +1,12 @@
+from urllib import response
+from .serializers import UserTaskSerializer
+from ..models import UserTask
 from projects.models import Project
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
 from tasks.actions import (
-    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUsersPerformance)
+    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUsersPerformance, taskProgressCalculator)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from common.actions import (
     delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
@@ -60,7 +63,14 @@ class TaskViewSet(Repository):
     def update(self, request, pk=None):
         task = self.get_object()
         return update(self, request, task)
-
+    
+    def destroy(self, request, pk=None):
+        task = self.get_object()
+        parent = task.parent
+        res = delete(self, request, self.model)
+        taskProgressCalculator(parent,"parent")
+        return res
+    
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
         task = self.get_object()

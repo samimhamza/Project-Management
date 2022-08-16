@@ -1,6 +1,5 @@
-import re
 from clients.actions import clientProductsFormatter, clientServicesFormatter, setProducts, setServices
-from common.actions import (filterRecords, allItems, convertBase64ToImage)
+from common.actions import filterRecords, allItems, convertBase64ToImage, delete
 from .serializers import (ClientSerializer, ClientDetailedSerializer,
                           ClientListSerializer, ClientTrashedSerializer)
 from common.permissions_scopes import ClientPermissions
@@ -96,9 +95,9 @@ class ClientViewSet(Repository):
             except Country.DoesNotExist:
                 return Response({"error": "Country does not exist"}, status=status.HTTP_400_BAD_REQUEST)
             client.country = country
-            
+
         for key, value in request.data.items():
-            if key != "country" and key != "products" and key != "services" and key !="profile":
+            if key != "country" and key != "products" and key != "services" and key != "profile":
                 setattr(client, key, value)
         client.updated_by = request.user
         client.save()
@@ -116,3 +115,6 @@ class ClientViewSet(Repository):
                 return Response({"error": "email already in use"}, status=400)
             except Client.DoesNotExist:
                 return Response({"success": "email is available"}, status=200)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, Client, imageField="profile")

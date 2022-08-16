@@ -1,7 +1,6 @@
+from common.actions import allItems, filterRecords, dataWithPermissions, convertBase64ToImage, delete
 from users.api.serializers import (
     UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer)
-from common.actions import (allItems, filterRecords,
-                            dataWithPermissions, convertBase64ToImage)
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
 from users.models import User, UserPermissionList
@@ -41,7 +40,7 @@ class UserViewSet(Repository):
                 return allItems(UserWithProfileSerializer, queryset, request)
             return allItems(UserWithProfileSerializer, queryset, request)
         if request.GET.get("items_per_page") == "-2":
-            return allItems(self.get_serializer, queryset)
+            return allItems(self.get_serializer, queryset, request)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
@@ -160,3 +159,11 @@ class UserViewSet(Repository):
             "in_progress": in_progress_tasks,
             "completed": completed_tasks
         }}, status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, User, imageField="profile")
+
+    @action(detail=False, methods=["get"])
+    def users(self, request):
+        queryset = self.get_queryset()
+        return allItems(UserWithProfileSerializer, queryset, request)

@@ -181,7 +181,7 @@ def retrieve(self, request, project, showPermission=False):
 
 
 def destroy(self, request):
-    response = delete(self, request, Project)
+    response = delete(self, request, Project, imageField="banner")
     ids = []
     for id in response.data['deleted_ids']:
         ids.append(str(id))

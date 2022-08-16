@@ -134,42 +134,74 @@ def trashList(self, table, *args, **kwargs):
     return self.get_paginated_response(serializer.data)
 
 
-def delete(self, request, table, imageField=None):
+def deleteFilesAndAttachments(item, imageField):
+    if imageField:
+        if os.path.isfile('media/'+str(getattr(item, imageField))):
+            os.remove('media/'+str(getattr(item, imageField)))
+    attachments = Attachment.objects.filter(object_id=item.id)
+    for attachment in attachments:
+        if os.path.isfile('media/'+str(getattr(attachment, 'attachment'))):
+            os.remove('media/'+str(getattr(attachment, 'attachment')))
+
+
+def deleteItem(request, table, item, imageField):
+    if getattr(table, 'deleted_at', False):
+        if item.deleted_at:
+            deleteFilesAndAttachments(item, imageField)
+            item.delete()
+        else:
+            item.deleted_at = datetime.datetime.now(tz=timezone.utc)
+            item.deleted_by = request.user
+            item.save()
+    else:
+        deleteFilesAndAttachments(item, imageField)
+        item.delete()
+
+
+def checkPermission(user, project, permission):
+    if checkProjectScope(user, project, permission):
+        return True
+    return False
+
+
+def deletePermission(request, item, permission, specialCase):
+    if permission:
+        if specialCase:
+            if specialCase == 'income':
+                return checkPermission(request.user, item.income.project, permission)
+            if specialCase == "expense":
+                return checkPermission(request.user, item.expense.project, permission)
+        else:
+            return checkPermission(request.user, item.project, permission)
+    return True
+
+
+def delete(self, request, table, **kwargs):
+    permission = kwargs.get("permission")
+    imageField = kwargs.get("imageField")
+    specialCase = kwargs.get("specialCase")
     data = request.data
     ids = []
+    hasPermissions = []
     if data:
         items = table.objects.filter(pk__in=data["ids"])
         for item in items:
-            ids.append(item.id)
-            if getattr(table, 'deleted_at', False):
-                if item.deleted_at:
-                    item.delete()
-                else:
-                    item.deleted_at = datetime.datetime.now(tz=timezone.utc)
-                    item.deleted_by = request.user
-                    item.save()
-            else:
-                if imageField:
-                    if os.path.isfile('media/'+str(getattr(item, imageField))):
-                        os.remove('media/'+str(getattr(item, imageField)))
-                item.delete()
+            hasPermissions.append(deletePermission(
+                request, item, permission, specialCase))
+
+        if all(hasPermissions) and len(hasPermissions):
+            for item in items:
+                ids.append(item.id)
+                deleteItem(request, table, item, imageField)
     else:
         item = self.get_object()
-        ids.append(item.id)
-        if getattr(table, 'deleted_at', False):
-            if item.deleted_at:
-                item.delete()
-            else:
-                item.deleted_at = datetime.datetime.now(tz=timezone.utc)
-                item.deleted_by = request.user
-                item.save()
-        else:
-            if imageField:
-                if os.path.isfile('media/'+str(getattr(table, imageField))):
-                    os.remove('media/'+str(getattr(table, imageField)))
-            item.delete()
-    if len(ids) == 0:
-        return Response({'detail': "Invalid Id"}, status=status.HTTP_400_BAD_REQUEST)
+        hasPermissions.append(deletePermission(
+            request, item, permission, specialCase))
+        if all(hasPermissions) and len(hasPermissions):
+            ids.append(item.id)
+            deleteItem(request, table, item, imageField)
+    # if len(ids) == 0:
+    #     return Response({'detail': "Something went wrong!"}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'deleted_ids': ids}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -271,7 +303,7 @@ def addAttachment(request, item):
 
 def deleteAttachments(self, request):
     try:
-        return delete(self, request, Attachment, 'attachment')
+        return delete(self, request, Attachment, imageField='attachment')
     except:
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
@@ -308,11 +340,11 @@ def bussinessHours():
     workday = businesstimedelta.WorkDayRule(
         start_time=datetime.time(8),
         end_time=datetime.time(17),
-        working_days=[0, 1, 2, 3, 4, 5])
+        working_days=[0, 1, 2, 3, 5, 6])
     lunchbreak = businesstimedelta.LunchTimeRule(
         start_time=datetime.time(12),
         end_time=datetime.time(13),
-        working_days=[0, 1, 2, 3, 4, 5])
+        working_days=[0, 1, 2, 3,5,6])
     return businesstimedelta.Rules([workday, lunchbreak])
 
 

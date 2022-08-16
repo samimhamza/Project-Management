@@ -278,11 +278,13 @@ def create(request):
         status=task_status,
     )
     new_Task.save()
+    taskProgressCalculator(new_Task)
     serializer = TaskSerializer(new_Task, context={"request": request})
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 def update(self, request, task, project=None):
+
     if "dependencies" in request.data:
         if task.dependencies is not None:
             task.dependencies = task.dependencies + \
@@ -319,6 +321,11 @@ def update(self, request, task, project=None):
     data = serializer.data
     data = getAttachments(request, data,
                           task.id, "task_attachments_v", project=project)
+
+    #Check For if plan dates changes to update the progress
+    if "p_start_date" in request.data:
+        taskProgressCalculator(task)
+
     return Response(data, status=status.HTTP_202_ACCEPTED)
 
 
@@ -349,8 +356,9 @@ def progress(request, task):
         return Response({'error': "Task has Sub tasks, please remove sub tasks first!"}, status=status.HTTP_400_BAD_REQUEST)
     userTask.progress = data['progress']
     userTask.save()
-    taskProgress(task)
-    projectProgress(task.project)
+    # taskProgress(task)
+    # projectProgress(task.project)
+    taskProgressCalculator(task)
     serializer = ProgressSerializer(
         userTask)
     serializerData = prepareData(serializer, task)
@@ -384,3 +392,66 @@ def calculateUsersPerformance(users, project_id = None):
 
         result.append(user_obj)
     return result
+
+
+
+def taskProgressCalculator(task, type = None):
+    if type == "parent":
+        id = task.pk
+    else:
+        selfProgressCalculator(task)
+        id = task.parent_id
+    while id:
+        pTask = Task.objects.get(deleted_at__isnull=True, pk=id)
+        if pTask:
+            pTask.progress = parentProgressCalculator(pTask,"")
+            if pTask.progress == 100:
+                pTask.status = "completed"
+            else:
+                pTask.status = "in_progress"
+            pTask.save()
+        id = pTask.parent_id
+
+    task.project.progress = parentProgressCalculator(task.project_id,"project")
+    task.project.save()
+    return True
+
+def selfProgressCalculator(task):
+    userTasks = UserTask.objects.filter(task=task.pk)
+    totalProgress = 0
+    for ut in userTasks:
+        totalProgress += ut.progress
+
+    if userTasks:
+        calculatedProgress = int(totalProgress / userTasks.count())
+    else:
+        calculatedProgress = 0
+
+    if calculatedProgress == 100:
+        task.status = "completed"
+    else:
+        task.status = "in_progress"
+    task.progress = calculatedProgress
+    task.save()
+    return True
+
+def parentProgressCalculator(item,type):
+    if type == "project":
+        tasks = Task.objects.filter(deleted_at__isnull=True, project = item)
+    else:
+        tasks = Task.objects.filter(deleted_at__isnull=True, parent=item.pk)
+
+    total = 0
+    hours = 0
+    for t in tasks:
+        if all([t.p_start_date, t.p_end_date]):
+            businesshrs = bussinessHours()
+            planDiff = businesshrs.difference(
+                t.p_start_date, t.p_end_date)
+            hours += planDiff.hours
+            total += planDiff.hours * t.progress
+            
+    return int(total/hours)
+
+
+

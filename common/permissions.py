@@ -57,9 +57,13 @@ class CustomPermissions(permissions.BasePermission):
         if request.user.is_authenticated:
             for attr, value in self.actions_scopes.items():
                 if view.action == attr:
+                    if value == "pass":
+                        return True
                     return checkScope(request.user, value)
             for attr, value in self.methods_scopes.items():
                 if request.method == attr:
+                    if value == "pass":
+                        return True
                     return checkScope(request.user, value)
         return False
 
