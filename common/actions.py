@@ -158,18 +158,28 @@ def deleteItem(request, table, item, imageField):
         item.delete()
 
 
-def deletePermission(request, item, permission):
+def checkPermission(user, project, permission):
+    if checkProjectScope(user, project, permission):
+        return True
+    return False
+
+
+def deletePermission(request, item, permission, specialCase):
     if permission:
-        if checkProjectScope(request.user, item.project, permission):
-            return True
+        if specialCase:
+            if specialCase == 'income':
+                return checkPermission(request.user, item.income.project, permission)
+            if specialCase == "expense":
+                return checkPermission(request.user, item.expense.project, permission)
         else:
-            return False
+            return checkPermission(request.user, item.project, permission)
     return True
 
 
 def delete(self, request, table, **kwargs):
     permission = kwargs.get("permission")
     imageField = kwargs.get("imageField")
+    specialCase = kwargs.get("specialCase")
     data = request.data
     ids = []
     hasPermissions = []
@@ -177,7 +187,7 @@ def delete(self, request, table, **kwargs):
         items = table.objects.filter(pk__in=data["ids"])
         for item in items:
             hasPermissions.append(deletePermission(
-                request, item, permission))
+                request, item, permission, specialCase))
 
         if all(hasPermissions) and len(hasPermissions):
             for item in items:
@@ -186,7 +196,7 @@ def delete(self, request, table, **kwargs):
     else:
         item = self.get_object()
         hasPermissions.append(deletePermission(
-            request, item, permission))
+            request, item, permission, specialCase))
         if all(hasPermissions) and len(hasPermissions):
             ids.append(item.id)
             deleteItem(request, table, item, imageField)

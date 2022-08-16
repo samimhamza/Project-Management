@@ -1,7 +1,7 @@
 from common.actions import filterRecords, allItems, checkAndReturn, unAuthorized, getAttachments
 from rest_framework.response import Response
-from .models import Category, Expense
-from projects.models import Project
+from .models import Category, Expense, ExpenseItem
+from projects.models import Project, Income
 from rest_framework import status
 from users.models import User
 
@@ -209,3 +209,13 @@ def expenseUpdate(self, request, expense):
     expense.save()
     serializer = self.get_serializer(expense, context={"request": request})
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+def incomeExpenseReport(request):
+    expenses = ExpenseItem.objects.filter(
+        deleted_at__isnull=True, expense__type='actual', expense__project=request.GET['project_id'])
+    incomes = Income.objects.filter(
+        deleted_at__isnull=True, project=request.GET['project_id'])
+    results = totalExpenseAndIncome(
+        expenses, incomes, request.GET['year'])
+    return Response(results)

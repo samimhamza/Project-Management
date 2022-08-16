@@ -211,9 +211,7 @@ class MyPaymentViewSet(viewsets.ModelViewSet):
                               paymentUpdate(self, request, payment))
 
     def destroy(self, request, pk=None):
-        payment = self.get_object()
-        return checkAndReturn(request.user, payment.income.project, "project_incomes_d",
-                              delete(self, request, Income))
+        return delete(self, request, Payment, permission="project_payments_d", specialCase='income')
 
     def get_serializer_class(self):
         try:
