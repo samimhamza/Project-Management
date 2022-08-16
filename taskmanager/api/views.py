@@ -1,14 +1,15 @@
+from common.permissions import checkCustomPermissions
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from projects.models import Project, Income
 from tasks.models import Task
 from users.models import User, Team
 from clients.models import Client
 from expenses.models import ExpenseItem
-from common.actions import fetchYears
+from common.actions import fetchYears, unAuthorized
 
 
 
@@ -43,7 +44,10 @@ def counterTables(request):
 
 @api_view()
 def fetchYearsAPI(request):
-    return fetchYears()
+    if(checkCustomPermissions(request,"projects_v")):
+        return fetchYears()
+    else:
+        unAuthorized()
 
 def counter(model, name, icon):
     result = {"name": name, "total":model.count(), "icon":icon}
