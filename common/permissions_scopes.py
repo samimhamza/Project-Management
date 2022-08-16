@@ -83,7 +83,8 @@ class UserPermissions(CustomPermissions):
         'check_uniqueness': 'users_c',
         'teams': 'users_v',
         'tasks_projects': 'users_v',
-        'projects': 'users_v'
+        'projects': 'users_v',
+        'users': "pass"
     }
 
 
@@ -135,20 +136,6 @@ class LocationPermissions(CustomPermissions):
     }
 
 
-class PaymentPermissions(CustomPermissions):
-    actions_scopes = {
-        'list': 'project_payments_v',
-        'create': 'project_payments_c',
-        'retrieve': "project_payments_v",
-        'update': 'project_payments_u',
-        'partial_update': 'project_payments_u',
-        'destroy': 'project_payments_d',
-        'restore': 'project_payments_d',
-        'trashed': 'project_payments_d',
-        'all': 'project_payments_v',
-    }
-
-
 class FocalPointPermissions(CustomPermissions):
     actions_scopes = {
         'list': 'project_focal_points_v',
@@ -176,6 +163,19 @@ class IncomePermissions(CustomPermissions):
         'all': 'project_incomes_v',
         'add_attachments': 'income_attachments_c',
         'delete_attachments': 'income_attachments_d'
+    }
+
+
+class PaymentPermissions(CustomPermissions):
+    actions_scopes = {
+        'list': 'project_incomes_v',
+        'create': 'project_incomes_c',
+        'retrieve': "project_incomes_v",
+        'update': 'project_incomes_u',
+        'destroy': 'project_incomes_d',
+        'restore': 'project_incomes_d',
+        'trashed': 'project_incomes_d',
+        'all': 'project_incomes_v',
     }
 
 

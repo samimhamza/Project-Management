@@ -219,3 +219,30 @@ def incomeExpenseReport(request):
     results = totalExpenseAndIncome(
         expenses, incomes, request.GET['year'])
     return Response(results)
+
+
+def expenseItemCreate(self, request, expense):
+    data = request.data
+    creator = request.user
+    new_Task = ExpenseItem.objects.create(
+        expense=expense,
+        name=data["name"],
+        cost=data["cost"],
+        unit=data["unit"],
+        quantity=data['quantity'],
+        created_by=creator,
+        updated_by=creator,
+    )
+    new_Task.save()
+    serializer = self.get_serializer(
+        new_Task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def expenseItemUpdate(self, request, item):
+    for key, value in request.data.items():
+        setattr(item, key, value)
+    item.updated_by = request.user
+    item.save()
+    serializer = self.get_serializer(item, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

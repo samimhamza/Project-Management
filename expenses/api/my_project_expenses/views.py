@@ -1,7 +1,9 @@
-from expenses.actions import (expenseUpdate, expernseCreate, categoryList, incomeExpenseReport,
+from expenses.actions import (expenseItemCreate, expenseItemUpdate, expenseUpdate,
+                              expernseCreate, categoryList, incomeExpenseReport,
                               categoryCreate, categoryActions, categoryUpdate, expenseRetrieve)
 from common.actions import (filterRecords, expensesOfProject, addAttachment,
-                            deleteAttachments, delete, checkProjectScope, unAuthorized, checkAndReturn)
+                            deleteAttachments, delete, checkProjectScope,
+                            unAuthorized, checkAndReturn)
 from expenses.models import Expense, ExpenseItem, Category
 from rest_framework.permissions import IsAuthenticated
 from common.custom import CustomPageNumberPagination
@@ -179,34 +181,18 @@ class MyExpenseItemViewSet(viewsets.ModelViewSet):
         return Response([])
 
     def create(self, request):
-        data = request.data
-        creator = request.user
-        if data['expense']:
-            expense = Expense.objects.only('id').get(pk=data['expense'])
+        if request.data['expense']:
+            expense = Expense.objects.only(
+                'id').get(pk=request.data['expense'])
         else:
-            expense = None
-        new_Task = ExpenseItem.objects.create(
-            expense=expense,
-            name=data["name"],
-            cost=data["cost"],
-            unit=data["unit"],
-            quantity=data['quantity'],
-            created_by=creator,
-            updated_by=creator,
-        )
-        new_Task.save()
-        serializer = self.get_serializer(
-            new_Task, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"detail": "Expense does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        return checkAndReturn(request.user, expense.project, "project_expenses_c",
+                              expenseItemCreate(self, request, expense))
 
     def update(self, request, pk=None):
         item = self.get_object()
-        for key, value in request.data.items():
-            setattr(item, key, value)
-        item.updated_by = request.user
-        item.save()
-        serializer = self.get_serializer(item, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return checkAndReturn(request.user, item.expense.project, "project_expenses_u",
+                              expenseItemUpdate(self, request, item))
 
     def destroy(self, request, pk=None):
         return delete(self, request, ExpenseItem, permission="project_expenses_d", specialCase='expense')

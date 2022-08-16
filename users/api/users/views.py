@@ -40,7 +40,7 @@ class UserViewSet(Repository):
                 return allItems(UserWithProfileSerializer, queryset, request)
             return allItems(UserWithProfileSerializer, queryset, request)
         if request.GET.get("items_per_page") == "-2":
-            return allItems(self.get_serializer, queryset)
+            return allItems(self.get_serializer, queryset, request)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
@@ -162,3 +162,8 @@ class UserViewSet(Repository):
 
     def destroy(self, request, pk=None):
         return delete(self, request, User, imageField="profile")
+
+    @action(detail=False, methods=["get"])
+    def users(self, request):
+        queryset = self.get_queryset()
+        return allItems(UserWithProfileSerializer, queryset, request)
