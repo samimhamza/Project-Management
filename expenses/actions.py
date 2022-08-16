@@ -1,8 +1,9 @@
 from common.actions import filterRecords, allItems, checkAndReturn, unAuthorized, getAttachments
 from rest_framework.response import Response
-from rest_framework import status
-from .models import Category
+from .models import Category, Expense
 from projects.models import Project
+from rest_framework import status
+from users.models import User
 
 
 def totalExpenseAndIncome(expenses, incomes, year):
@@ -159,3 +160,52 @@ def expenseRetrieve(self, request, expense):
     data = getAttachments(request, data, expense.id,
                           "expense_attachments_v", expense.project)
     return Response(data)
+
+
+def expernseCreate(self, request, data, project):
+    if data["expense_by"]:
+        expense_by = User.objects.only('id').get(pk=data['expense_by'])
+    else:
+        expense_by = None
+    if data['category']:
+        category = Category.objects.only('id').get(pk=data['category'])
+    else:
+        category = None
+    creator = request.user
+    new_Task = Expense.objects.create(
+        category=category,
+        title=data["title"],
+        date=data["date"],
+        project=project,
+        expense_by=expense_by,
+        type=data["type"],
+        created_by=creator,
+        updated_by=creator,
+    )
+    new_Task.save()
+    serializer = self.get_serializer(
+        new_Task, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def expenseUpdate(self, request, expense):
+    data = request.data
+    if "category" in data:
+        try:
+            category = Category.objects.only('id').get(pk=data['category'])
+            expense.category = category
+        except Category.DoesNotExist:
+            return Response({"error": "Category does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+    if "expense_by" in data:
+        try:
+            expense_by = User.objects.only('id').get(pk=data['expense_by'])
+            expense.expense_by = expense_by
+        except User.DoesNotExist:
+            return Response({"error": "User does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+    for key, value in request.data.items():
+        if key != "category" and key != "id" and key != "expense_by":
+            setattr(expense, key, value)
+    expense.updated_by = request.user
+    expense.save()
+    serializer = self.get_serializer(expense, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

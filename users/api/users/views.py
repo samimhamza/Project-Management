@@ -1,7 +1,6 @@
+from common.actions import allItems, filterRecords, dataWithPermissions, convertBase64ToImage, delete
 from users.api.serializers import (
     UserSerializer, UserWithProfileSerializer, UserPermissionListSerializer, UserTrashedSerializer)
-from common.actions import (allItems, filterRecords,
-                            dataWithPermissions, convertBase64ToImage)
 from common.permissions import addPermissionsToUser, addRolesToUser
 from common.permissions_scopes import UserPermissions
 from users.models import User, UserPermissionList
@@ -160,3 +159,6 @@ class UserViewSet(Repository):
             "in_progress": in_progress_tasks,
             "completed": completed_tasks
         }}, status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, User, imageField="profile")
