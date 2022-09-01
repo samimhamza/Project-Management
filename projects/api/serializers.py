@@ -80,6 +80,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class IncomeSerializer(serializers.ModelSerializer):
     payments = serializers.SerializerMethodField()
+    # amount = serializers.SerializerMethodField()
     project = ProjectNameListSerializer()
 
     def get_payments(self, income):
@@ -88,6 +89,14 @@ class IncomeSerializer(serializers.ModelSerializer):
         serializer = PaymentSerializer(instance=qs, many=True, context={
                                        "request": self.context['request']})
         return serializer.data
+
+    # def get_amount(self, income):
+    #     qs = Payment.objects.filter(
+    #         deleted_at__isnull=True, income=income).order_by('-date')
+    #     amount = 0
+    #     for payment in qs:
+    #         amount += payment.amount
+    #     return amount
 
     class Meta:
         model = Income
