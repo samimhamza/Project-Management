@@ -45,6 +45,8 @@ class UserSerializer(serializers.ModelSerializer):
             "updated_at",
             "deleted_at",
         ]
+
+
 class AuthUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

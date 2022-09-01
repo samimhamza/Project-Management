@@ -36,13 +36,13 @@ class CategoryViewSet(Repository):
     }
 
     def list(self, request):
-        categoryList(self, request, CategoryListSerializer)
+        return categoryList(self, request, CategoryListSerializer)
 
     def create(self, request):
-        categoryCreate(self, request)
+        return categoryCreate(self, request)
 
     def update(self, request, pk=None):
-        categoryUpdate(self, request)
+        return categoryUpdate(self, request)
 
 
 class ExpenseViewSet(Repository):
@@ -71,7 +71,7 @@ class ExpenseViewSet(Repository):
 
     def retrieve(self, request, pk=None):
         expense = self.get_object()
-        expenseRetrieve(self, request, expense)
+        return expenseRetrieve(self, request, expense)
 
     def create(self, request):
         data = request.data
@@ -83,7 +83,7 @@ class ExpenseViewSet(Repository):
 
     def update(self, request, pk=None):
         expense = self.get_object()
-        expenseUpdate(self, request, expense)
+        return expenseUpdate(self, request, expense)
 
     @ action(detail=True, methods=["post"])
     def add_attachments(self, request, pk=None):
@@ -151,7 +151,7 @@ class ExpenseItemViewSet(Repository):
                 'id').get(pk=request.data['expense'])
         else:
             return Response({"detail": "Expense does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-        expenseItemCreate(self, request, expense)
+        return expenseItemCreate(self, request, expense)
 
     def update(self, request, pk=None):
         item = self.get_object()
