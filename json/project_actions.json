@@ -82,7 +82,7 @@
 	},
 	{
 		"fields": {
-			"name": "project_dashboard",
+			"name": "dashboard",
 			"codename": "pd",
 			"model": "Project Dashboard",
 			"order": 7
