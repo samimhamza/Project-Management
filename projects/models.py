@@ -247,8 +247,8 @@ class Income(models.Model):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
     description = models.TextField(blank=True, null=True)
-    amount = models.DecimalField(
-        max_digits=19, decimal_places=2, blank=True, null=True)
+    # amount = models.DecimalField(
+    #     max_digits=19, decimal_places=2, blank=True, null=True)
     date = models.DateField()
 
     class Types(models.TextChoices):

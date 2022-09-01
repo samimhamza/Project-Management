@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
+    "django_seed"
 ]
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -126,11 +127,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Asia/Kabul"
+# TIME_ZONE = "Asia/Kabul"
 
 USE_I18N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
