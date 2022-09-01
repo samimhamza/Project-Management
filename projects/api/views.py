@@ -1,8 +1,10 @@
 from common.permissions_scopes import FocalPointPermissions, LocationPermissions
-from common.actions import (allItems, filterRecords, unAuthorized,
+from common.actions import (allItems, filterRecords, unAuthorized, checkAndReturn,
                             checkProjectScope, convertBase64ToImage, delete)
+from projects.actions import focalPointCreate, focalPointList, focalPointUpdate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import status, viewsets
 from common.Repository import Repository
 from projects.api.serializers import (
     FocalPointSerializer,
@@ -14,7 +16,6 @@ from projects.api.serializers import (
     FocalPointTrashedSerializer,
 )
 from rest_framework import generics
-from rest_framework import status
 from projects.models import (
     Country,
     Location,
@@ -127,64 +128,65 @@ class FocalPointViewSet(Repository):
     def list(self, request):
         queryset = self.get_queryset()
         if request.GET.get("project_id"):
-            queryset = FocalPoint.objects.filter(
-                deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
+            return focalPointList(self, request, queryset)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         data = request.data
-        data["created_by"] = request.user
         try:
             project = Project.objects.only(
                 'id').get(pk=data["project"])
         except Project.DoesNotExist:
             return Response({"error": "Project does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-        profile = convertBase64ToImage(data["profile"])
-        new_focalPoint = FocalPoint.objects.create(
-            project=project,
-            profile=profile,
-            contact_name=data["contact_name"],
-            contact_last_name=data["contact_last_name"],
-            phone=data["phone"],
-            email=data["email"],
-            whatsapp=data["whatsapp"],
-            position=data["position"],
-            prefer_communication_way=data["prefer_communication_way"],
-            created_by=data["created_by"],
-            updated_by=data["created_by"],
-        )
-        new_focalPoint.save()
-        serializer = self.get_serializer(
-            new_focalPoint, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return focalPointCreate(self, request, data, project)
 
     def update(self, request, pk=None):
         focal_point = self.get_object()
-        data = request.data
-        if request.data.get("project"):
-            try:
-                project = Project.objects.only(
-                    'id').get(pk=data["project"])
-            except Project.DoesNotExist:
-                return Response({"error": "Project does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-            focal_point.project = project
-        if request.data.get("profile"):
-            imageField = convertBase64ToImage(data["profile"])
-            if imageField:
-                if os.path.isfile('media/'+str(focal_point.profile)):
-                    os.remove('media/'+str(focal_point.profile))
-                focal_point.profile = imageField
-        for key, value in data.items():
-            if key != "id" and key != "project" and key != "profile":
-                setattr(focal_point, key, value)
-        focal_point.updated_by = request.user
-        focal_point.save()
-        serializer = self.get_serializer(
-            focal_point, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return focalPointUpdate(self, request, focal_point)
 
     def destroy(self, request, pk=None):
         return delete(self, request, FocalPoint, imageField="profile")
+
+
+class MyFocalPointViewSet(viewsets.ModelViewSet):
+    model = FocalPoint
+    queryset = FocalPoint.objects.all()
+    serializer_class = FocalPointSerializer
+    permission_classes = (FocalPointPermissions,)
+    serializer_action_classes = {
+        "trashed": FocalPointTrashedSerializer
+    }
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        if request.GET.get("project_id"):
+            try:
+                project = Project.objects.get(pk=request.GET.get("project_id"))
+            except Project.DoesNotExist:
+                return unAuthorized()
+            if checkProjectScope(request.user, project, "project_focal_points_v"):
+                queryset = self.get_queryset()
+                return focalPointList(self, request, queryset)
+            else:
+                return unAuthorized()
+        else:
+            return unAuthorized()
+
+    def create(self, request):
+        data = request.data
+        try:
+            project = Project.objects.only(
+                'id').get(pk=data["project"])
+        except Project.DoesNotExist:
+            return Response({"error": "Project does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        return checkAndReturn(request.user, project, "project_focal_points_c",
+                              focalPointCreate(self, request, data, project))
+
+    def update(self, request, pk=None):
+        focal_point = self.get_object()
+        return checkAndReturn(request.user, focal_point.project, "project_focal_points_u",
+                              focalPointUpdate(self, request, focal_point))
+
+    def destroy(self, request, pk=None):
+        return delete(self, request, FocalPoint, imageField="profile", permission="project_focal_points_d")

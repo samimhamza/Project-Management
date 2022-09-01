@@ -7,6 +7,7 @@ from .department.views import DepartmentViewSet
 from django.urls import path, include, re_path
 from projects.api.views import (
     FocalPointViewSet,
+    MyFocalPointViewSet,
     LocationCreateAPIView,
     CountryListAPIView,
     StateListAPIView,
@@ -17,6 +18,8 @@ router = DefaultRouter()
 router.register(r"projects", ProjectViewSet, basename="projects")
 router.register(r"my_projects", MyProjectViewSet, basename="my_projects")
 router.register(r"focal_points", FocalPointViewSet, basename="focal_points")
+router.register(r"my_focal_points", MyFocalPointViewSet,
+                basename="my_focal_points")
 router.register(r"incomes", IncomeViewSet, basename="incomes")
 router.register(r"payments", PaymentViewSet, basename="payments")
 router.register(r"my_payments", MyPaymentViewSet, basename="my_payments")

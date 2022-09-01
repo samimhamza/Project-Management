@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from projects.models import Stage, SubStage
 from common.pusher import pusher_client
 from users.models import User, Team
-from projects.models import Project
+from projects.models import Project, FocalPoint
 from rest_framework import status
 from tasks.models import Task
 import os
@@ -372,3 +372,53 @@ def projectTiming(projects):
 
         result.append(pro_obj)
     return result
+
+
+def focalPointList(self, request, queryset):
+    queryset = FocalPoint.objects.filter(
+        deleted_at__isnull=True, project=request.GET.get("project_id")).order_by("-created_at")
+    serializer = self.get_serializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+def focalPointCreate(self, request, data, project):
+    data["created_by"] = request.user
+    profile = convertBase64ToImage(data["profile"])
+    new_focalPoint = FocalPoint.objects.create(
+        project=project,
+        profile=profile,
+        contact_name=data["contact_name"],
+        contact_last_name=data["contact_last_name"],
+        phone=data["phone"],
+        email=data["email"],
+        whatsapp=data["whatsapp"] if request.data.get(
+            'whatsapp') else None,
+        position=data["position"] if request.data.get(
+            'position') else None,
+        prefer_communication_way=data["prefer_communication_way"] if request.data.get(
+            'prefer_communication_way') else "email",
+        created_by=data["created_by"],
+        updated_by=data["created_by"],
+    )
+    new_focalPoint.save()
+    serializer = self.get_serializer(
+        new_focalPoint, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def focalPointUpdate(self, request, focal_point):
+    data = request.data
+    if request.data.get("profile"):
+        imageField = convertBase64ToImage(data["profile"])
+        if imageField:
+            if os.path.isfile('media/'+str(focal_point.profile)):
+                os.remove('media/'+str(focal_point.profile))
+            focal_point.profile = imageField
+    for key, value in data.items():
+        if key != "id" and key != "project" and key != "profile":
+            setattr(focal_point, key, value)
+    focal_point.updated_by = request.user
+    focal_point.save()
+    serializer = self.get_serializer(
+        focal_point, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
