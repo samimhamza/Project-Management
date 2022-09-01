@@ -344,7 +344,7 @@ def bussinessHours():
     lunchbreak = businesstimedelta.LunchTimeRule(
         start_time=datetime.time(12),
         end_time=datetime.time(13),
-        working_days=[0, 1, 2, 3,5,6])
+        working_days=[0, 1, 2, 3, 5, 6])
     return businesstimedelta.Rules([workday, lunchbreak])
 
 

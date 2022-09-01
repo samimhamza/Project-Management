@@ -49,7 +49,8 @@ class MyCategoryViewSet(viewsets.ModelViewSet):
                                categoryUpdate(self, request))
 
     def destroy(self, request, pk=None):
-        return delete(self, request, Category, permission="project_expenses_d")
+        return categoryActions(request, "project_expenses_d",
+                               delete(self, request, Category))
 
     def get_serializer_class(self):
         try:
