@@ -82,10 +82,19 @@
 	},
 	{
 		"fields": {
+			"name": "project_dashboard",
+			"codename": "pd",
+			"model": "Project Dashboard",
+			"order": 7
+		},
+		"sub_actions": [{ "code": "v", "name": "View" }]
+	},
+	{
+		"fields": {
 			"name": "project_incomes",
 			"codename": "pi",
 			"model": "Project Incomes",
-			"order": 7
+			"order": 8
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -99,7 +108,7 @@
 			"name": "project_focal_points",
 			"codename": "pf",
 			"model": "Project Focal Points",
-			"order": 8
+			"order": 9
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -113,7 +122,7 @@
 			"name": "project_expenses",
 			"codename": "pe",
 			"model": "Project Expenses",
-			"order": 9
+			"order": 10
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },

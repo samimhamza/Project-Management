@@ -109,10 +109,19 @@
 	},
 	{
 		"fields": {
+			"name": "dashboard",
+			"codename": "da",
+			"model": "Dashboard",
+			"order": 9
+		},
+		"sub_actions": [{ "code": "v", "name": "View" }]
+	},
+	{
+		"fields": {
 			"name": "project_incomes",
 			"codename": "pi",
 			"model": "Project Incomes",
-			"order": 9
+			"order": 10
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -126,7 +135,7 @@
 			"name": "income_attachments",
 			"codename": "ia",
 			"model": "Income Attachments",
-			"order": 10
+			"order": 11
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -140,7 +149,7 @@
 			"name": "project_expenses",
 			"codename": "pe",
 			"model": "Project Expenses",
-			"order": 11
+			"order": 12
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -154,7 +163,7 @@
 			"name": "expense_attachments",
 			"codename": "ea",
 			"model": "Expense Attachments",
-			"order": 12
+			"order": 13
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -168,7 +177,7 @@
 			"name": "project_focal_points",
 			"codename": "pf",
 			"model": "Project Focal Points",
-			"order": 13
+			"order": 14
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -182,7 +191,7 @@
 			"name": "users",
 			"codename": "u",
 			"model": "Users",
-			"order": 14
+			"order": 15
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -197,7 +206,7 @@
 			"name": "teams",
 			"codename": "t",
 			"model": "Teams",
-			"order": 15
+			"order": 16
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -212,7 +221,7 @@
 			"name": "reminders",
 			"codename": "r",
 			"model": "Reminders and Notes",
-			"order": 16
+			"order": 17
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -226,7 +235,7 @@
 			"name": "roles",
 			"codename": "ro",
 			"model": "Roles",
-			"order": 17
+			"order": 18
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -241,7 +250,7 @@
 			"name": "stages",
 			"codename": "s",
 			"model": "Stages",
-			"order": 18
+			"order": 19
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -255,7 +264,7 @@
 			"name": "sub_stages",
 			"codename": "sub",
 			"model": "Sub Stages",
-			"order": 19
+			"order": 20
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -269,7 +278,7 @@
 			"name": "clients",
 			"codename": "cl",
 			"model": "Clients",
-			"order": 20
+			"order": 21
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -284,7 +293,7 @@
 			"name": "products",
 			"codename": "pr",
 			"model": "Products",
-			"order": 21
+			"order": 22
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -299,7 +308,7 @@
 			"name": "services",
 			"codename": "se",
 			"model": "Services",
-			"order": 22
+			"order": 23
 		},
 		"sub_actions": [
 			{ "code": "c", "name": "Create" },
@@ -314,7 +323,7 @@
 			"name": "trashes",
 			"codename": "tr",
 			"model": "Trashes",
-			"order": 23
+			"order": 24
 		},
 		"sub_actions": [
 			{ "code": "r", "name": "Restore" },
