@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import (
 
 )
 from taskmanager.api.views import MyObtainTokenPairView, counterTables, fetchYearsAPI
+from projects.api import views
 
 urlpatterns = [
     # path("api/token/", TokenObtainPairView.as_view()),
@@ -23,7 +24,7 @@ urlpatterns = [
     path("api/", include("users.api.urls")),
     path("api/", include("expenses.api.urls")),
     path("api/", include("clients.api.urls")),
-
+    path("", views.indexPage),
 
 ] + static(settings.MEDIA_URL,
            document_root=settings.MEDIA_ROOT)

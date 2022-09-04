@@ -23,7 +23,11 @@ from projects.models import (
     State,
     Project
 )
-import os
+from django.shortcuts import render
+
+
+def indexPage(request):
+    return render(request, 'index.html')
 
 
 def locationAction(self, project, data):
