@@ -1,6 +1,7 @@
 from projects.api.income.views import PaymentViewSet, IncomeViewSet, MyIncomeViewSet, MyPaymentViewSet
 from projects.api.my_projects.views import MyProjectViewSet
 from projects.api.project.views import ProjectViewSet
+from projects.models import ProjectPermission
 from .stage.views import StageViewSet, SubStageViewSet
 from rest_framework.routers import DefaultRouter
 from .department.views import DepartmentViewSet
@@ -11,7 +12,8 @@ from projects.api.views import (
     LocationCreateAPIView,
     CountryListAPIView,
     StateListAPIView,
-    MyLocationCreateAPIView
+    MyLocationCreateAPIView,
+    PermmissionListAPIView
 )
 
 router = DefaultRouter()
@@ -33,6 +35,8 @@ urlpatterns = [
     path('locations/', LocationCreateAPIView.as_view(), name='locations'),
     path('my_locations/', MyLocationCreateAPIView.as_view(), name='my_locations'),
     path('countries/', CountryListAPIView.as_view(), name='countries'),
+    path('project_permissions/', PermmissionListAPIView.as_view(),
+         name='project_permissions'),
     path('states/', StateListAPIView.as_view(), name='states'),
     re_path(r'', include((router.urls))),
 ]

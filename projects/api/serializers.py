@@ -8,7 +8,10 @@ from projects.models import (
     Payment,
     Project,
     Attachment,
-    State
+    State,
+    Action,
+    ProjectPermission,
+    SubAction
 )
 
 
@@ -183,3 +186,23 @@ class PaymentTrashedSerializer(serializers.ModelSerializer):
             "updated_by",
             "deleted_by"
         ]
+
+
+class ActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Action
+        fields = ["id", "name", "model"]
+
+
+class SubActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubAction
+        fields = ["id", "code", 'name']
+
+
+class ProjectPermissionActionSerializer(serializers.ModelSerializer):
+    sub_action = SubActionSerializer()
+
+    class Meta:
+        model = ProjectPermission
+        fields = ["sub_action"]
