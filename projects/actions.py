@@ -1,5 +1,7 @@
-from common.actions import (convertBase64ToImage, getAttachments,
-                            countStatuses, filterRecords, allItems, projectsOfUser, unAuthorized, delete, bussinessHours, taskTimingCalculator)
+from itertools import permutations
+from common.actions import (convertBase64ToImage, getAttachments, countStatuses, filterRecords,
+                            allItems, projectsOfUser, unAuthorized, delete, bussinessHours, taskTimingCalculator)
+from projects.models import Project, FocalPoint, ProjectPermission, ProjectPermissionUser
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
@@ -9,8 +11,7 @@ from common.permissions import checkProjectScope
 from rest_framework.response import Response
 from projects.models import Stage, SubStage
 from common.pusher import pusher_client
-from users.models import User, Team
-from projects.models import Project, FocalPoint
+from users.models import Permission, User, Team
 from rest_framework import status
 from tasks.models import Task
 import os
@@ -224,6 +225,13 @@ def add_users(request, project):
     users = User.objects.filter(pk__in=data['ids'])
     for user in data['ids']:
         project.users.add(user)
+    for user in users:
+        for key, value in data["permissions"].items():
+            permissions = ProjectPermission.objects.filter(
+                action=key, sub_action__in=value)
+            for permission in permissions:
+                p, created = ProjectPermissionUser.objects.get_or_create(
+                    project_permission=permission, project=project, user=user)
     notification(getAssignNotification, project,
                  request, 'pk__in', data['ids'])
     serializer = UserWithProfileSerializer(
@@ -247,6 +255,11 @@ def delete_users(request, project):
     data = request.data
     for user in data['ids']:
         project.users.remove(user)
+    users = User.objects.filter(pk__in=data['ids'])
+    for user in users:
+        permissions = ProjectPermissionUser.objects.filter(
+            project=project, user=user)
+        permissions.delete()
     notification(getRevokeNotification, project,
                  request, 'pk__in', data['ids'])
     return Response(status=status.HTTP_204_NO_CONTENT)
@@ -310,13 +323,13 @@ def excluded_teams(request, pk):
 
 # ProjectViewSet Member Actions
 def member_actions(self, method, request):
-    try:
-        project = self.get_object()
-        return method(request, project)
-    except:
-        return Response(
-            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-        )
+    # try:
+    project = self.get_object()
+    return method(request, project)
+    # except:
+    #     return Response(
+    #         {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+    #     )
 
 
 # MyProjectViewSet Member Actions
