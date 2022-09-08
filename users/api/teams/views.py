@@ -14,7 +14,8 @@ from users.api.teams.serializers import (
     TeamNamesSerializer,
     TeamRetieveSerializer,
     ProjectTeamSerializer,
-    TeamTrashedSerializer
+    TeamTrashedSerializer,
+    TeamUserDetailSerializer
 )
 from projects.models import Project
 from django.db import transaction
@@ -127,13 +128,17 @@ class TeamViewSet(Repository):
         try:
             data = request.data
             team = self.get_object()
-            user = get_object_or_404(User, pk=data["id"])
+            user = User.objects.get(pk=data["id"])
+            userData = UserWithProfileSerializer(
+                user, context={"request": request})
             team_user, created = TeamUser.objects.get_or_create(
                 team=team, user=user)
             team_user.position = data["position"]
             team_user.save()
-            serializer = TeamUserSerializer(team_user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            team_user_serializer = TeamUserSerializer(team_user)
+            userData.data['is_leader'] = team_user_serializer.data['is_leader']
+            userData.data['position'] = team_user_serializer.data['position']
+            return Response(userData.data, status=status.HTTP_201_CREATED)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST

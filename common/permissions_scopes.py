@@ -101,7 +101,7 @@ class TeamPermissions(CustomPermissions):
         'trashed': 'teams_d',
         'all': 'teams_v',
         'users': 'teams_v',
-        'add_users': 'teams_c',
+        'add_user': 'teams_c',
         'excluded_users': 'users_v',
         'excluded_projects': 'projects_v',
         'add_project': 'teams_u',

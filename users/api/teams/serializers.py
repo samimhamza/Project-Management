@@ -12,6 +12,14 @@ class TeamUserSerializer(serializers.ModelSerializer):
         fields = ["position", "is_leader"]
 
 
+class TeamUserDetailSerializer(serializers.ModelSerializer):
+    user = UserWithProfileSerializer(read_only=True)
+
+    class Meta:
+        model = TeamUser
+        fields = "__all__"
+
+
 class LessFieldsTeamSerializer(serializers.ModelSerializer):
     users = serializers.SerializerMethodField()
 
