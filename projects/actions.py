@@ -1,7 +1,7 @@
 from itertools import permutations
 from common.actions import (convertBase64ToImage, getAttachments, countStatuses, filterRecords,
                             allItems, projectsOfUser, unAuthorized, delete, bussinessHours, taskTimingCalculator)
-from projects.models import Project, FocalPoint, ProjectPermission, ProjectPermissionUser
+from projects.models import Project, FocalPoint, ProjectPermission, ProjectPermissionUser, Action, SubAction
 from users.api.teams.serializers import LessFieldsTeamSerializer
 from common.my_project_permissions import getProjectPermissions
 from projects.api.serializers import ProjectNameListSerializer
@@ -11,7 +11,7 @@ from common.permissions import checkProjectScope
 from rest_framework.response import Response
 from projects.models import Stage, SubStage
 from common.pusher import pusher_client
-from users.models import Permission, User, Team
+from users.models import User, Team
 from rest_framework import status
 from tasks.models import Task
 import os
@@ -323,13 +323,13 @@ def excluded_teams(request, pk):
 
 # ProjectViewSet Member Actions
 def member_actions(self, method, request):
-    # try:
-    project = self.get_object()
-    return method(request, project)
-    # except:
-    #     return Response(
-    #         {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-    #     )
+    try:
+        project = self.get_object()
+        return method(request, project)
+    except:
+        return Response(
+            {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 # MyProjectViewSet Member Actions
@@ -347,6 +347,23 @@ def my_project_member_actions(method, request, pk):
         return Response(
             {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+def get_user(request, project):
+    try:
+        user = User.objects.only('id').get(pk=request.GET.get("user_id"))
+    except User.DoesNotExist:
+        return Response({"detail": "User does not exists!"}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        projectPermissionsUser = ProjectPermissionUser.objects.get(
+            user=user, project=project)
+        for permission in projectPermissionsUser:
+            permission_action = Action.objects.get(
+                pk=permission.action).values_list("id", "name", "model")
+            actions = SubAction.objects.filter(permission_action)
+
+    except ProjectPermissionUser.DoesNotExist:
+        return Response({"detail": "UserPermission does not exists!"}, status=status.HTTP_404_NOT_FOUND)
 
 
 def abbr(text=None):

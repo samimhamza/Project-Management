@@ -44,6 +44,7 @@ class ProjectPermissions(CustomPermissions):
         'delete_attachments': 'project_attachments_d',
         'projects_status': 'projects_v',
         'project_timing': 'projects_v',
+        'get_user': 'projects_m',
     }
 
 

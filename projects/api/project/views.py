@@ -1,16 +1,17 @@
-from tasks.models import Task
-from projects.actions import (excluded_teams, excluded_users, member_actions, shareTo, broadcastProject,
+from projects.actions import (excluded_teams, excluded_users, get_user, member_actions, shareTo, broadcastProject,
                               addStagesToProject, list, update, retrieve, add_users, add_teams, users, teams,
                               delete_users, delete_teams, member_actions, destroy, projectTiming)
 from projects.api.project.serializers import ProjectSerializer, ProjectTrashedSerializer
 from common.actions import (
     addAttachment, deleteAttachments, convertBase64ToImage, countStatuses)
+from projects.api.serializers import ProjectPermissionUserSerializer
 from common.permissions_scopes import ProjectPermissions
 from projects.models import Project, Department
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.Repository import Repository
 from rest_framework import status
+from tasks.models import Task
 
 
 class ProjectViewSet(Repository):
@@ -21,6 +22,7 @@ class ProjectViewSet(Repository):
     permission_classes = (ProjectPermissions,)
     serializer_action_classes = {
         "trashed": ProjectTrashedSerializer,
+        "get_user": ProjectPermissionUserSerializer
     }
     queryset_actions = {
         "destroy": Project.objects.all(),
@@ -74,6 +76,11 @@ class ProjectViewSet(Repository):
         return destroy(self, request)
 
     # Custom Actions
+    @ action(detail=True, methods=["get"])
+    def get_user(self, request, pk=None):
+        project = self.get_object()
+        return get_user(request, project)
+
     @ action(detail=True, methods=["get"])
     def users(self, request, pk=None):
         project = self.get_object()

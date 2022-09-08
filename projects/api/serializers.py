@@ -206,3 +206,14 @@ class ProjectPermissionActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectPermission
         fields = ["sub_action"]
+
+
+class ProjectPermissionUserSerializer(serializers.ModelSerializer):
+    action = serializers.SerializerMethodField()
+
+    def get_action(self, obj):
+        return ProjectPermissionActionSerializer(obj).data
+
+    class Meta:
+        model = ProjectPermission
+        fields = ["action"]
