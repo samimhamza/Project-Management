@@ -244,6 +244,7 @@ def add_teams(request, project):
     teams = Team.objects.filter(pk__in=data['ids'])
     for team in data['ids']:
         project.teams.add(team)
+    users = User.objects.filter(teams__in=teams)
     for user in users:
         for key, value in data["permissions"].items():
             permissions = ProjectPermission.objects.filter(
@@ -251,7 +252,6 @@ def add_teams(request, project):
             for permission in permissions:
                 p, created = ProjectPermissionUser.objects.get_or_create(
                     project_permission=permission, project=project, user=user)
-
     notification(getAssignNotification,
                  project, request, 'teams__in', data['ids'])
     serializer = LessFieldsTeamSerializer(
@@ -277,6 +277,11 @@ def delete_teams(request, project):
     data = request.data
     for team in data['ids']:
         project.teams.remove(team)
+    users = User.objects.filter(teams__in=data['ids'])
+    for user in users:
+        permissions = ProjectPermissionUser.objects.filter(
+            project=project, user=user)
+        permissions.delete()
     notification(getRevokeNotification,
                  project, request, 'teams__in', data['ids'])
     return Response(status=status.HTTP_204_NO_CONTENT)
