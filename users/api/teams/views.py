@@ -130,15 +130,15 @@ class TeamViewSet(Repository):
             team = self.get_object()
             user = User.objects.get(pk=data["id"])
             userData = UserWithProfileSerializer(
-                user, context={"request": request})
+                user, context={"request": request}).data
             team_user, created = TeamUser.objects.get_or_create(
                 team=team, user=user)
             team_user.position = data["position"]
             team_user.save()
             team_user_serializer = TeamUserSerializer(team_user)
-            userData.data['is_leader'] = team_user_serializer.data['is_leader']
-            userData.data['position'] = team_user_serializer.data['position']
-            return Response(userData.data, status=status.HTTP_201_CREATED)
+            userData['is_leader'] = team_user_serializer.data['is_leader']
+            userData['position'] = team_user_serializer.data['position']
+            return Response(userData, status=status.HTTP_201_CREATED)
         except:
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
