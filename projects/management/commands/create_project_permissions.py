@@ -1,4 +1,4 @@
-from projects.models import Project, ProjectPermission, Action, SubAction
+from projects.models import Project, ProjectPermission, Action, ProjectPermissionUser, SubAction
 from django.core.management.base import BaseCommand
 from users.models import User
 import json
@@ -34,4 +34,8 @@ class Command(BaseCommand):
         user = kwargs['user']
         user_obj = User.objects.get(pk=user)
         permissions = ProjectPermission.objects.all()
-        user_obj.project_user_permissions.set(permissions)
+        for permission in permissions:
+            p, created = ProjectPermissionUser.objects.get_or_create(
+                user=user_obj, project_permission=permission, project=project_obj)
+            # user_obj.project_user_permissions.add(
+            #     permission, project)

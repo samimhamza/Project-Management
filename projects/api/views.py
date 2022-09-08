@@ -220,21 +220,14 @@ class PermmissionListAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request):
-        if request.GET.get("project_id"):
-            try:
-                project = Project.objects.get(pk=request.GET.get("project_id"))
-            except Project.DoesNotExist:
-                return unAuthorized()
-            queryset = self.get_queryset()
-            serializer = self.get_serializer(queryset, many=True)
-            for permission in serializer.data:
-                sub_action_ids = ProjectPermission.objects.filter(
-                    action=permission['id'])
-                actionSerializer = ProjectPermissionActionSerializer(
-                    sub_action_ids, many=True)
-                permission['actions'] = []
-                for action in actionSerializer.data:
-                    permission['actions'].append(action['sub_action'])
-            return Response(serializer.data)
-        else:
-            return Response({"detail": "Project Id is not provided!"}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        for permission in serializer.data:
+            sub_action_ids = ProjectPermission.objects.filter(
+                action=permission['id'])
+            actionSerializer = ProjectPermissionActionSerializer(
+                sub_action_ids, many=True)
+            permission['actions'] = []
+            for action in actionSerializer.data:
+                permission['actions'].append(action['sub_action'])
+        return Response(serializer.data)
