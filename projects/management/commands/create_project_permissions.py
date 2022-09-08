@@ -30,8 +30,8 @@ class Command(BaseCommand):
                 sub_action_obj, created = SubAction.objects.get_or_create(
                     code=sub_action['code'], name=sub_action['name'])
                 permission, created = ProjectPermission.objects.get_or_create(
-                    action=action_obj, sub_action=sub_action_obj, project=project_obj)
+                    action=action_obj, sub_action=sub_action_obj)
         user = kwargs['user']
         user_obj = User.objects.get(pk=user)
         permissions = ProjectPermission.objects.all()
-        user_obj.project_permissions.set(permissions)
+        user_obj.project_user_permissions.set(permissions)

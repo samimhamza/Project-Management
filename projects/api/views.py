@@ -17,7 +17,8 @@ from projects.api.serializers import (
     StateSerializer,
     FocalPointTrashedSerializer,
     ProjectPermissionActionSerializer,
-    ActionSerializer
+    ActionSerializer,
+    SubActionSerializer
 )
 from rest_framework import generics
 from projects.models import (
@@ -27,7 +28,8 @@ from projects.models import (
     State,
     Project,
     Action,
-    ProjectPermission
+    ProjectPermission,
+    SubAction
 )
 from django.shortcuts import render
 
@@ -202,14 +204,14 @@ class MyFocalPointViewSet(viewsets.ModelViewSet):
         return delete(self, request, FocalPoint, imageField="profile", permission="project_focal_points_d")
 
 
-@api_view()
-@permission_classes([IsAuthenticated])
-def ProjectPermissionsList(request):
-    if request.GET.get("project_id"):
-        return Response(getProjectPermissions(
-            request.user, None, request.GET.get("project_id")))
-    else:
-        return Response({"detail": "Project Id is not provided!"}, status=status.HTTP_400_BAD_REQUEST)
+# @api_view()
+# @permission_classes([IsAuthenticated])
+# def ProjectPermissionsList(request):
+#     if request.GET.get("project_id"):
+#         return Response(getProjectPermissions(
+#             request.user, None, request.GET.get("project_id")))
+#     else:
+#         return Response({"detail": "Project Id is not provided!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PermmissionListAPIView(generics.ListAPIView):
@@ -218,14 +220,21 @@ class PermmissionListAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        for permission in serializer.data:
-            sub_action_ids = ProjectPermission.objects.filter(
-                action=permission['id'])
-            actionSerializer = ProjectPermissionActionSerializer(
-                sub_action_ids, many=True)
-            permission['actions'] = []
-            for action in actionSerializer.data:
-                permission['actions'].append(action['sub_action'])
-        return Response(serializer.data)
+        if request.GET.get("project_id"):
+            try:
+                project = Project.objects.get(pk=request.GET.get("project_id"))
+            except Project.DoesNotExist:
+                return unAuthorized()
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            for permission in serializer.data:
+                sub_action_ids = ProjectPermission.objects.filter(
+                    action=permission['id'])
+                actionSerializer = ProjectPermissionActionSerializer(
+                    sub_action_ids, many=True)
+                permission['actions'] = []
+                for action in actionSerializer.data:
+                    permission['actions'].append(action['sub_action'])
+            return Response(serializer.data)
+        else:
+            return Response({"detail": "Project Id is not provided!"}, status=status.HTTP_400_BAD_REQUEST)

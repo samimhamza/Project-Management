@@ -411,10 +411,20 @@ class ProjectPermission(models.Model):
         Action, on_delete=models.CASCADE, related_name="project_action")
     sub_action = models.ForeignKey(
         SubAction, on_delete=models.CASCADE, related_name="project_sub_action")
-    project = models.ForeignKey(
-        Project, related_name="project_role", on_delete=models.CASCADE)
     users = models.ManyToManyField(
-        "users.User", related_name="project_permissions")
+        "users.User", through="ProjectPermissionUser", related_name="project_permission_user")
+
+
+class ProjectPermissionUser(models.Model):
+    project_permission = models.ForeignKey(
+        ProjectPermission, on_delete=models.CASCADE, null=True, related_name='project_permission')
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, null=True, related_name='project_user_permissions')
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="project_permissions")
+
+    class Meta:
+        unique_together = ('project_permission', 'user', 'project')
 
 
 class Stage(models.Model):
