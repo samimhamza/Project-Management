@@ -105,7 +105,7 @@ class TeamPermissions(CustomPermissions):
         'excluded_users': 'users_v',
         'excluded_projects': 'projects_v',
         'add_project': 'teams_u',
-        'delete_user': 'teams_d'
+        'delete_users': 'teams_d'
     }
 
 

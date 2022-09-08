@@ -172,8 +172,8 @@ class TeamViewSet(Repository):
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=["post"])
-    def delete_user(self, request, pk=None):
+    @action(detail=True, methods=["delete"])
+    def delete_users(self, request, pk=None):
         try:
             with transaction.atomic():
                 team = self.get_object()
