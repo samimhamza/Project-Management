@@ -152,7 +152,7 @@ class Role(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
     users = models.ManyToManyField(
-        User, related_name="roles_users")
+        User, related_name="roles_users", blank=True)
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,

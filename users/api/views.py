@@ -118,14 +118,19 @@ class RoleViewSet(Repository):
     def create(self, request):
         data = request.data
         data["created_by"] = request.user
-        new_role = Role.objects.create(
-            name=data["name"],
-            created_by=data["created_by"],
-            updated_by=data["created_by"],
-        )
-        addPermissionsToRole(data['permissions'], new_role)
-        serializer = RoleSerializer(new_role, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(data={"name": data["name"]})
+        if(serializer.is_valid()):
+            new_role = Role.objects.create(
+                name=data["name"],
+                created_by=data["created_by"],
+                updated_by=data["created_by"],
+            )
+            addPermissionsToRole(data['permissions'], new_role)
+            serializer = self.get_serializer(
+                new_role, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         return dataWithPermissions(self, 'roles')
