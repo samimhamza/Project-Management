@@ -157,7 +157,7 @@ def update(self, request, project):
     project.save()
     serializer = self.get_serializer(
         project, context={"request": request})
-    broadcastProject(project, serializer.data)
+    # broadcastProject(project, serializer.data)
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
@@ -186,7 +186,7 @@ def destroy(self, request):
     ids = []
     for id in response.data['deleted_ids']:
         ids.append(str(id))
-    broadcastDeleteProject({'deleted_ids': ids})
+    # broadcastDeleteProject({'deleted_ids': ids})
     return response
 
 
@@ -232,8 +232,8 @@ def add_users(request, project):
             for permission in permissions:
                 p, created = ProjectPermissionUser.objects.get_or_create(
                     project_permission=permission, project=project, user=user)
-    notification(getAssignNotification, project,
-                 request, 'pk__in', data['ids'])
+    # notification(getAssignNotification, project,
+    #              request, 'pk__in', data['ids'])
     serializer = UserWithProfileSerializer(
         users, many=True, context={"request": request})
     return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -252,8 +252,8 @@ def add_teams(request, project):
             for permission in permissions:
                 p, created = ProjectPermissionUser.objects.get_or_create(
                     project_permission=permission, project=project, user=user)
-    notification(getAssignNotification,
-                 project, request, 'teams__in', data['ids'])
+    # notification(getAssignNotification,
+    #              project, request, 'teams__in', data['ids'])
     serializer = LessFieldsTeamSerializer(
         teams, many=True, context={"request": request})
     return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -268,8 +268,8 @@ def delete_users(request, project):
         permissions = ProjectPermissionUser.objects.filter(
             project=project, user=user)
         permissions.delete()
-    notification(getRevokeNotification, project,
-                 request, 'pk__in', data['ids'])
+    # notification(getRevokeNotification, project,
+    #              request, 'pk__in', data['ids'])
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -282,8 +282,8 @@ def delete_teams(request, project):
         permissions = ProjectPermissionUser.objects.filter(
             project=project, user=user)
         permissions.delete()
-    notification(getRevokeNotification,
-                 project, request, 'teams__in', data['ids'])
+    # notification(getRevokeNotification,
+    #              project, request, 'teams__in', data['ids'])
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 

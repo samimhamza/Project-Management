@@ -322,7 +322,7 @@ def update(self, request, task, project=None):
     data = getAttachments(request, data,
                           task.id, "task_attachments_v", project=project)
 
-    #Check For if plan dates changes to update the progress
+    # Check For if plan dates changes to update the progress
     if "p_start_date" in request.data:
         taskProgressCalculator(task)
 
@@ -362,15 +362,17 @@ def progress(request, task):
     serializer = ProgressSerializer(
         userTask)
     serializerData = prepareData(serializer, task)
-    broadcastProgress(serializerData)
+    # broadcastProgress(serializerData)
     return Response(serializerData)
 
-def calculateUsersPerformance(users, project_id = None):
+
+def calculateUsersPerformance(users, project_id=None):
     result = []
     for user in users:
         user_obj = {"name": user.username, "overdue": 0, "normal": 0,
                     "earlier": 0, "notclear": 0}
-        task_ids = UserTask.objects.filter(user=user.id).values_list('task').distinct()
+        task_ids = UserTask.objects.filter(
+            user=user.id).values_list('task').distinct()
 
         tasks = []
         if project_id is None:
@@ -378,7 +380,7 @@ def calculateUsersPerformance(users, project_id = None):
         else:
             tasks = Task.objects.filter(pk__in=task_ids, project=project_id)
 
-        for task in tasks: 
+        for task in tasks:
             if all([task.p_start_date, task.p_end_date, task.a_start_date, task.a_end_date]) is False:
                 user_obj['notclear'] = user_obj['notclear'] + 1
             else:
@@ -394,8 +396,7 @@ def calculateUsersPerformance(users, project_id = None):
     return result
 
 
-
-def taskProgressCalculator(task, type = None):
+def taskProgressCalculator(task, type=None):
     if type == "parent":
         id = task.pk
     else:
@@ -404,7 +405,7 @@ def taskProgressCalculator(task, type = None):
     while id:
         pTask = Task.objects.get(deleted_at__isnull=True, pk=id)
         if pTask:
-            pTask.progress = parentProgressCalculator(pTask,"")
+            pTask.progress = parentProgressCalculator(pTask, "")
             if pTask.progress == 100:
                 pTask.status = "completed"
             else:
@@ -412,9 +413,11 @@ def taskProgressCalculator(task, type = None):
             pTask.save()
         id = pTask.parent_id
 
-    task.project.progress = parentProgressCalculator(task.project_id,"project")
+    task.project.progress = parentProgressCalculator(
+        task.project_id, "project")
     task.project.save()
     return True
+
 
 def selfProgressCalculator(task):
     userTasks = UserTask.objects.filter(task=task.pk)
@@ -435,9 +438,10 @@ def selfProgressCalculator(task):
     task.save()
     return True
 
-def parentProgressCalculator(item,type):
+
+def parentProgressCalculator(item, type):
     if type == "project":
-        tasks = Task.objects.filter(deleted_at__isnull=True, project = item)
+        tasks = Task.objects.filter(deleted_at__isnull=True, project=item)
     else:
         tasks = Task.objects.filter(deleted_at__isnull=True, parent=item.pk)
 
@@ -450,8 +454,5 @@ def parentProgressCalculator(item,type):
                 t.p_start_date, t.p_end_date)
             hours += planDiff.hours
             total += planDiff.hours * t.progress
-            
+
     return int(total/hours)
-
-
-

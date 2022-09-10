@@ -74,7 +74,7 @@ def createComments(self, request):
             )
         serializer = CommentSerializer(
             comment, context={"request": request})
-        broadcastComment(commentable, serializer.data)
+        # broadcastComment(commentable, serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response({'error': 'Object id is not correct'}, status=status.HTTP_400_BAD_REQUEST)
@@ -85,7 +85,7 @@ def updateComments(self, request, pk):
     comment.body = request.data.get('body')
     comment.save()
     serializer = CommentSerializer(comment,  context={"request": request})
-    broadcastComment(comment.object_id, serializer.data, update=True)
+    # broadcastComment(comment.object_id, serializer.data, update=True)
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
@@ -105,5 +105,5 @@ def comments(self, method, request, permission, type="project"):
 
 def destroy(self, request):
     response = delete(self, request, Comment)
-    broadcastDeleteComment(response.data)
+    # broadcastDeleteComment(response.data)
     return response

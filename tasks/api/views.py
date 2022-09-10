@@ -63,14 +63,14 @@ class TaskViewSet(Repository):
     def update(self, request, pk=None):
         task = self.get_object()
         return update(self, request, task)
-    
+
     def destroy(self, request, pk=None):
         task = self.get_object()
         parent = task.parent
         res = delete(self, request, self.model)
-        taskProgressCalculator(parent,"parent")
+        taskProgressCalculator(parent, "parent")
         return res
-    
+
     @action(detail=True, methods=["get"])
     def excluded_users(self, request, pk=None):
         task = self.get_object()
@@ -107,17 +107,19 @@ class TaskViewSet(Repository):
     def employee_task_report(self, request, pk=None):
         users = ''
         if request.query_params.get('project_id'):
-            user_ids = Project.objects.filter(pk = request.GET['project_id']).values_list('users')
-            users = User.objects.filter(deleted_at__isnull=True,pk__in=user_ids)
-            return Response(calculateUsersPerformance(users,request.GET['project_id']))
+            user_ids = Project.objects.filter(
+                pk=request.GET['project_id']).values_list('users')
+            users = User.objects.filter(
+                deleted_at__isnull=True, pk__in=user_ids)
+            return Response(calculateUsersPerformance(users, request.GET['project_id']))
         else:
             if request.query_params.get('user_id'):
-                users = User.objects.filter(pk=request.GET['user_id'])  
+                users = User.objects.filter(pk=request.GET['user_id'])
             else:
                 user_ids = Project.objects.values_list('users')
-                users = User.objects.filter(deleted_at__isnull=True,pk__in=user_ids)[:10]
+                users = User.objects.filter(
+                    deleted_at__isnull=True, pk__in=user_ids)[:10]
             return Response(calculateUsersPerformance(users))
-
 
 
 class ProjectCommentViewSet(viewsets.ModelViewSet):
@@ -137,7 +139,7 @@ class ProjectCommentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         response = delete(self, request, Comment)
-        broadcastDeleteComment(response.data)
+        # broadcastDeleteComment(response.data)
         return response
 
 
@@ -158,5 +160,5 @@ class TaskCommentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         response = delete(self, request, Comment)
-        broadcastDeleteComment(response.data)
+        # broadcastDeleteComment(response.data)
         return response

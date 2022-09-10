@@ -64,7 +64,7 @@ class ProjectViewSet(Repository):
         new_project.save()
         serializer = ProjectSerializer(
             new_project, context={"request": request})
-        broadcastProject(new_project, serializer.data)
+        # broadcastProject(new_project, serializer.data)
         addStagesToProject(new_project, department, request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
