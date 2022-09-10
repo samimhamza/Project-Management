@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['192.168.3.243', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    # 'channels',
     "clients",
     "projects",
     "expenses",
@@ -88,7 +89,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "taskmanager.wsgi.application"
-
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.InMemoryChannelLayer',
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
