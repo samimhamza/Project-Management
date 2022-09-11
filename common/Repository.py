@@ -16,7 +16,7 @@ class Repository(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request):
-        return withTrashed(self, self.model, order_by=self.order_by)
+        return withTrashed(self, self.model, order_by=self.order_by, request=request)
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):

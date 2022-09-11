@@ -56,16 +56,16 @@ class TeamViewSet(Repository):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         for team in serializer.data:
-            team["total_users"] = get_total_users(team["id"])
-            team["leader"] = get_leader_by_id(team["id"])
+            team["total_members"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(team["id"], request)
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
         team = self.get_object()
         serializer = self.get_serializer(team)
         data = serializer.data
-        data["total_users"] = get_total(team)
-        data["leader"] = get_leader(team)
+        data["total_members"] = get_total(team)
+        data["leader"] = get_leader(team, request)
         return Response(data, status=status.HTTP_200_OK)
 
     def create(self, request):
@@ -86,10 +86,10 @@ class TeamViewSet(Repository):
             TeamUser.objects.create(
                 user=user, team=new_team, is_leader=True, position="Leader"
             )
-        serializer = TeamListSerializer(new_team)
+        serializer = TeamListSerializer(new_team, context={"request": request})
         data = serializer.data
-        data["total_users"] = get_total(new_team)
-        data["leader"] = get_leader(new_team)
+        data["total_members"] = get_total(new_team)
+        data["leader"] = get_leader(new_team, request)
         return Response(data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -103,8 +103,8 @@ class TeamViewSet(Repository):
         team.save()
         serializer = self.get_serializer(team)
         data = serializer.data
-        data["total_users"] = get_total(team)
-        data["leader"] = get_leader(team)
+        data["total_members"] = get_total(team)
+        data["leader"] = get_leader(team, request)
         return Response(data, status=status.HTTP_202_ACCEPTED)
 
     # Custom Actions

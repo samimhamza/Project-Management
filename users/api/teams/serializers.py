@@ -27,8 +27,7 @@ class LessFieldsTeamSerializer(serializers.ModelSerializer):
         qs = User.objects.filter(
             deleted_at__isnull=True, teams=team)
         serializer = UserWithProfileSerializer(
-            instance=qs, many=True, read_only=True, context={
-                "request": self.context['request']})
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
         return serializer.data
 
     class Meta:
@@ -39,12 +38,21 @@ class LessFieldsTeamSerializer(serializers.ModelSerializer):
 class TeamListSerializer(serializers.ModelSerializer):
     created_by = UserWithProfileSerializer(read_only=True)
     updated_by = UserWithProfileSerializer(read_only=True)
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, team):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, teams=team)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
+        return serializer.data
 
     class Meta:
         model = Team
         fields = [
             "id",
             "name",
+            "users",
             "description",
             "created_by",
             "updated_by",

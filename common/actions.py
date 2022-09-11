@@ -120,8 +120,9 @@ def withTrashed(self, table, *args, **kwargs):
     serializer = self.get_serializer(page, many=True)
     if table == Team:
         for team in serializer.data:
-            team["total_users"] = get_total_users(team["id"])
-            team["leader"] = get_leader_by_id(team["id"])
+            team["total_members"] = get_total_users(team["id"])
+            team["leader"] = get_leader_by_id(
+                team["id"], request=kwargs.get("request"))
     return self.get_paginated_response(serializer.data)
 
 
