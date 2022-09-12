@@ -408,7 +408,7 @@ def taskProgressCalculator(task, type=None):
             pTask.progress = parentProgressCalculator(pTask, "")
             if pTask.progress == 100:
                 pTask.status = "completed"
-            else:
+            elif task.status == "in_progress":
                 pTask.status = "in_progress"
             pTask.save()
         id = pTask.parent_id
@@ -425,15 +425,13 @@ def selfProgressCalculator(task):
     for ut in userTasks:
         totalProgress += ut.progress
 
-    if userTasks:
+    if userTasks.count():
         calculatedProgress = int(totalProgress / userTasks.count())
     else:
         calculatedProgress = 0
 
     if calculatedProgress == 100:
         task.status = "completed"
-    else:
-        task.status = "in_progress"
     task.progress = calculatedProgress
     task.save()
     return True
@@ -441,7 +439,8 @@ def selfProgressCalculator(task):
 
 def parentProgressCalculator(item, type):
     if type == "project":
-        tasks = Task.objects.filter(deleted_at__isnull=True, project=item)
+        tasks = Task.objects.filter(
+            deleted_at__isnull=True, project=item, parent__isnull=True)
     else:
         tasks = Task.objects.filter(deleted_at__isnull=True, parent=item.pk)
 
@@ -454,5 +453,7 @@ def parentProgressCalculator(item, type):
                 t.p_start_date, t.p_end_date)
             hours += planDiff.hours
             total += planDiff.hours * t.progress
-
-    return int(total/hours)
+    if hours:
+        return int(total/hours)
+    else:
+        return 0

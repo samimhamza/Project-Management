@@ -1,12 +1,8 @@
-from urllib import response
-from .serializers import UserTaskSerializer
-from ..models import UserTask
-from projects.models import Project
 from tasks.api.serializers import (
     TaskSerializer, LessFieldsTaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from common.permissions_scopes import TaskPermissions, ProjectCommentPermissions, TaskCommentPermissions
-from tasks.actions import (
-    delete_dependencies, excluded_users, progress, tasksOfProject, tasksResponse, create, update, calculateUsersPerformance, taskProgressCalculator)
+from tasks.actions import (delete_dependencies, excluded_users, progress, tasksOfProject,
+                           tasksResponse, create, update, calculateUsersPerformance, taskProgressCalculator)
 from common.comments import listComments, createComments, updateComments, broadcastDeleteComment
 from common.actions import (
     delete, allItems, filterRecords, addAttachment, deleteAttachments, getAttachments)
@@ -16,6 +12,7 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from common.Repository import Repository
 from tasks.models import Task, Comment
+from projects.models import Project
 from users.models import User
 
 
