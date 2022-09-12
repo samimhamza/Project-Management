@@ -67,6 +67,7 @@ def countTime(table, countables, project_id=None):
 
 
 def filterRecords(queryset, request, columns=[], **kwargs):
+    special_like_columns = ["first_name", "title", "source", "contact_name"]
     data = request.query_params
     if request.query_params.get('content'):
         queries = Q()
@@ -87,6 +88,19 @@ def filterRecords(queryset, request, columns=[], **kwargs):
                 exactValue = value[7:]
                 queryset = queryset.filter(**{key: exactValue})
                 continue
+
+            elif value.startswith('special_like@@'):
+                likeValue = value[14:]
+                if getattr(kwargs.get("table"), key, False):
+                    queryset = queryset.filter(
+                        **{"%s__icontains" % key: likeValue})
+                    continue
+                else:
+                    for item in special_like_columns:
+                        if getattr(kwargs.get("table"), item, False):
+                            queryset = queryset.filter(
+                                **{"%s__icontains" % item: likeValue})
+                            continue
 
             elif "__" in key:
                 queryset = queryset.filter(**{key: value})
