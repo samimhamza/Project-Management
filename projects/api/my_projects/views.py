@@ -10,6 +10,8 @@ from rest_framework.decorators import action
 from common.Repository import Repository
 from projects.models import Project
 from rest_framework import status
+from django.db.models import Q
+from users.models import Team
 
 
 class MyProjectViewSet(Repository):
@@ -24,12 +26,15 @@ class MyProjectViewSet(Repository):
     }
 
     def list(self, request):
-        queryset = self.get_queryset().filter(users=request.user)
+        teams = Team.objects.only("id").filter(users=request.user)
+        queryset = self.get_queryset().filter(Q(users=request.user) | Q(teams__in=teams))
         return list(self, request, queryset, showPermissions=True)
 
     def retrieve(self, request, pk=None):
         try:
-            project = Project.objects.get(pk=pk, users=request.user)
+            teams = Team.objects.only("id").filter(users=request.user)
+            project = Project.objects.filter(
+                Q(users=request.user) | Q(teams__in=teams)).get(pk=pk)
         except Project.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return retrieve(self, request, project, showPermission=True)

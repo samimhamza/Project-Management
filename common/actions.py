@@ -70,7 +70,6 @@ def searchContent(queryset, columns, special_like_columns, data, ** kwargs):
     if data.get('content'):
         queries = Q()
         if kwargs.get("specialCase") is not None:
-            queries = Q()
             for item in special_like_columns:
                 if getattr(kwargs.get("table"), item, False):
                     queries = queries | Q(
