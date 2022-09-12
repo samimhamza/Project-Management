@@ -66,16 +66,31 @@ def countTime(table, countables, project_id=None):
     return totals
 
 
+def searchContent(queryset, columns, special_like_columns, data, ** kwargs):
+    if data.get('content'):
+        queries = Q()
+        if kwargs.get("specialCase") is not None:
+            queries = Q()
+            for item in special_like_columns:
+                if getattr(kwargs.get("table"), item, False):
+                    queries = queries | Q(
+                        **{"%s__icontains" % item: data.get('content')})
+            queryset = queryset.filter(queries)
+        else:
+            for column in columns:
+                queries = queries | Q(
+                    **{'%s__icontains' % column: data.get('content')})
+            queryset = queryset.filter(queries)
+    return queryset
+
+
 def filterRecords(queryset, request, columns=[], **kwargs):
-    special_like_columns = ["first_name", "last_name",
+    special_like_columns = ["name", "first_name", "last_name",
                             "title", "source", "contact_name", "contact_last_name"]
     data = request.query_params
-    if request.query_params.get('content'):
-        queries = Q()
-        for column in columns:
-            queries = queries | Q(
-                **{'%s__icontains' % column: request.query_params.get('content')})
-        queryset = queryset.filter(queries)
+    queryset = searchContent(queryset, columns,
+                             special_like_columns, data, **kwargs)
+
     for key, value in data.lists():
         if len(value) == 1:
             value = value[0]
@@ -148,7 +163,8 @@ def trashList(self, table, request, *args, **kwargs):
         table.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
     )
     columns = ['name']
-    queryset = filterRecords(queryset, request, columns, table=table)
+    queryset = filterRecords(queryset, request, columns,
+                             table=table, specialCase=True)
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
