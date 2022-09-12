@@ -11,6 +11,7 @@ from rest_framework import status
 from projects.models import Country
 import os
 
+
 class ClientViewSet(Repository):
     model = Client
     queryset = Client.objects.filter(
@@ -27,7 +28,8 @@ class ClientViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Client)
+        columns = ['first_name', 'last_name', 'email', 'phone', 'whatsapp']
+        queryset = filterRecords(queryset, request, columns, table=Client)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ClientListSerializer, queryset)
         if request.GET.get("items_per_page") == "-2":
@@ -88,7 +90,7 @@ class ClientViewSet(Repository):
                 if os.path.isfile('media/'+str(client.profile)):
                     os.remove('media/'+str(client.profile))
                 client.profile = imageField
-       
+
         if request.data.get('country'):
             try:
                 country = Country.objects.get(pk=request.data["country"])
