@@ -20,7 +20,7 @@ class Repository(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def trashed(self, request):
-        return trashList(self, self.model)
+        return trashList(self, self.model, request)
 
     @action(detail=False, methods=["put"])
     def restore(self, request, pk=None):

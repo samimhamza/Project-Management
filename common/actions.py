@@ -126,10 +126,12 @@ def withTrashed(self, table, *args, **kwargs):
     return self.get_paginated_response(serializer.data)
 
 
-def trashList(self, table, *args, **kwargs):
+def trashList(self, table, request, *args, **kwargs):
     queryset = self.filter_queryset(
         table.objects.filter(deleted_at__isnull=False).order_by("-deleted_at")
     )
+    columns = ['name']
+    queryset = filterRecords(queryset, request, columns, table=table)
     page = self.paginate_queryset(queryset)
     serializer = self.get_serializer(page, many=True)
     return self.get_paginated_response(serializer.data)
