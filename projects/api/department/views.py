@@ -19,7 +19,8 @@ class DepartmentViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Department)
+        columns = ["name"]
+        queryset = filterRecords(queryset, request, columns, table=Department)
         if request.GET.get("items_per_page") == "-1":
             return allItems(DepartmentSerializer, queryset)
         if request.GET.get("items_per_page") == "-2":

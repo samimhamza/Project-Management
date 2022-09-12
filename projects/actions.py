@@ -119,7 +119,8 @@ def addStagesToProject(project, department, request):
 
 # ProjectViewSet and MyProjectViewSet list function
 def list(self, request, queryset, showPermissions=False):
-    queryset = filterRecords(queryset, request, table=Project)
+    columns = ["name", "progress"]
+    queryset = filterRecords(queryset, request, columns, table=Project)
     if request.GET.get("items_per_page") == "-1":
         return allItems(ProjectNameListSerializer, queryset)
     if request.GET.get("items_per_page") == "-2":

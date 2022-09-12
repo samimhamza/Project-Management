@@ -21,7 +21,8 @@ class ProductViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Product)
+        columns = ["name", "developed_by"]
+        queryset = filterRecords(queryset, request, columns, table=Product)
         if request.GET.get("items_per_page") == "-1" or request.GET.get("items_per_page") == "-2":
             if request.GET.get("lessData"):
                 serializer = ProductListSerializer(

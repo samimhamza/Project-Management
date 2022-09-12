@@ -20,7 +20,8 @@ class ServiceViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request, table=Service)
+        columns = ["name"]
+        queryset = filterRecords(queryset, request, columns, table=Service)
         if request.GET.get("items_per_page") == "-1":
             return allItems(ServiceListSerializer, queryset)
         if request.GET.get("items_per_page") == "-2":

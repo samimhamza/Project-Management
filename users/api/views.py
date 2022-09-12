@@ -104,7 +104,8 @@ class RoleViewSet(Repository):
 
     def list(self, request):
         queryset = self.get_queryset()
-        queryset = filterRecords(queryset, request,  table=Role)
+        columns = ["name"]
+        queryset = filterRecords(queryset, request,  columns, table=Role)
         if request.GET.get("items_per_page") == "-1":
             return allItems(RoleListSerializer, queryset)
         if request.GET.get("items_per_page") == "-2":
