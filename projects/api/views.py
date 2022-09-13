@@ -165,7 +165,7 @@ class MyFocalPointViewSet(viewsets.ModelViewSet):
     model = FocalPoint
     queryset = FocalPoint.objects.all()
     serializer_class = FocalPointSerializer
-    permission_classes = (FocalPointPermissions,)
+    permission_classes = (IsAuthenticated,)
     serializer_action_classes = {
         "trashed": FocalPointTrashedSerializer
     }

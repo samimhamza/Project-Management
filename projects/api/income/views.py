@@ -192,8 +192,20 @@ class MyPaymentViewSet(viewsets.ModelViewSet):
     def list(self, request):
         return Response([])
 
-    def retrieve(self, request):
-        return Response([])
+    def retrieve(self, request, pk=None):
+        if request.GET.get("project_id"):
+            try:
+                project = Project.objects.get(pk=request.GET.get("project_id"))
+            except Project.DoesNotExist:
+                return unAuthorized()
+            if checkProjectScope(request.user, project, "project_incomes_v"):
+                payment = Payment.objects.get(pk=pk)
+                serializer = self.get_serializer(payment)
+                return Response(serializer.data)
+            else:
+                return unAuthorized()
+        else:
+            return unAuthorized()
 
     def create(self, request):
         data = request.data

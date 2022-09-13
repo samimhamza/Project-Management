@@ -27,14 +27,15 @@ class MyProjectViewSet(Repository):
 
     def list(self, request):
         teams = Team.objects.only("id").filter(users=request.user)
-        queryset = self.get_queryset().filter(Q(users=request.user) | Q(teams__in=teams))
+        queryset = self.get_queryset().filter(
+            Q(users=request.user) | Q(teams__in=teams)).distinct()
         return list(self, request, queryset, showPermissions=True)
 
     def retrieve(self, request, pk=None):
         try:
             teams = Team.objects.only("id").filter(users=request.user)
             project = Project.objects.filter(
-                Q(users=request.user) | Q(teams__in=teams)).get(pk=pk)
+                Q(users=request.user) | Q(teams__in=teams)).distinct().get(pk=pk)
         except Project.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return retrieve(self, request, project, showPermission=True)

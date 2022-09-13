@@ -1,4 +1,4 @@
-from projects.models import Action, SubAction, ProjectPermission
+from projects.models import Action, SubAction, ProjectPermission, ProjectPermissionUser
 from rest_framework import serializers
 
 
@@ -21,3 +21,11 @@ class ProjectPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectPermission
         fields = ["action", "sub_action"]
+
+
+class ProjectPermissionUserSerializer(serializers.ModelSerializer):
+    project_permission = ProjectPermissionSerializer()
+
+    class Meta:
+        model = ProjectPermissionUser
+        fields = ["project_permission"]

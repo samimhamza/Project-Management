@@ -1,20 +1,21 @@
-from projects.api.my_projects.serializers import ProjectPermissionSerializer
+from projects.api.my_projects.serializers import ProjectPermissionSerializer, ProjectPermissionUserSerializer
+from projects.models import Project, ProjectPermission, ProjectPermissionUser
 from users.api.serializers import PermissionSerializer
-from projects.models import Project, ProjectPermission
 from users.models import Permission, Role
 from django.db.models import Q
 
 
 def projectPermissions(user, project, permissions):
     try:
-        permissions_list = ProjectPermission.objects.filter(
-            users=user, project=project)
+        project_permissions_user = ProjectPermissionUser.objects.only('project_permission').filter(
+            project=project, user=user).distinct()
     except:
         return []
-    serializer = ProjectPermissionSerializer(permissions_list, many=True)
+    serializer = ProjectPermissionUserSerializer(
+        project_permissions_user, many=True)
     for permission in serializer.data:
-        per = permission['action']['name']
-        action = permission['sub_action']['code']
+        per = permission['project_permission']['action']['name']
+        action = permission['project_permission']['sub_action']['code']
         code = per + "_" + action
         if code not in permissions:
             permissions.append(code)
