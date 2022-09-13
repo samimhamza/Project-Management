@@ -2,7 +2,22 @@ from users.api.serializers import UserWithProfileSerializer
 from projects.api.serializers import LocationSerializer
 from rest_framework import serializers
 from projects.models import Project
-from users.models import User
+from users.models import User, Team
+
+
+class TeamUserSerializer(serializers.ModelSerializer):
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, team):
+        qs = User.objects.filter(
+            deleted_at__isnull=True, teams=team)
+        serializer = UserWithProfileSerializer(
+            instance=qs, many=True, read_only=True, context={"request": self.context['request']})
+        return serializer.data
+
+    class Meta:
+        model = Team
+        fields = ["users"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -14,9 +29,20 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_users(self, project):
         qs = User.objects.filter(
             deleted_at__isnull=True, project_users=project)
-        serializer = UserWithProfileSerializer(
+        team_users = Team.objects.filter(projects=project)
+        serializer1 = TeamUserSerializer(
+            instance=team_users, many=True, read_only=True, context={"request": self.context['request']})
+        serializer2 = UserWithProfileSerializer(
             instance=qs, many=True, read_only=True, context={"request": self.context['request']})
-        return serializer.data
+        users = []
+        for data in serializer1.data:
+            for user in data["users"]:
+                if user not in users:
+                    users.append(user)
+        for user in serializer2.data:
+            if user not in users:
+                users.append(user)
+        return users
 
     class Meta:
         model = Project
