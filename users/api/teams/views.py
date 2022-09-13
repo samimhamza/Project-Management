@@ -30,7 +30,6 @@ class TeamViewSet(Repository):
     permission_classes = (TeamPermissions,)
     serializer_action_classes = {
         "retrieve": TeamRetieveSerializer,
-        "update": TeamRetieveSerializer,
         "add_project": ProjectTeamSerializer,
         "trashed": TeamTrashedSerializer
     }
@@ -81,8 +80,8 @@ class TeamViewSet(Repository):
             created_by=data["created_by"],
             updated_by=data["created_by"],
         )
-        if request.data.get("team_leader"):
-            user = get_object_or_404(User, pk=request.data.get("team_leader"))
+        if request.data.get("leader"):
+            user = get_object_or_404(User, pk=request.data.get("leader"))
             TeamUser.objects.create(
                 user=user, team=new_team, is_leader=True, position="Leader"
             )
@@ -101,7 +100,19 @@ class TeamViewSet(Repository):
                 setattr(team, key, value)
         team.updated_by = request.user
         team.save()
-        serializer = self.get_serializer(team)
+        if request.data.get("leader"):
+            user = get_object_or_404(User, pk=request.data.get("leader"))
+            try:
+                prev_leader = TeamUser.objects.get(team=team, is_leader=True)
+                prev_leader.delete()
+            except:
+                pass
+            teamUser, created = TeamUser.objects.get_or_create(
+                user=user, team=team)
+            teamUser.is_leader = True
+            teamUser.position = "Leader"
+            teamUser.save()
+        serializer = self.get_serializer(team,  context={"request": request})
         data = serializer.data
         data["total_members"] = get_total(team)
         data["leader"] = get_leader(team, request)
