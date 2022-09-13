@@ -27,7 +27,7 @@ def userPromissions(user, permissions):
         Q(users=user) | Q(roles__in=user_role)).filter(
             Q(action__name__icontains="project") | Q(action__name__icontains="task") |
             Q(action__name__icontains="expense") | Q(action__name__icontains="income") |
-            Q(action__name__icontains="focal_point"))
+            Q(action__name__icontains="focal_point") | Q(action__name__icontains="dashboard"))
     serializer2 = PermissionSerializer(permissions_list2, many=True)
     for permission in serializer2.data:
         per = permission['action']['name']
