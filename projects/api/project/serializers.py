@@ -101,3 +101,10 @@ class ProjectTrashedSerializer(serializers.ModelSerializer):
             "updated_by",
             "deleted_by"
         ]
+
+
+class ProjectSerializer2(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = ["name"]
