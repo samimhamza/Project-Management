@@ -362,7 +362,7 @@ def progress(request, task):
     serializer = ProgressSerializer(
         userTask)
     serializerData = prepareData(serializer, task)
-    # broadcastProgress(serializerData)
+    broadcastProgress(serializerData)
     return Response(serializerData)
 
 
