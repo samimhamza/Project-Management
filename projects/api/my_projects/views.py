@@ -45,7 +45,7 @@ class MyProjectViewSet(Repository):
 
     def update(self, request, pk=None):
         try:
-            project = Project.objects.get(pk=pk, users=request.user)
+            project = Project.objects.get(pk=pk)
         except Project.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         if checkProjectScope(request.user, project, "projects_u"):
