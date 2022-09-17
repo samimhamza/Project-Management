@@ -37,7 +37,7 @@ ALLOWED_HOSTS = ['192.168.3.243', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
+    'channels',
     "clients",
     "projects",
     "expenses",
