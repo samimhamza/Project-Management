@@ -440,7 +440,7 @@ def selfProgressCalculator(task):
 def parentProgressCalculator(item, type):
     if type == "project":
         tasks = Task.objects.filter(
-            deleted_at__isnull=True, project=item, parent__isnull=True)
+            deleted_at__isnull=True, project=item, type="stage")
     else:
         tasks = Task.objects.filter(deleted_at__isnull=True, parent=item.pk)
 
@@ -457,3 +457,21 @@ def parentProgressCalculator(item, type):
         return int(total/hours)
     else:
         return 0
+
+
+def emp_task_report(request):
+    users = ''
+    if request.query_params.get('project_id'):
+        user_ids = Project.objects.filter(
+            pk=request.GET['project_id']).values_list('users')
+        users = User.objects.filter(
+            deleted_at__isnull=True, pk__in=user_ids)
+        return Response(calculateUsersPerformance(users, request.GET['project_id']))
+    else:
+        if request.query_params.get('user_id'):
+            users = User.objects.filter(pk=request.GET['user_id'])
+        else:
+            user_ids = Project.objects.values_list('users')
+            users = User.objects.filter(
+                deleted_at__isnull=True, pk__in=user_ids)[:10]
+        return Response(calculateUsersPerformance(users))

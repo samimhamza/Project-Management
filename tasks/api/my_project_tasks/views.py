@@ -2,7 +2,7 @@ from common.comments import comments, destroy, listComments, createComments, upd
 from common.actions import (
     addAttachment, deleteAttachments, getAttachments, filterRecords, unAuthorized, delete)
 from tasks.actions import (
-    delete_dependencies, excluded_users, progress, tasksOfProject, create, update)
+    delete_dependencies, emp_task_report, excluded_users, progress, tasksOfProject, create, update)
 from tasks.api.serializers import (
     TaskSerializer, CommentSerializer, TaskListSerializer, TaskTrashedSerializer)
 from rest_framework.permissions import IsAuthenticated
@@ -33,7 +33,9 @@ class MyTaskViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         if request.GET.get("project_id"):
             if checkProjectScope(request.user, None, "project_tasks_v", project_id=request.GET.get("project_id")):
-                queryset = filterRecords(queryset, request, table=Task)
+                columns = ['name']
+                queryset = filterRecords(
+                    queryset, request, columns, table=Task)
                 return tasksOfProject(self, request, queryset)
             else:
                 return unAuthorized()
@@ -114,6 +116,10 @@ class MyTaskViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         return delete(self, request, Task, permission="project_tasks_d")
+
+    @action(detail=False, methods=['get'])
+    def employee_task_report(self, request, pk=None):
+        return emp_task_report(request)
 
 
 class MyProjectCommentViewSet(viewsets.ModelViewSet):
